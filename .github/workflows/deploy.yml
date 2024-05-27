@@ -26,7 +26,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/PetPalApp-images:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/petpalapp-images:latest
           no-cache: true # Tambahkan ini untuk menghindari cache
 
   deploy-prod:
@@ -43,9 +43,9 @@ jobs:
           script: |
             docker stop petpalapp || true
             docker rm petpalapp || true
-            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/PetPalApp-images:latest || true
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/petpalapp-images:latest || true
             docker images -q --filter "dangling=true" | xargs -r docker rmi || true
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/PetPalApp-images:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/petpalapp-images:latest
             docker run -d -p 80:8080 \
               -e DBUSER=${{ secrets.DBUSER }} \
               -e DBPASS=${{ secrets.DBPASS }} \
@@ -57,4 +57,4 @@ jobs:
               -e S3ACCESKEY=${{ secrets.S3ACCESKEY }} \
               -e S3SECRETACCESKEY=${{ secrets.S3SECRETACCESKEY }} \
               -e VALIDATLOCALORSERVER=${{ secrets.VALIDATLOCALORSERVER }} \
-              --name petpalapp ${{ secrets.DOCKERHUB_USERNAME }}/PetPalApp-images:latest
+              --name petpalapp ${{ secrets.DOCKERHUB_USERNAME }}/petpalapp-images:latest
