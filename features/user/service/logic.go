@@ -60,3 +60,10 @@ func (u *userService) Login(email string, password string) (data *user.Core, tok
 	}
 	return data, token, nil
 }
+
+func (u *userService) GetProfile(id uint) (data *user.Core, err error) {
+	if id <= 0 {
+		return nil, errors.New("[validation] id not valid")
+	}
+	return u.userData.SelectById(id)
+}

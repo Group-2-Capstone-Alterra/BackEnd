@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"PetPalApp/app/middlewares"
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/helper"
 
@@ -22,4 +23,5 @@ func InitRouter(e *echo.Echo, db *gorm.DB) {
 
 	e.POST("/user/register", userHandlerAPI.Register)
 	e.POST("/user/login", userHandlerAPI.Login)
+	e.GET("/user/profile", userHandlerAPI.Profile, middlewares.JWTMiddleware())
 }
