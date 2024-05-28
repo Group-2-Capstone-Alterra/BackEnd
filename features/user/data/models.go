@@ -6,9 +6,10 @@ import (
 
 type User struct {
 	gorm.Model
-	Nama         string `json:"nama" form:"nama"`
-	Email        string `gorm:"unique" json:"email" form:"email"`
-	Password     string `json:"password" form:"password"`
-	TanggalLahir string `json:"tanggal_lahir" form:"tanggal_lahir"`
-	Foto         string `json:"foto" form:"foto"`
+	FullName       string `json:"FullName" form:"FullName"`
+	Email          string `gorm:"unique" json:"email" form:"email"`
+	NumberPhone    string `gorm:"unique" json:"NumberPhone" form:"NumberPhone"`
+	Address        string `json:"Address" form:"Address"`
+	Password       string `json:"Password" form:"Password"`
+	ProfilePicture string `json:"ProfilePicture" form:"ProfilePicture"`
 }
