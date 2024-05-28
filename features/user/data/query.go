@@ -27,3 +27,13 @@ func (u *userQuery) Insert(input user.Core) error {
 	}
 	return nil
 }
+
+func (u *userQuery) SelectByEmail(email string) (*user.Core, error) {
+	var userData User
+	tx := u.db.Where("email = ?", email).First(&userData)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var usercore = UserGormToUserCore(userData)
+	return &usercore, nil
+}
