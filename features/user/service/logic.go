@@ -3,18 +3,21 @@ package service
 import (
 	"PetPalApp/features/user"
 	"PetPalApp/utils/encrypts"
+	"PetPalApp/utils/helper"
 	"errors"
 )
 
 type userService struct {
-	userData    user.DataInterface
-	hashService encrypts.HashInterface
+	userData      user.DataInterface
+	hashService   encrypts.HashInterface
+	helperService helper.HelperInterface
 }
 
-func New(ud user.DataInterface, hash encrypts.HashInterface) user.ServiceInterface {
+func New(ud user.DataInterface, hash encrypts.HashInterface, helper helper.HelperInterface) user.ServiceInterface {
 	return &userService{
-		userData:    ud,
-		hashService: hash,
+		userData:      ud,
+		hashService:   hash,
+		helperService: helper,
 	}
 }
 

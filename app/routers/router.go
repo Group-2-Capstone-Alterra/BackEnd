@@ -2,6 +2,7 @@ package routers
 
 import (
 	"PetPalApp/utils/encrypts"
+	"PetPalApp/utils/helper"
 
 	_userData "PetPalApp/features/user/data"
 	_userHandler "PetPalApp/features/user/handler"
@@ -13,9 +14,10 @@ import (
 
 func InitRouter(e *echo.Echo, db *gorm.DB) {
 	hashService := encrypts.NewHashService()
+	helperService := helper.NewHelperService()
 
-	userData := _userData.New(db)
-	userService := _userService.New(userData, hashService)
+	userData := _userData.New(db, helperService)
+	userService := _userService.New(userData, hashService, helperService)
 	userHandlerAPI := _userHandler.New(userService, hashService)
 
 	e.POST("/user/register", userHandlerAPI.Register)

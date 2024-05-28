@@ -16,6 +16,7 @@ type UserRequest struct {
 	RetypePassword string `json:"RetypePassword" form:"RetypePassword"`
 	ProfilePicture string `json:"ProfilePicture" form:"ProfilePicture"`
 }
+
 type LoginRequest struct {
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
