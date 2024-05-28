@@ -15,30 +15,30 @@ type UserResponse struct {
 	Token          string `json:"token,omitempty"`
 }
 
-func ResponseProfile(userResponse *user.Core) UserResponse {
+func ResponseProfile(userGorm user.Core) UserResponse {
 	result := UserResponse{
-		ID:             userResponse.ID,
-		FullName:       userResponse.FullName,
-		Email:          userResponse.Email,
-		NumberPhone:    userResponse.NumberPhone,
-		Address:        userResponse.Address,
-		Password:       userResponse.Password,
-		ProfilePicture: userResponse.ProfilePicture,
+		ID:             userGorm.ID,
+		FullName:       userGorm.FullName,
+		Email:          userGorm.Email,
+		NumberPhone:    userGorm.NumberPhone,
+		Address:        userGorm.Address,
+		ProfilePicture: userGorm.ProfilePicture,
 	}
 	return result
 }
 
-// func CoreToGorm(userGorm user.Core) UserResponse {
-// 	userCore := UserResponse{
-// 		ID:           userGorm.ID,
-// 		Nama:         userGorm.Nama,
-// 		Email:        userGorm.Email,
-// 		TanggalLahir: userGorm.TanggalLahir,
-// 		Foto:         userGorm.Foto,
-// 	}
-
-// 	return userCore
-// }
+func CoreToGorm(userGorm user.Core) UserResponse {
+	userCore := UserResponse{
+		ID:             userGorm.ID,
+		FullName:       userGorm.FullName,
+		Email:          userGorm.Email,
+		NumberPhone:    userGorm.NumberPhone,
+		Address:        userGorm.Address,
+		Password:       userGorm.Password,
+		ProfilePicture: userGorm.ProfilePicture,
+	}
+	return userCore
+}
 
 func ResponseLogin(userResponse *user.Core) UserResponse {
 	result := UserResponse{

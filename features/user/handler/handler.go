@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"PetPalApp/app/middlewares"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/responses"
+	"log"
 	"net/http"
 	"strings"
 
@@ -55,4 +57,15 @@ func (uh *UserHandler) Login(c echo.Context) error {
 	result.Token = token
 	var resultResponse = ResponseLogin(result)
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success login", resultResponse))
+}
+
+func (uh *UserHandler) Profile(c echo.Context) error {
+	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	log.Println("idtoken:", idToken)
+	userData, err := uh.userService.GetProfile(uint(idToken)) // Ambil data pengguna dari Redis
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error get user data", nil))
+	}
+	userResponse := ResponseProfile(*userData)
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get profile", userResponse))
 }
