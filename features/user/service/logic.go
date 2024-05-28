@@ -6,6 +6,9 @@ import (
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/helper"
 	"errors"
+	"fmt"
+	"io"
+	"time"
 )
 
 type userService struct {
@@ -36,7 +39,7 @@ func (u *userService) Create(input user.Core) (string, error) {
 		}
 		input.Password = result
 	}
-	defaultPhoto := "https://air-bnb.s3.ap-southeast-2.amazonaws.com/fotoprofile/default-pp.jpg"
+	defaultPhoto := "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg"
 	input.ProfilePicture = defaultPhoto
 	err := u.userData.Insert(input)
 	if err != nil {
@@ -66,4 +69,36 @@ func (u *userService) GetProfile(id uint) (data *user.Core, err error) {
 		return nil, errors.New("[validation] id not valid")
 	}
 	return u.userData.SelectById(id)
+}
+
+func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handlerFilename string) (string, error) {
+	if id <= 0 {
+		return "", errors.New("id not valid")
+	} else if input.FullName == "" || input.Email == "" {
+		return "", errors.New("nama/email tidak boleh kosong")
+	}
+
+	if input.Password != "" {
+		result, errHash := u.hashService.HashPassword(input.Password)
+		if errHash != nil {
+			return "", errHash
+		}
+		input.Password = result
+	}
+
+	if file != nil && handlerFilename != "" {
+		timestamp := time.Now().Unix()
+		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+		photoFileName, errPhoto := u.helperService.UploadProfilePicture(file, fileName)
+		if errPhoto != nil {
+			return "", errPhoto
+		}
+		input.ProfilePicture = photoFileName
+	}
+
+	err := u.userData.PutById(id, input)
+	if err != nil {
+		return "", err
+	}
+	return input.ProfilePicture, nil
 }

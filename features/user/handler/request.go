@@ -26,8 +26,10 @@ func RequestToCore(input UserRequest) user.Core {
 	inputCore := user.Core{
 		FullName:       input.FullName,
 		Email:          input.Email,
+		NumberPhone:    input.NumberPhone,
+		Address:        input.Address,
 		Password:       input.Password,
-		RetypePassword: input.RetypePassword,
+		ProfilePicture: input.ProfilePicture,
 	}
 	return inputCore
 }

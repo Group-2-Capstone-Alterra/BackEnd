@@ -1,6 +1,7 @@
 package user
 
 import (
+	"io"
 	"time"
 )
 
@@ -22,10 +23,12 @@ type DataInterface interface {
 	Insert(input Core) error
 	SelectByEmail(email string) (*Core, error)
 	SelectById(id uint) (*Core, error)
+	PutById(id uint, input Core) error
 }
 
 type ServiceInterface interface {
 	Create(input Core) (string, error)
 	Login(email string, password string) (data *Core, token string, err error)
 	GetProfile(id uint) (data *Core, err error)
+	UpdateById(id uint, input Core, file io.Reader, handlerFilename string) (string, error)
 }

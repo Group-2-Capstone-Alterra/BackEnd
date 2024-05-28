@@ -6,6 +6,7 @@ import (
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/responses"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"strings"
 
@@ -68,4 +69,44 @@ func (uh *UserHandler) Profile(c echo.Context) error {
 	}
 	userResponse := ResponseProfile(*userData)
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get profile", userResponse))
+}
+
+func (uh *UserHandler) UpdateUserById(c echo.Context) error {
+	idToken := middlewares.ExtractTokenUserId(c)
+	updatedUser := UserRequest{}
+	errBind := c.Bind(&updatedUser)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind"+errBind.Error(), nil))
+	}
+
+	var file multipart.File
+	var handler *multipart.FileHeader
+	var err error
+
+	file, handler, err = c.Request().FormFile("ProfilePicture")
+	if err != nil {
+		if err != http.ErrMissingFile {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Unable to upload photo: " + err.Error(),
+			})
+		}
+		// Handle the case where no file was uploaded
+		file = nil
+		handler = nil
+	} else {
+		defer file.Close()
+	}
+
+	inputCore := RequestToCore(updatedUser)
+
+	var filename string
+	if handler != nil {
+		filename = handler.Filename
+	}
+
+	_, errUpdate := uh.userService.UpdateById(uint(idToken), inputCore, file, filename)
+	if errUpdate != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", errUpdate))
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", nil))
 }

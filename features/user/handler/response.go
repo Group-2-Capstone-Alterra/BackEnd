@@ -7,12 +7,12 @@ import (
 type UserResponse struct {
 	ID             uint   `json:"id,omitempty"`
 	FullName       string `json:"FullName,omitempty"`
-	Email          string `json:"email,omitempty"`
-	NumberPhone    string `json:"tanggal_lahir,omitempty"`
-	Address        string `json:"foto,omitempty"`
+	Email          string `json:"Email,omitempty"`
+	NumberPhone    string `json:"NumberPhone,omitempty"`
+	Address        string `json:"Address,omitempty"`
 	Password       string `json:"Password,omitempty"`
 	ProfilePicture string `json:"ProfilePicture,omitempty"`
-	Token          string `json:"token,omitempty"`
+	Token          string `json:"Token,omitempty"`
 }
 
 func ResponseProfile(userGorm user.Core) UserResponse {
