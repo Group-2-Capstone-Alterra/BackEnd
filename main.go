@@ -4,6 +4,7 @@ import (
 	"PetPalApp/app/configs"
 	"PetPalApp/app/databases"
 	"PetPalApp/app/migrations"
+	"PetPalApp/app/routers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,6 +20,6 @@ func main() {
 	// e.Use(middlewares.RemoveTrailingSlash)
 	// e.Use(middleware.CORSWithConfig(middlewares.CORSConfig()))
 
-	// routers.InitRouter(e, dbMysql, s3Client, cfg, s3Bucket)
+	routers.InitRouter(e, dbMysql)
 	e.Logger.Fatal(e.Start(":8080"))
 }
