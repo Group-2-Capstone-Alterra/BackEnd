@@ -1,6 +1,7 @@
 package service
 
 import (
+	"PetPalApp/app/middlewares"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/helper"
@@ -42,4 +43,20 @@ func (u *userService) Create(input user.Core) (string, error) {
 		return "", err
 	}
 	return input.ProfilePicture, nil
+}
+
+func (u *userService) Login(email string, password string) (data *user.Core, token string, err error) {
+	data, err = u.userData.SelectByEmail(email)
+	if err != nil {
+		return nil, "", err
+	}
+	isLoginValid := u.hashService.CheckPasswordHash(data.Password, password)
+	if !isLoginValid {
+		return nil, "", errors.New("[validation] password tidak sesuai")
+	}
+	token, errJWT := middlewares.CreateToken(int(data.ID))
+	if errJWT != nil {
+		return nil, "", errJWT
+	}
+	return data, token, nil
 }
