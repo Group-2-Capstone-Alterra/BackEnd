@@ -2,6 +2,7 @@ package data
 
 import (
 	"PetPalApp/features/user"
+	"PetPalApp/utils/helper"
 
 	"gorm.io/gorm"
 )
@@ -16,27 +17,29 @@ type User struct {
 	ProfilePicture *string `json:"ProfilePicture" form:"ProfilePicture"`
 }
 
-func UserGormToUserCore(userGorm User) user.Core {
-	userCore := user.Core{
-		ID:             userGorm.ID,
-		FullName:       *userGorm.FullName,
-		Email:          *userGorm.Email,
-		NumberPhone:    *userGorm.NumberPhone,
-		Address:        *userGorm.Address,
-		Password:       *userGorm.Password,
-		ProfilePicture: *userGorm.ProfilePicture,
-		CreatedAt:      userGorm.CreatedAt,
-		UpdatedAt:      userGorm.UpdatedAt,
-	}
-	return userCore
-}
-
-func UserCoreToUserGorm(userCore user.Core) User {
+func UserCoreToUserGorm(userCore user.Core, helper helper.HelperInterface) User {
 	userGorm := User{
-		// FullName:       userCore.FullName,
-		// Email:          userCore.Email,
-		// Password:       userCore.Password,
-		// ProfilePicture: userCore.ProfilePicture,
+		FullName:       helper.ConvertToNullableString(userCore.FullName),
+		Email:          helper.ConvertToNullableString(userCore.Email),
+		NumberPhone:    helper.ConvertToNullableString(userCore.NumberPhone),
+		Address:        helper.ConvertToNullableString(userCore.Address),
+		Password:       helper.ConvertToNullableString(userCore.Password),
+		ProfilePicture: helper.ConvertToNullableString(userCore.ProfilePicture),
 	}
 	return userGorm
 }
+
+// func UserGormToUserCore(userGorm User) user.Core {
+// 	userCore := user.Core{
+// 		ID:             userGorm.ID,
+// 		FullName:       userGorm.FullName,
+// 		Email:          userGorm.Email,
+// 		NumberPhone:    userGorm.NumberPhone,
+// 		Address:        userGorm.Address,
+// 		Password:       userGorm.Password,
+// 		ProfilePicture: userGorm.ProfilePicture,
+// 		CreatedAt:      userGorm.CreatedAt,
+// 		UpdatedAt:      userGorm.UpdatedAt,
+// 	}
+// 	return userCore
+// }
