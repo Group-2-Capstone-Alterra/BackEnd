@@ -6,12 +6,13 @@ import (
 
 type Core struct {
 	ID                 uint
-	Nama               string
+	FullName           string
 	Email              string
+	NumberPhone        string
+	Address            string
 	Password           string
 	KetikUlangPassword string
-	TanggalLahir       string
-	Foto               string
+	ProfilePicture     string
 	Token              string
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
