@@ -13,13 +13,13 @@ func main() {
 	cfg := configs.InitConfig()
 	dbMysql := databases.InitDBMysql(cfg)
 	migrations.InitMigrations(dbMysql)
-	// s3Client, s3Bucket := databases.InitS3(cfg)
+	s3Client, s3Bucket := databases.InitS3(cfg)
 
 	e := echo.New()
 
 	// e.Use(middlewares.RemoveTrailingSlash)
 	// e.Use(middleware.CORSWithConfig(middlewares.CORSConfig()))
 
-	routers.InitRouter(e, dbMysql)
+	routers.InitRouter(e, dbMysql, s3Client, s3Bucket)
 	e.Logger.Fatal(e.Start(":8080"))
 }

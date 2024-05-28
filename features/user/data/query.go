@@ -55,3 +55,12 @@ func (u *userQuery) SelectById(id uint) (*user.Core, error) {
 	// }
 	return &usercore, nil
 }
+
+func (u *userQuery) PutById(id uint, input user.Core) error {
+	inputGorm := UserCoreToUserGorm(input, u.helper)
+	tx := u.db.Model(&User{}).Where("id = ?", id).Updates(&inputGorm)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}
