@@ -73,8 +73,6 @@ func (u *userService) GetProfile(id uint) (data *user.Core, err error) {
 func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
 		return "", errors.New("id not valid")
-	} else if input.FullName == "" || input.Email == "" {
-		return "", errors.New("nama/email tidak boleh kosong")
 	}
 
 	if input.Password != "" {
