@@ -22,7 +22,7 @@ func New(pd product.DataInterface, helper helper.HelperInterface) product.Servic
 }
 
 func (p *productService) Create(id uint, input product.Core, file io.Reader, handlerFilename string) (string, error) {
-	if input.IdUser <= 0 || input.ProductName == "" || input.Price <= 0 || input.ProductPicture == "" {
+	if id <= 0 || input.ProductName == "" || input.Price <= 0 || file == nil {
 		return "", errors.New("Nama Produk / Harga / Foto Produk tidak boleh kosong!")
 	}
 
@@ -32,6 +32,7 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 	if errPhoto != nil {
 		return "", errPhoto
 	}
+
 	input.IdUser = id
 	input.ProductPicture = photoFileName
 
