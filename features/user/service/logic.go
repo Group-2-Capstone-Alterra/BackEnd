@@ -26,12 +26,11 @@ func New(ud user.DataInterface, hash encrypts.HashInterface, helper helper.Helpe
 }
 
 func (u *userService) Create(input user.Core) (string, error) {
+
 	if input.FullName == "" || input.Email == "" || input.Password == "" {
 		return "", errors.New("[validation] nama/email/password tidak boleh kosong")
 	}
-	if input.Password != input.RetypePassword {
-		return "", errors.New("[validation] password dan ketik ulang password berbeda")
-	}
+
 	if input.Password != "" {
 		result, errHash := u.hashService.HashPassword(input.Password)
 		if errHash != nil {

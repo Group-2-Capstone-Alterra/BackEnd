@@ -5,6 +5,7 @@ import (
 	"PetPalApp/features/user"
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/responses"
+	"fmt"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -26,7 +27,6 @@ func New(us user.ServiceInterface, hash encrypts.HashInterface) *UserHandler {
 }
 
 func (uh *UserHandler) Register(c echo.Context) error {
-
 	newUser := UserRequest{}
 	errBind := c.Bind(&newUser)
 	if errBind != nil {
@@ -34,6 +34,7 @@ func (uh *UserHandler) Register(c echo.Context) error {
 	}
 
 	inputCore := RequestToCore(newUser)
+	fmt.Println("inputCore", inputCore)
 	_, errInsert := uh.userService.Create(inputCore)
 	if errInsert != nil {
 		if strings.Contains(errInsert.Error(), "validation") {

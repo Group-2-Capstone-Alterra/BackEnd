@@ -20,6 +20,7 @@ func New(db *gorm.DB, helper helper.HelperInterface) user.DataInterface {
 }
 
 func (u *userQuery) Insert(input user.Core) error {
+
 	userGorm := UserCoreToUserGorm(input, u.helper)
 	tx := u.db.Create(&userGorm)
 	if tx.Error != nil {
@@ -34,7 +35,7 @@ func (u *userQuery) SelectByEmail(email string) (*user.Core, error) {
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	var usercore = UserGormToUserCore(userData)
+	var usercore = UserGormToUserCore(userData, u.helper)
 	return &usercore, nil
 }
 
@@ -44,7 +45,7 @@ func (u *userQuery) SelectById(id uint) (*user.Core, error) {
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	var usercore = UserGormToUserCore(userData)
+	var usercore = UserGormToUserCore(userData, u.helper)
 	// errAddRedis := UserGormToRedis(u.rdb, userData, ttl)
 	// for key, v := range errAddRedis {
 	// 	keyWithPrefix := fmt.Sprint(key)
