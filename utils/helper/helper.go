@@ -50,12 +50,12 @@ func (u *helper) UploadProfilePicture(file io.Reader, fileName string) (string, 
 
 	_, err := u.s3.PutObject(&s3.PutObjectInput{
 		Bucket: aws.String(u.s3Bucket),
-		Key:    aws.String("fotoprofile/" + fileName),
+		Key:    aws.String("profilepicture/" + fileName),
 		Body:   bytes.NewReader(buf.Bytes()),
 		ACL:    aws.String("public-read"),
 	})
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/profilepicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
+	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
 }
