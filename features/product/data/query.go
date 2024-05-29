@@ -25,7 +25,20 @@ func (p *productrQuery) Insert(input product.Core) error {
 	return nil
 }
 
-func (p *productrQuery) SelectAll(userid uint) ([]product.Core, error) {
+func (p *productrQuery) SelectAll() ([]product.Core, error) {
+	var allProduct []Product
+	tx := p.db.Find(&allProduct)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var allProductCore []product.Core
+	for _, v := range allProduct {
+		allProductCore = append(allProductCore, GormToCore(v))
+	}
+	return allProductCore, nil
+}
+
+func (p *productrQuery) SelectAllAdmin(userid uint) ([]product.Core, error) {
 	var allProduct []Product
 	tx := p.db.Where("id_user = ?", userid).Find(&allProduct)
 	if tx.Error != nil {
