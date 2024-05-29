@@ -9,3 +9,8 @@ type AdminRequest struct {
 	KetikUlangPassword string `json:"ketik_ulang_password" form:"ketik_ulang_password"`
 	ProfilePicture     string `json:"profile_picture" form:"profile_picture"`
 }
+
+type LoginRequest struct {
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
+}

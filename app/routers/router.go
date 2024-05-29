@@ -38,4 +38,5 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	//admin
 	e.POST("/admin/register", adminHandlerAPI.Register)
+	e.POST("/admin/login", adminHandlerAPI.Login)
 }

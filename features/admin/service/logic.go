@@ -1,6 +1,7 @@
 package service
 
 import (
+	"PetPalApp/app/middlewares"
 	"PetPalApp/features/admin"
 	"PetPalApp/utils/encrypts"
 	"errors"
@@ -38,4 +39,22 @@ func (as *AdminService) Register(admin admin.Core) error {
 	}
 
 	return as.AdminModel.Register(admin)
+}
+
+func (as *AdminService) Login(email string, password string) (data *admin.Core, token string, err error) {
+	data, err = as.AdminModel.AdminByEmail(email)
+	if err != nil {
+		return nil, "", err
+	}
+
+	isLoginValid := as.hashService.CheckPasswordHash(data.Password, password)
+	if !isLoginValid {
+		return nil, "", errors.New("email atau password tidak sesuai")
+	}
+
+	token, errJWT := middlewares.CreateToken(int(data.ID))
+	if errJWT != nil {
+		return nil, "", errJWT
+	}
+	return data, token, nil
 }
