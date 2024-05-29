@@ -12,7 +12,7 @@ type ProductRequest struct {
 	ProductName    string  `json:"product_name" form:"product_name"`
 	Price          float32 `json:"price" form:"price"`
 	Stock          uint    `json:"stock" form:"stock"`
-	Description    string  `json:"desctription" form:"description"`
+	Description    string  `json:"description" form:"description"`
 	ProductPicture string  `json:"product_picture" form:"product_picture"`
 }
 

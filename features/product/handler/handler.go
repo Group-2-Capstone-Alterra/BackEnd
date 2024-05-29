@@ -32,7 +32,7 @@ func (ph *ProductHandler) AddProduct(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("err bind"+errBind.Error(), nil))
 	}
 
-	file, handler, err := c.Request().FormFile("foto")
+	file, handler, err := c.Request().FormFile("product_picture")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "Unable to upload photo: " + err.Error(),
