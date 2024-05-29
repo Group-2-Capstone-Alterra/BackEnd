@@ -45,3 +45,18 @@ func (ah *AdminHandler) Register(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Registrasi berhasil", nil))
 }
+
+func (ah *AdminHandler) Login(c echo.Context) error {
+	loginReq := LoginRequest{}
+	errBind := c.Bind(&loginReq)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind data: "+errBind.Error(), nil))
+	}
+
+	_, token, err := ah.adminService.Login(loginReq.Email, loginReq.Password)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("login gagal: "+err.Error(), nil))
+	}
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("login berhasil", echo.Map{"token": token}))
+}

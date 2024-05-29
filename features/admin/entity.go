@@ -20,8 +20,10 @@ type Core struct {
 
 type AdminModel interface {
 	Register(admin Core) error
+	AdminByEmail(email string) (*Core, error)
 }
 
 type AdminService interface {
 	Register(admin Core) error
+	Login(email string, password string) (data *Core, token string, err error)
 }

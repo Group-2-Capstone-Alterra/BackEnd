@@ -33,3 +33,21 @@ func (am *AdminModel) Register(admin admin.Core) error {
 
 	return nil
 }
+
+func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
+	var adminData Admin
+	tx := am.db.Where("email = ?", email).First(&adminData)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var admins = admin.Core{
+		ID: adminData.ID,
+		FullName: adminData.FullName,
+		Email: adminData.Email,
+		NumberPhone: adminData.NumberPhone,
+		Address: adminData.Address,
+		Password: adminData.Password,
+		ProfilePicture: adminData.ProfilePicture,
+	}
+	return &admins, nil
+}
