@@ -42,3 +42,10 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 	}
 	return input.ProductPicture, nil
 }
+
+func (p *productService) GetAll(userid uint) ([]product.Core, error) {
+	if userid <= 0 {
+		return nil, errors.New("[validation] id not valid")
+	}
+	return p.productData.SelectAll(userid)
+}

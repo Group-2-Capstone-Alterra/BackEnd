@@ -58,7 +58,7 @@ func (u *helper) UploadProfilePicture(file io.Reader, fileName string) (string, 
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
+	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/profilepicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
 }
 
 func (u *helper) UploadProductPicture(file io.Reader, fileName string) (string, error) {
@@ -76,5 +76,5 @@ func (u *helper) UploadProductPicture(file io.Reader, fileName string) (string, 
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
+	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/productpicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
 }
