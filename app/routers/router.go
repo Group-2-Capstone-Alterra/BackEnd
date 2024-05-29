@@ -38,11 +38,13 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	adminService := _adminService.New(adminData, hashService)
 	adminHandlerAPI := _adminHandler.New(adminService)
 
-	//users
-	e.POST("/user/register", userHandlerAPI.Register)
-	e.POST("/user/login", userHandlerAPI.Login)
-	e.GET("/user/profile", userHandlerAPI.Profile, middlewares.JWTMiddleware())
-	e.PUT("/user", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
+
+	//user
+	e.POST("/users/create", userHandlerAPI.Register)
+	e.POST("/users/login", userHandlerAPI.Login)
+	e.GET("/users/profile", userHandlerAPI.Profile, middlewares.JWTMiddleware())
+	e.PUT("/users/update", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
+
 
 	//products
 	e.POST("/products/insert", productHandlerAPI.AddProduct, middlewares.JWTMiddleware())
