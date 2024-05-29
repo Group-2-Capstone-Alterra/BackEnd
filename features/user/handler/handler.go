@@ -14,6 +14,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	bindError = "error bind"
+)
+
 type UserHandler struct {
 	userService user.ServiceInterface
 	hashService encrypts.HashInterface
@@ -30,7 +34,7 @@ func (uh *UserHandler) Register(c echo.Context) error {
 	newUser := UserRequest{}
 	errBind := c.Bind(&newUser)
 	if errBind != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind"+errBind.Error(), nil))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(bindError+errBind.Error(), nil))
 	}
 
 	inputCore := RequestToCore(newUser)
@@ -50,7 +54,7 @@ func (uh *UserHandler) Login(c echo.Context) error {
 	var reqLoginData = LoginRequest{}
 	errBind := c.Bind(&reqLoginData)
 	if errBind != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind"+errBind.Error(), nil))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(bindError+errBind.Error(), nil))
 	}
 	result, token, err := uh.userService.Login(reqLoginData.Email, reqLoginData.Password)
 	if err != nil {
@@ -77,7 +81,7 @@ func (uh *UserHandler) UpdateUserById(c echo.Context) error {
 	updatedUser := UserRequest{}
 	errBind := c.Bind(&updatedUser)
 	if errBind != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind"+errBind.Error(), nil))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(bindError+errBind.Error(), nil))
 	}
 
 	var file multipart.File

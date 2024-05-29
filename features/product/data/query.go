@@ -50,3 +50,25 @@ func (p *productrQuery) SelectAllAdmin(userid uint) ([]product.Core, error) {
 	}
 	return allProductCore, nil
 }
+
+func (p *productrQuery) SelectById(id uint) (*product.Core, error) {
+	var productData Product
+	tx := p.db.First(&productData, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	projectcore := GormToCore(productData)
+	return &projectcore, nil
+}
+
+func (p *productrQuery) SelectByIdAdmin(id uint, userid uint) (*product.Core, error) {
+	var productData Product
+	tx := p.db.Where("id_user = ?", userid).First(&productData, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	projectcore := GormToCore(productData)
+	return &projectcore, nil
+}
