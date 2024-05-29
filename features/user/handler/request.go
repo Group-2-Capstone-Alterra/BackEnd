@@ -8,12 +8,12 @@ import (
 
 type UserRequest struct {
 	gorm.Model
-	FullName       string `json:"FullName" form:"FullName"`
+	FullName       string `json:"full_name" form:"full_name"`
 	Email          string `gorm:"unique" json:"email" form:"email"`
-	NumberPhone    string `gorm:"unique" json:"NumberPhone" form:"NumberPhone"`
-	Address        string `json:"Address" form:"Address"`
-	Password       string `json:"Password" form:"Password"`
-	ProfilePicture string `json:"ProfilePicture" form:"ProfilePicture"`
+	NumberPhone    string `gorm:"unique" json:"number_phone" form:"number_phone"`
+	Address        string `json:"address" form:"address"`
+	Password       string `json:"password" form:"password"`
+	ProfilePicture string `json:"profile_picture" form:"profile_picture"`
 }
 
 type LoginRequest struct {

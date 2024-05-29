@@ -18,11 +18,11 @@ func New(db *gorm.DB) admin.AdminModel {
 
 func (am *AdminModel) Register(admin admin.Core) error {
 	adminGorm := Admin{
-		FullName: admin.FullName,
-		Email: admin.Email,
-		NumberPhone: admin.NumberPhone,
-		Address: admin.Address,
-		Password: admin.Password,
+		FullName:       admin.FullName,
+		Email:          admin.Email,
+		NumberPhone:    admin.NumberPhone,
+		Address:        admin.Address,
+		Password:       admin.Password,
 		ProfilePicture: admin.ProfilePicture,
 	}
 	tx := am.db.Create(&adminGorm)
@@ -41,12 +41,12 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 		return nil, tx.Error
 	}
 	var admins = admin.Core{
-		ID: adminData.ID,
-		FullName: adminData.FullName,
-		Email: adminData.Email,
-		NumberPhone: adminData.NumberPhone,
-		Address: adminData.Address,
-		Password: adminData.Password,
+		ID:             adminData.ID,
+		FullName:       adminData.FullName,
+		Email:          adminData.Email,
+		NumberPhone:    adminData.NumberPhone,
+		Address:        adminData.Address,
+		Password:       adminData.Password,
 		ProfilePicture: adminData.ProfilePicture,
 	}
 	return &admins, nil
