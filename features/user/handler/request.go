@@ -13,7 +13,6 @@ type UserRequest struct {
 	NumberPhone    string `gorm:"unique" json:"NumberPhone" form:"NumberPhone"`
 	Address        string `json:"Address" form:"Address"`
 	Password       string `json:"Password" form:"Password"`
-	RetypePassword string `json:"RetypePassword" form:"RetypePassword"`
 	ProfilePicture string `json:"ProfilePicture" form:"ProfilePicture"`
 }
 

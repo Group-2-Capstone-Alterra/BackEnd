@@ -12,6 +12,7 @@ import (
 type HelperInterface interface {
 	ConvertToNullableString(value string) *string
 	UploadProfilePicture(file io.Reader, fileName string) (string, error)
+	DereferenceString(s *string) string
 }
 
 type helper struct {
@@ -31,6 +32,14 @@ func (h *helper) ConvertToNullableString(value string) *string {
 		return nil
 	}
 	return &value
+}
+
+// Fungsi helper untuk meng-dereference pointer string
+func (h *helper) DereferenceString(s *string) string {
+	if s == nil {
+		return "" // atau nilai default lain yang sesuai
+	}
+	return *s
 }
 
 func (u *helper) UploadProfilePicture(file io.Reader, fileName string) (string, error) {

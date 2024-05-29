@@ -12,7 +12,6 @@ type Core struct {
 	NumberPhone    string
 	Address        string
 	Password       string
-	RetypePassword string
 	ProfilePicture string
 	Token          string
 	CreatedAt      time.Time
