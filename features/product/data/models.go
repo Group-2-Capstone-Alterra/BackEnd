@@ -16,14 +16,27 @@ type Product struct {
 	ProductPicture string
 }
 
-func CoreToGorm(productCore product.Core) Product {
+func CoreToGorm(core product.Core) Product {
 	gorm := Product{
-		IdUser:         productCore.IdUser,
-		ProductName:    productCore.ProductName,
-		Price:          productCore.Price,
-		Stock:          productCore.Stock,
-		Description:    productCore.Description,
-		ProductPicture: productCore.ProductPicture,
+		IdUser:         core.IdUser,
+		ProductName:    core.ProductName,
+		Price:          core.Price,
+		Stock:          core.Stock,
+		Description:    core.Description,
+		ProductPicture: core.ProductPicture,
 	}
 	return gorm
+}
+
+func GormToCore(gorm Product) product.Core {
+	core := product.Core{
+		ID:             gorm.ID,
+		IdUser:         gorm.IdUser,
+		ProductName:    gorm.ProductName,
+		Price:          gorm.Price,
+		Stock:          gorm.Stock,
+		Description:    gorm.Description,
+		ProductPicture: gorm.ProductPicture,
+	}
+	return core
 }

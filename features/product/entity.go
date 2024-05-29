@@ -19,8 +19,10 @@ type Core struct {
 
 type DataInterface interface {
 	Insert(input Core) error
+	SelectAll(userid uint) ([]Core, error)
 }
 
 type ServiceInterface interface {
 	Create(id uint, input Core, file io.Reader, handlerFilename string) (string, error)
+	GetAll(userid uint) ([]Core, error)
 }

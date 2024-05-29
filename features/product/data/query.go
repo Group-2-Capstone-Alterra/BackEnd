@@ -16,11 +16,24 @@ func New(db *gorm.DB) product.DataInterface {
 	}
 }
 
-func (u *productrQuery) Insert(input product.Core) error {
+func (p *productrQuery) Insert(input product.Core) error {
 	userGorm := CoreToGorm(input)
-	tx := u.db.Create(&userGorm)
+	tx := p.db.Create(&userGorm)
 	if tx.Error != nil {
 		return tx.Error
 	}
 	return nil
+}
+
+func (p *productrQuery) SelectAll(userid uint) ([]product.Core, error) {
+	var allProduct []Product
+	tx := p.db.Where("id_user = ?", userid).Find(&allProduct)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var allProductCore []product.Core
+	for _, v := range allProduct {
+		allProductCore = append(allProductCore, GormToCore(v))
+	}
+	return allProductCore, nil
 }
