@@ -72,3 +72,15 @@ func (p *productrQuery) SelectByIdAdmin(id uint, userid uint) (*product.Core, er
 	projectcore := GormToCore(productData)
 	return &projectcore, nil
 }
+
+func (p *productrQuery) PutById(id uint, userid uint, input product.Core) error {
+
+	userGorm := CoreToGorm(input)
+
+	tx := p.db.Model(&Product{}).Where("id = ? AND id_user = ?", id, userid).Updates(&userGorm)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}

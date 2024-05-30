@@ -23,6 +23,7 @@ type DataInterface interface {
 	SelectAllAdmin(userid uint) ([]Core, error)
 	SelectById(id uint) (*Core, error)
 	SelectByIdAdmin(id uint, userid uint) (*Core, error)
+	PutById(id uint, userid uint, input Core) error
 }
 
 type ServiceInterface interface {
@@ -31,4 +32,5 @@ type ServiceInterface interface {
 	GetAllAdmin(userid uint) ([]Core, error)
 	GetProductById(id uint) (data *Core, err error)
 	GetProductByIdAdmin(id uint, userid uint) (data *Core, err error)
+	UpdateById(id uint, userid uint, input Core) error
 }

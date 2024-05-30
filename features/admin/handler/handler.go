@@ -74,10 +74,10 @@ func (ah *AdminHandler) GetProfile(c echo.Context) error {
 	}
 
 	adminResponse := AdminResponse{
-		FullName: profile.FullName,
-		Email: profile.Email,
-		Address: profile.Address,
-		NumberPhone: profile.NumberPhone,
+		FullName:       profile.FullName,
+		Email:          profile.Email,
+		Address:        profile.Address,
+		NumberPhone:    profile.NumberPhone,
 		ProfilePicture: profile.ProfilePicture,
 	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("berhasil mengambil profil", adminResponse))
@@ -126,4 +126,3 @@ func (ah *AdminHandler) Update(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Update berhasil", nil))
 }
-
