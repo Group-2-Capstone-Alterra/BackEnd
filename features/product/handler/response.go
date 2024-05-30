@@ -13,6 +13,7 @@ type ProductResponse struct {
 }
 
 type AllProductResponse struct {
+	ID             uint    `json:"id" form:"id"`
 	ProductName    string  `json:"product_name" form:"product_name"`
 	Price          float32 `json:"price" form:"price"`
 	ProductPicture string  `json:"product_picture" form:"product_picture"`
@@ -31,6 +32,7 @@ func GormToCore(gorm product.Core) ProductResponse {
 
 func AllGormToCore(gorm product.Core) AllProductResponse {
 	core := AllProductResponse{
+		ID:             gorm.ID,
 		ProductName:    gorm.ProductName,
 		Price:          gorm.Price,
 		ProductPicture: gorm.ProductPicture,
