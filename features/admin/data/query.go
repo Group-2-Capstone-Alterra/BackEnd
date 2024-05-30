@@ -67,3 +67,11 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 	}
 	return &admin, nil
 }
+
+func (am *AdminModel) Delete(adminid uint) error {
+	tx := am.db.Delete(&Admin{}, adminid)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}

@@ -66,3 +66,11 @@ func (as *AdminService) GetProfile(adminid uint) (*admin.Core, error) {
 	}
 	return profile, nil
 }
+
+func (as *AdminService) Delete(adminid uint) error {
+	err := as.AdminModel.Delete(adminid)
+	if err != nil {
+		return err
+	}
+	return nil
+}

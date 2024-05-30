@@ -82,3 +82,16 @@ func (ah *AdminHandler) GetProfile(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("berhasil mengambil profil", adminResponse))
 }
+
+func (ah *AdminHandler) Delete(c echo.Context) error {
+	adminID := middlewares.ExtractTokenUserId(c)
+	if adminID == 0 {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
+
+	errDelete := ah.adminService.Delete(uint(adminID))
+	if errDelete != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("hapus akun gagal: "+errDelete.Error(), nil))
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("hapus akun berhasil", nil))
+}
