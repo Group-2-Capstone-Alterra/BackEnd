@@ -30,7 +30,6 @@ type ServiceInterface interface {
 	Create(id uint, input Core, file io.Reader, handlerFilename string) (string, error)
 	GetAll() ([]Core, error)
 	GetAllAdmin(userid uint) ([]Core, error)
-	GetProductById(id uint) (data *Core, err error)
-	GetProductByIdAdmin(id uint, userid uint) (data *Core, err error)
+	GetProductById(id uint, userid uint) (data *Core, err error)
 	UpdateById(id uint, userid uint, input Core) error
 }
