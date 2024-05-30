@@ -73,6 +73,7 @@ func (ah *AdminHandler) GetProfile(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("gagal mengambil profil: "+err.Error(), nil))
 	}
 
+	//mapping
 	adminResponse := AdminResponse{
 		FullName:       profile.FullName,
 		Email:          profile.Email,
