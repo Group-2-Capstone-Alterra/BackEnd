@@ -58,3 +58,11 @@ func (as *AdminService) Login(email string, password string) (data *admin.Core, 
 	}
 	return data, token, nil
 }
+
+func (as *AdminService) GetProfile(adminid uint) (*admin.Core, error) {
+	profile, err := as.AdminModel.AdminById(adminid)
+	if err != nil {
+		return nil, err
+	}
+	return profile, nil
+}
