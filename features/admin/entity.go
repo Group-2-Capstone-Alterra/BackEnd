@@ -23,6 +23,7 @@ type AdminModel interface {
 	AdminByEmail(email string) (*Core, error)
 	AdminById(adminid uint) (*Core, error)
 	Delete(adminid uint) error
+	Update(adminid uint, updateData Core) error
 }
 
 type AdminService interface {
@@ -30,4 +31,5 @@ type AdminService interface {
 	Login(email string, password string) (data *Core, token string, err error)
 	GetProfile(adminid uint) (data *Core, err error)
 	Delete(adminid uint) error
+	Update(adminid uint, updateData Core) error
 }

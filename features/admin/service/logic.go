@@ -74,3 +74,12 @@ func (as *AdminService) Delete(adminid uint) error {
 	}
 	return nil
 }
+
+func (as *AdminService) Update(adminid uint, updateData admin.Core) error {
+	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" && updateData.Address == "" && updateData.ProfilePicture == "" {
+		return errors.New("[validation] Tidak ada data yang diupdate")
+	}
+
+	return as.AdminModel.Update(adminid, updateData)
+}
+

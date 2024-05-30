@@ -75,3 +75,35 @@ func (am *AdminModel) Delete(adminid uint) error {
 	}
 	return nil
 }
+
+func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
+	var adminData Admin
+	tx := am.db.First(&adminData, adminid)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if updateData.FullName != "" {
+		adminData.FullName = updateData.FullName
+	}
+	if updateData.Email != "" {
+		adminData.Email = updateData.Email
+	}
+	if updateData.NumberPhone != "" {
+		adminData.NumberPhone = updateData.NumberPhone
+	}
+	if updateData.Address != "" {
+		adminData.Address = updateData.Address
+	}
+	if updateData.ProfilePicture != "" {
+		adminData.ProfilePicture = updateData.ProfilePicture
+	}
+
+	txSave := am.db.Save(&adminData)
+	if txSave.Error != nil {
+		return txSave.Error
+	}
+
+	return nil
+}
+

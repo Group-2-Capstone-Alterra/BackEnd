@@ -95,3 +95,35 @@ func (ah *AdminHandler) Delete(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("hapus akun berhasil", nil))
 }
+
+func (ah *AdminHandler) Update(c echo.Context) error {
+	adminID := middlewares.ExtractTokenUserId(c)
+	if adminID == 0 {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
+
+	updateReq := AdminRequest{}
+	errBind := c.Bind(&updateReq)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+errBind.Error(), nil))
+	}
+
+	updateData := admin.Core{
+		FullName:       updateReq.FullName,
+		Email:          updateReq.Email,
+		NumberPhone:    updateReq.NumberPhone,
+		Address:        updateReq.Address,
+		ProfilePicture: updateReq.ProfilePicture,
+	}
+
+	errUpdate := ah.adminService.Update(uint(adminID), updateData)
+	if errUpdate != nil {
+		if strings.Contains(errUpdate.Error(), "validation") {
+			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Update gagal: "+errUpdate.Error(), nil))
+		}
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Update gagal: "+errUpdate.Error(), nil))
+	}
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Update berhasil", nil))
+}
+
