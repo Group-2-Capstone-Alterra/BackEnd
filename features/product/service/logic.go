@@ -72,3 +72,14 @@ func (p *productService) GetProductByIdAdmin(id uint, userid uint) (data *produc
 
 	return p.productData.SelectByIdAdmin(id, userid)
 }
+
+func (p *productService) UpdateById(id uint, userid uint, input product.Core) error {
+	if id <= 0 {
+		return errors.New("id not valid")
+	}
+	err := p.productData.PutById(id, userid, input)
+	if err != nil {
+		return err
+	}
+	return nil
+}

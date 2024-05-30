@@ -117,3 +117,27 @@ func (ph *ProductHandler) GetProductByIdAdmin(c echo.Context) error {
 	productResponse := GormToCore(*productData)
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get detail product", productResponse))
 }
+
+func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
+	id := c.Param("id")
+	idConv, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
+	}
+
+	idToken := middlewares.ExtractTokenUserId(c)
+
+	updatedProduct := ProductRequest{}
+	errBind := c.Bind(&updatedProduct)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind data: "+errBind.Error(), nil))
+	}
+
+	err := ph.productService.UpdateById(uint(idConv), uint(idToken), RequestToCore(updatedProduct))
+	if err != nil {
+		// Handle error from userService.UpdateById
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))
+	}
+	// Return success response
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", err))
+}
