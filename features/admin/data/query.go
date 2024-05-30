@@ -51,3 +51,19 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 	}
 	return &admins, nil
 }
+
+func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
+	var adminData Admin
+	tx := am.db.First(&adminData, adminid)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var admin = admin.Core{
+		FullName: adminData.FullName,
+		Email: adminData.Email,
+		NumberPhone: adminData.NumberPhone,
+		Address: adminData.Address,
+		ProfilePicture: adminData.ProfilePicture,
+	}
+	return &admin, nil
+}

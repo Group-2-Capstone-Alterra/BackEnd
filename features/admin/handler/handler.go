@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"PetPalApp/app/middlewares"
 	"PetPalApp/features/admin"
 	"PetPalApp/utils/responses"
 	"net/http"
@@ -59,4 +60,25 @@ func (ah *AdminHandler) Login(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("login berhasil", echo.Map{"token": token}))
+}
+
+func (ah *AdminHandler) GetProfile(c echo.Context) error {
+	adminID := middlewares.ExtractTokenUserId(c)
+	if adminID == 0 {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
+
+	profile, err := ah.adminService.GetProfile(uint(adminID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("gagal mengambil profil: "+err.Error(), nil))
+	}
+
+	adminResponse := AdminResponse{
+		FullName: profile.FullName,
+		Email: profile.Email,
+		Address: profile.Address,
+		NumberPhone: profile.NumberPhone,
+		ProfilePicture: profile.ProfilePicture,
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("berhasil mengambil profil", adminResponse))
 }
