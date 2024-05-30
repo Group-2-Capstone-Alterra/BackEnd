@@ -115,3 +115,12 @@ func (uh *UserHandler) UpdateUserById(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", nil))
 }
+
+func (uh *UserHandler) Delete(c echo.Context) error {
+	idToken := middlewares.ExtractTokenUserId(c)
+	err := uh.userService.Delete(uint(idToken))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", err))
+}

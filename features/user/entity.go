@@ -23,6 +23,7 @@ type DataInterface interface {
 	SelectByEmail(email string) (*Core, error)
 	SelectById(id uint) (*Core, error)
 	PutById(id uint, input Core) error
+	Delete(id uint) error
 }
 
 type ServiceInterface interface {
@@ -30,4 +31,5 @@ type ServiceInterface interface {
 	Login(email string, password string) (data *Core, token string, err error)
 	GetProfile(id uint) (data *Core, err error)
 	UpdateById(id uint, input Core, file io.Reader, handlerFilename string) (string, error)
+	Delete(id uint) error
 }

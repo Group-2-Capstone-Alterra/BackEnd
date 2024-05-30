@@ -65,3 +65,11 @@ func (u *userQuery) PutById(id uint, input user.Core) error {
 	}
 	return nil
 }
+
+func (u *userQuery) Delete(id uint) error {
+	tx := u.db.Delete(&User{}, id)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}
