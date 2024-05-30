@@ -17,6 +17,10 @@ import (
 	_productHandler "PetPalApp/features/product/handler"
 	_productService "PetPalApp/features/product/service"
 
+	_doctorData "PetPalApp/features/doctor/data"
+	_doctorHandler "PetPalApp/features/doctor/handler"
+	_doctorService "PetPalApp/features/doctor/service"
+
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -37,6 +41,10 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	adminData := _adminData.New(db)
 	adminService := _adminService.New(adminData, hashService)
 	adminHandlerAPI := _adminHandler.New(adminService)
+
+	doctorData := _doctorData.New(db)
+	doctorService := _doctorService.New(doctorData)
+	doctorHandlerAPI := _doctorHandler.New(doctorService)
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
@@ -59,4 +67,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.GET("/admins", adminHandlerAPI.GetProfile, middlewares.JWTMiddleware())
 	e.DELETE("/admins", adminHandlerAPI.Delete, middlewares.JWTMiddleware())
 	e.PUT("/admins", adminHandlerAPI.Update, middlewares.JWTMiddleware())
+
+	//doctors
+	e.POST("/doctors", doctorHandlerAPI.AddDoctor, middlewares.JWTMiddleware())
 }
