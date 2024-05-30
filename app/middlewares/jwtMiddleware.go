@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"PetPalApp/app/configs"
+	"errors"
 	"strings"
 	"time"
 
@@ -29,21 +30,52 @@ func CreateToken(userId int) (string, error) {
 }
 
 // extract token jwt
+// func ExtractTokenUserId(e echo.Context) int {
+// 	header := e.Request().Header.Get("Authorization")
+// 	headerToken := strings.Split(header, " ")
+// 	token := headerToken[len(headerToken)-1]
+// 	tokenJWT, _ := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+// 		return []byte(configs.JWT_SECRET), nil
+// 	})
+
+// 	if tokenJWT.Valid {
+// 		claims := tokenJWT.Claims.(jwt.MapClaims)
+// 		userId, isValidUserId := claims["userId"].(float64)
+// 		if !isValidUserId {
+// 			return 0
+// 		}
+// 		return int(userId)
+// 	}
+// 	return 0
+// }
+
 func ExtractTokenUserId(e echo.Context) int {
 	header := e.Request().Header.Get("Authorization")
+	if header == "" {
+		return 0
+	}
+
 	headerToken := strings.Split(header, " ")
 	token := headerToken[len(headerToken)-1]
-	tokenJWT, _ := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+	tokenJWT, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return []byte(configs.JWT_SECRET), nil
 	})
+
+	if err != nil {
+		e.Error(err)
+		return 0
+	}
 
 	if tokenJWT.Valid {
 		claims := tokenJWT.Claims.(jwt.MapClaims)
 		userId, isValidUserId := claims["userId"].(float64)
 		if !isValidUserId {
+			e.Error(errors.New("jwt not found"))
 			return 0
 		}
 		return int(userId)
 	}
+
+	e.Error(errors.New("jwt not found"))
 	return 0
 }
