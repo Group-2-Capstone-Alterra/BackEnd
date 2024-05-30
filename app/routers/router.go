@@ -55,5 +55,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	//admins
 	e.POST("/admins/register", adminHandlerAPI.Register)
 	e.POST("/admins/login", adminHandlerAPI.Login)
-	e.GET("/admins/profile", adminHandlerAPI.GetProfile, middlewares.JWTMiddleware())
+	e.GET("/admins", adminHandlerAPI.GetProfile, middlewares.JWTMiddleware())
+	e.DELETE("/admins", adminHandlerAPI.Delete, middlewares.JWTMiddleware())
 }
