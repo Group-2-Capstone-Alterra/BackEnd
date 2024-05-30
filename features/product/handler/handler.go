@@ -89,27 +89,10 @@ func (ph *ProductHandler) GetProductById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get id", idConv))
 	}
 
-	productData, errProductData := ph.productService.GetProductById(uint(idConv))
-	if errProductData != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
-	}
-
-	productResponse := GormToCore(*productData)
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get detail product", productResponse))
-}
-
-func (ph *ProductHandler) GetProductByIdAdmin(c echo.Context) error {
-
-	id := c.Param("id")
-	idConv, errConv := strconv.Atoi(id)
-	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get id", idConv))
-	}
-
 	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
-	productData, errProductData := ph.productService.GetProductByIdAdmin(uint(idConv), uint(idToken))
+	productData, errProductData := ph.productService.GetProductById(uint(idConv), uint(idToken))
 	if errProductData != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
 	}

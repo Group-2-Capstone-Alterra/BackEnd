@@ -55,22 +55,17 @@ func (p *productService) GetAllAdmin(userid uint) ([]product.Core, error) {
 	return p.productData.SelectAllAdmin(userid)
 }
 
-func (p *productService) GetProductById(id uint) (data *product.Core, err error) {
+func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {
 
 	if id <= 0 {
 		return nil, errors.New("[validation] product id not valid")
 	}
 
-	return p.productData.SelectById(id)
-}
-
-func (p *productService) GetProductByIdAdmin(id uint, userid uint) (data *product.Core, err error) {
-
-	if id <= 0 {
-		return nil, errors.New("[validation] product id not valid")
+	if userid != 0 {
+		return p.productData.SelectByIdAdmin(id, userid)
+	} else {
+		return p.productData.SelectById(id)
 	}
-
-	return p.productData.SelectByIdAdmin(id, userid)
 }
 
 func (p *productService) UpdateById(id uint, userid uint, input product.Core) error {
