@@ -81,4 +81,5 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	//chats
 	e.POST("/chats", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
+	e.GET("/chats", chatHandlerAPI.GetChats, middlewares.JWTMiddleware())
 }

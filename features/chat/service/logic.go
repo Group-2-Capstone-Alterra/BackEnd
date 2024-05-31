@@ -18,3 +18,6 @@ func (cs *ChatService) CreateChat(chat chat.ChatCore) error {
     return cs.chatModel.CreateChat(chat)
 }
 
+func (cs *ChatService) GetChats(senderID, receiverID uint) ([]chat.ChatCore, error) {
+    return cs.chatModel.GetChats(senderID, receiverID)
+}
