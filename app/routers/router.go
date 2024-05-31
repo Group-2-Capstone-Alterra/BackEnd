@@ -25,6 +25,10 @@ import (
 	_chatHandler "PetPalApp/features/chat/handler"
 	_chatService "PetPalApp/features/chat/service"
 
+	_orderData "PetPalApp/features/order/data"
+	_orderHandler "PetPalApp/features/order/handler"
+	_orderService "PetPalApp/features/order/service"
+
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -54,6 +58,9 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	chatService := _chatService.New(chatData)
 	chatHandlerAPI := _chatHandler.New(chatService)
 
+	orderData := _orderData.New(db)
+	orderService := _orderService.New(orderData)
+	orderHandlerAPI := _orderHandler.New(orderService)
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
@@ -82,4 +89,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	//chats
 	e.POST("/chats", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
 	e.GET("/chats", chatHandlerAPI.GetChats, middlewares.JWTMiddleware())
+
+	//orders
+	e.POST("/orders", orderHandlerAPI.CreateOrder, middlewares.JWTMiddleware())
 }
