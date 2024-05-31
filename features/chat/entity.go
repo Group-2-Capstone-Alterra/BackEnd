@@ -8,8 +8,10 @@ type ChatCore struct {
 
 type ChatModel interface {
 	CreateChat(ChatCore) error
+	GetChats(senderID, receiverID uint) ([]ChatCore, error)
 }
 
 type ChatService interface {
 	CreateChat(ChatCore) error
+	GetChats(senderID, receiverID uint) ([]ChatCore, error)
 }
