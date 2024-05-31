@@ -30,3 +30,18 @@ func (om *OrderModel) CreateOrder(orderCore order.OrderCore) error {
 	}
 	return nil
 }
+
+func (om *OrderModel) GetOrdersByUserID(userID uint) ([]order.OrderCore, error) {
+    var orders []Order
+    tx := om.db.Where("user_id = ?", userID).Find(&orders)
+    if tx.Error != nil {
+        return nil, tx.Error
+    }
+
+    var result []order.OrderCore
+    for _, order := range orders {
+        result = append(result, order.ToCore())
+    }
+
+    return result, nil
+}

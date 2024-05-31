@@ -17,3 +17,7 @@ func New(om order.OrderModel) order.OrderService {
 func (os *OrderService) CreateOrder(order order.OrderCore) error {
     return os.orderModel.CreateOrder(order)
 }
+
+func (os *OrderService) GetOrdersByUserID(userID uint) ([]order.OrderCore, error) {
+    return os.orderModel.GetOrdersByUserID(userID)
+}

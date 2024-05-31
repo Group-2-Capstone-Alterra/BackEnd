@@ -45,3 +45,17 @@ func (oh *OrderHandler) CreateOrder(c echo.Context) error {
     return c.JSON(http.StatusCreated, responses.JSONWebResponse("Order created successfully", nil))
 }
 
+func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
+    userID := middlewares.ExtractTokenUserId(c)
+    if userID == 0 {
+        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+    }
+
+    orders, err := oh.orderService.GetOrdersByUserID(uint(userID))
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
+    }
+
+    return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", orders))
+}
+
