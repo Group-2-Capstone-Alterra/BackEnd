@@ -52,24 +52,12 @@ func (ph *ProductHandler) AddProduct(c echo.Context) error {
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse("success add data", nil))
 }
 
-func (ph *ProductHandler) GetAllProductAdmin(c echo.Context) error {
+func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
+
 	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
-	result, errResult := ph.productService.GetAllAdmin(uint(idToken))
-	if errResult != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
-	}
-
-	var allProduct []AllProductResponse
-	for _, v := range result {
-		allProduct = append(allProduct, AllGormToCore(v))
-	}
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", allProduct))
-}
-
-func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
-	result, errResult := ph.productService.GetAll()
+	result, errResult := ph.productService.GetAll(uint(idToken))
 	if errResult != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
 	}
