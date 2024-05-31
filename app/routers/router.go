@@ -92,4 +92,5 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	//orders
 	e.POST("/orders", orderHandlerAPI.CreateOrder, middlewares.JWTMiddleware())
+	e.GET("/orders", orderHandlerAPI.GetOrdersByUserID, middlewares.JWTMiddleware())
 }

@@ -14,8 +14,10 @@ type OrderCore struct {
 
 type OrderModel interface {
     CreateOrder(OrderCore) error
+    GetOrdersByUserID(userID uint) ([]OrderCore, error)
 }
 
 type OrderService interface {
     CreateOrder(OrderCore) error
+    GetOrdersByUserID(userID uint) ([]OrderCore, error)
 }
