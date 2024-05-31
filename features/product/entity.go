@@ -24,6 +24,7 @@ type DataInterface interface {
 	SelectById(id uint) (*Core, error)
 	SelectByIdAdmin(id uint, userid uint) (*Core, error)
 	PutById(id uint, userid uint, input Core) error
+	Delete(id uint, userid uint) error
 }
 
 type ServiceInterface interface {
@@ -31,4 +32,5 @@ type ServiceInterface interface {
 	GetAll(userid uint, offset uint) ([]Core, error)
 	GetProductById(id uint, userid uint) (data *Core, err error)
 	UpdateById(id uint, userid uint, input Core) error
+	Delete(id uint, userid uint) error
 }

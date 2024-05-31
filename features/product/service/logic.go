@@ -73,3 +73,10 @@ func (p *productService) UpdateById(id uint, userid uint, input product.Core) er
 	}
 	return nil
 }
+
+func (p *productService) Delete(id uint, userid uint) error {
+	if id <= 0 {
+		return errors.New("id not valid")
+	}
+	return p.productData.Delete(id, userid)
+}

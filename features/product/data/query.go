@@ -84,3 +84,11 @@ func (p *productrQuery) PutById(id uint, userid uint, input product.Core) error 
 
 	return nil
 }
+
+func (p *productrQuery) Delete(id uint, userid uint) error {
+	tx := p.db.Where("id_user = ?", userid).Delete(&Product{}, id)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}
