@@ -120,3 +120,18 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 	// Return success response
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", err))
 }
+
+func (ph *ProductHandler) Delete(c echo.Context) error {
+	id := c.Param("id")
+	idConv, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
+	}
+
+	idToken := middlewares.ExtractTokenUserId(c)
+	err := ph.productService.Delete(uint(idToken), uint(idConv))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", err))
+}
