@@ -25,11 +25,23 @@ func (p *productrQuery) Insert(input product.Core) error {
 	return nil
 }
 
-func (p *productrQuery) SelectAll(offset uint) ([]product.Core, error) {
+func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, error) {
 	var allProduct []Product
-	tx := p.db.Limit(10).Offset(int(offset)).Find(&allProduct)
-	if tx.Error != nil {
-		return nil, tx.Error
+	if sortStr == "lowest" {
+		tx := p.db.Order("price asc").Limit(10).Offset(int(offset)).Find(&allProduct)
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+	} else if sortStr == "highest" {
+		tx := p.db.Order("price desc").Limit(10).Offset(int(offset)).Find(&allProduct)
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+	} else {
+		tx := p.db.Limit(10).Offset(int(offset)).Find(&allProduct)
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
 	}
 	var allProductCore []product.Core
 	for _, v := range allProduct {
