@@ -25,9 +25,9 @@ func (p *productrQuery) Insert(input product.Core) error {
 	return nil
 }
 
-func (p *productrQuery) SelectAll() ([]product.Core, error) {
+func (p *productrQuery) SelectAll(offset uint) ([]product.Core, error) {
 	var allProduct []Product
-	tx := p.db.Find(&allProduct)
+	tx := p.db.Limit(10).Offset(int(offset)).Find(&allProduct)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -38,7 +38,7 @@ func (p *productrQuery) SelectAll() ([]product.Core, error) {
 	return allProductCore, nil
 }
 
-func (p *productrQuery) SelectAllAdmin(userid uint) ([]product.Core, error) {
+func (p *productrQuery) SelectAllAdmin(userid uint, offset uint) ([]product.Core, error) {
 	var allProduct []Product
 	tx := p.db.Where("id_user = ?", userid).Find(&allProduct)
 	if tx.Error != nil {

@@ -54,10 +54,18 @@ func (ph *ProductHandler) AddProduct(c echo.Context) error {
 
 func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
 
+	page := c.QueryParam("page")
+	pageInt, err := strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+
+	offset := (pageInt - 1) * 10
+
 	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
-	result, errResult := ph.productService.GetAll(uint(idToken))
+	result, errResult := ph.productService.GetAll(uint(idToken), uint(offset))
 	if errResult != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
 	}

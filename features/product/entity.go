@@ -19,8 +19,8 @@ type Core struct {
 
 type DataInterface interface {
 	Insert(input Core) error
-	SelectAll() ([]Core, error)
-	SelectAllAdmin(userid uint) ([]Core, error)
+	SelectAll(offset uint) ([]Core, error)
+	SelectAllAdmin(userid uint, offset uint) ([]Core, error)
 	SelectById(id uint) (*Core, error)
 	SelectByIdAdmin(id uint, userid uint) (*Core, error)
 	PutById(id uint, userid uint, input Core) error
@@ -28,7 +28,7 @@ type DataInterface interface {
 
 type ServiceInterface interface {
 	Create(id uint, input Core, file io.Reader, handlerFilename string) (string, error)
-	GetAll(userid uint) ([]Core, error)
+	GetAll(userid uint, offset uint) ([]Core, error)
 	GetProductById(id uint, userid uint) (data *Core, err error)
 	UpdateById(id uint, userid uint, input Core) error
 }

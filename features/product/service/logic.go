@@ -43,11 +43,11 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 	return input.ProductPicture, nil
 }
 
-func (p *productService) GetAll(userid uint) ([]product.Core, error) {
+func (p *productService) GetAll(userid uint, offset uint) ([]product.Core, error) {
 	if userid != 0 {
-		return p.productData.SelectAllAdmin(userid)
+		return p.productData.SelectAllAdmin(userid, offset)
 	}
-	return p.productData.SelectAll()
+	return p.productData.SelectAll(offset)
 }
 
 func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {
