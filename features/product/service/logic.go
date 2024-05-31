@@ -43,16 +43,11 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 	return input.ProductPicture, nil
 }
 
-func (p *productService) GetAll() ([]product.Core, error) {
-
-	return p.productData.SelectAll()
-}
-
-func (p *productService) GetAllAdmin(userid uint) ([]product.Core, error) {
-	if userid <= 0 {
-		return nil, errors.New("[validation] id not valid")
+func (p *productService) GetAll(userid uint, offset uint) ([]product.Core, error) {
+	if userid != 0 {
+		return p.productData.SelectAllAdmin(userid, offset)
 	}
-	return p.productData.SelectAllAdmin(userid)
+	return p.productData.SelectAll(offset)
 }
 
 func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {
