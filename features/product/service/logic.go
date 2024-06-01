@@ -45,6 +45,7 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 }
 
 func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]product.Core, error) {
+
 	log.Println("[Service]")
 	log.Println("[Service] sortStr", sortStr)
 	product, _ := p.productData.VerIsAdmin(userid)
@@ -71,6 +72,7 @@ func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]pro
 		}
 		return product, nil
 	}
+
 }
 
 func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {

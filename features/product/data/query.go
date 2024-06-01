@@ -31,21 +31,28 @@ func (p *productrQuery) Insert(input product.Core) error {
 
 func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, error) {
 	var allProduct []Product
+
 	log.Println("[Query] sortStr", sortStr)
 	if sortStr == "lowest distance" || sortStr == "lowest" {
 		log.Println("[query] lowest+distance")
+
 		tx := p.db.Order("price asc").Limit(10).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
 		}
+
 	} else if sortStr == "highest distance" || sortStr == "highest" {
 		log.Println("[query] highest+distance")
+
+
 		tx := p.db.Order("price desc").Limit(10).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
 		}
 	} else {
+
 		log.Println("[query] default")
+
 		tx := p.db.Limit(10).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
