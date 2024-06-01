@@ -4,6 +4,7 @@ import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/helper"
+	"PetPalApp/utils/helperuser"
 
 	_adminData "PetPalApp/features/admin/data"
 	_adminHandler "PetPalApp/features/admin/handler"
@@ -40,15 +41,16 @@ import (
 
 func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	hashService := encrypts.NewHashService()
-	helperService := helper.NewHelperService(s3, s3Bucket)
+	helperUserService := helperuser.NewHelperService()
+	helperService := helper.NewHelperService(s3, s3Bucket, _adminData.New(db), _userData.New(db, helperUserService))
 
-	userData := _userData.New(db, helperService)
+	userData := _userData.New(db, helperUserService)
 	userService := _userService.New(userData, hashService, helperService)
 	userHandlerAPI := _userHandler.New(userService, hashService)
 
-	productData := _productData.New(db)
+	productData := _productData.New(db, helperService)
 	productService := _productService.New(productData, helperService)
-	productHandlerAPI := _productHandler.New(productService)
+	productHandlerAPI := _productHandler.New(productService, helperService)
 
 	adminData := _adminData.New(db)
 	adminService := _adminService.New(adminData, hashService)

@@ -13,6 +13,7 @@ type Core struct {
 	Stock          uint
 	Description    string
 	ProductPicture string
+	Distance       float64
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }
@@ -25,6 +26,7 @@ type DataInterface interface {
 	SelectByIdAdmin(id uint, userid uint) (*Core, error)
 	PutById(id uint, userid uint, input Core) error
 	Delete(id uint, userid uint) error
+	VerIsAdmin(userid uint) (*Core, error)
 }
 
 type ServiceInterface interface {

@@ -3,6 +3,7 @@ package handler
 import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/product"
+	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
 	"log"
 	"net/http"
@@ -14,11 +15,13 @@ import (
 
 type ProductHandler struct {
 	productService product.ServiceInterface
+	helper         helper.HelperInterface
 }
 
-func New(ps product.ServiceInterface) *ProductHandler {
+func New(ps product.ServiceInterface, helper helper.HelperInterface) *ProductHandler {
 	return &ProductHandler{
 		productService: ps,
+		helper:         helper,
 	}
 }
 
@@ -53,7 +56,7 @@ func (ph *ProductHandler) AddProduct(c echo.Context) error {
 }
 
 func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
-
+	log.Println("[handler]")
 	page := c.QueryParam("page")
 	pageInt, err := strconv.Atoi(page)
 	if err != nil || pageInt < 1 {
@@ -75,6 +78,7 @@ func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
 	for _, v := range result {
 		allProduct = append(allProduct, AllGormToCore(v))
 	}
+
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", allProduct))
 }
 

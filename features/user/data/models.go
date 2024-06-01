@@ -2,7 +2,7 @@ package data
 
 import (
 	"PetPalApp/features/user"
-	"PetPalApp/utils/helper"
+	"PetPalApp/utils/helperuser"
 
 	"gorm.io/gorm"
 )
@@ -18,7 +18,7 @@ type User struct {
 	Coordinate     *string
 }
 
-func UserCoreToUserGorm(userCore user.Core, helper helper.HelperInterface) User {
+func UserCoreToUserGorm(userCore user.Core, helper helperuser.HelperuserInterface) User {
 	userGorm := User{
 		FullName:       helper.ConvertToNullableString(userCore.FullName),
 		Email:          helper.ConvertToNullableString(userCore.Email),
@@ -31,7 +31,7 @@ func UserCoreToUserGorm(userCore user.Core, helper helper.HelperInterface) User 
 	return userGorm
 }
 
-func UserGormToUserCore(userGorm User, helper helper.HelperInterface) user.Core {
+func UserGormToUserCore(userGorm User, helper helperuser.HelperuserInterface) user.Core {
 	userCore := user.Core{
 		ID:             userGorm.ID,
 		FullName:       helper.DereferenceString(userGorm.FullName),

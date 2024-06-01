@@ -2,26 +2,26 @@ package data
 
 import (
 	"PetPalApp/features/user"
-	"PetPalApp/utils/helper"
+	"PetPalApp/utils/helperuser"
 
 	"gorm.io/gorm"
 )
 
 type userQuery struct {
-	db     *gorm.DB
-	helper helper.HelperInterface
+	db         *gorm.DB
+	helperuser helperuser.HelperuserInterface
 }
 
-func New(db *gorm.DB, helper helper.HelperInterface) user.DataInterface {
+func New(db *gorm.DB, helperuser helperuser.HelperuserInterface) user.DataInterface {
 	return &userQuery{
-		db:     db,
-		helper: helper,
+		db:         db,
+		helperuser: helperuser,
 	}
 }
 
 func (u *userQuery) Insert(input user.Core) error {
 
-	userGorm := UserCoreToUserGorm(input, u.helper)
+	userGorm := UserCoreToUserGorm(input, u.helperuser)
 	tx := u.db.Create(&userGorm)
 	if tx.Error != nil {
 		return tx.Error
@@ -35,7 +35,7 @@ func (u *userQuery) SelectByEmail(email string) (*user.Core, error) {
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	var usercore = UserGormToUserCore(userData, u.helper)
+	var usercore = UserGormToUserCore(userData, u.helperuser)
 	return &usercore, nil
 }
 
@@ -45,7 +45,7 @@ func (u *userQuery) SelectById(id uint) (*user.Core, error) {
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	var usercore = UserGormToUserCore(userData, u.helper)
+	var usercore = UserGormToUserCore(userData, u.helperuser)
 	// errAddRedis := UserGormToRedis(u.rdb, userData, ttl)
 	// for key, v := range errAddRedis {
 	// 	keyWithPrefix := fmt.Sprint(key)
@@ -58,7 +58,7 @@ func (u *userQuery) SelectById(id uint) (*user.Core, error) {
 }
 
 func (u *userQuery) PutById(id uint, input user.Core) error {
-	inputGorm := UserCoreToUserGorm(input, u.helper)
+	inputGorm := UserCoreToUserGorm(input, u.helperuser)
 	tx := u.db.Model(&User{}).Where("id = ?", id).Updates(&inputGorm)
 	if tx.Error != nil {
 		return tx.Error
