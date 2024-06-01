@@ -13,6 +13,7 @@ type Core struct {
 	Password           string
 	KetikUlangPassword string
 	ProfilePicture     string
+	Coordinate         string
 	Token              string
 	CreatedAt          time.Time
 	UpdatedAt          time.Time

@@ -6,10 +6,11 @@ import (
 
 type Admin struct {
 	gorm.Model
-	FullName       string 
+	FullName       string
 	Email          string `gorm:"unique"`
 	NumberPhone    string `gorm:"unique"`
-	Address        string 
-	Password       string 
-	ProfilePicture string 
+	Address        string
+	Password       string
+	ProfilePicture string
+	Coordinate     string
 }

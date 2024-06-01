@@ -59,11 +59,12 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 		return nil, tx.Error
 	}
 	var admin = admin.Core{
-		FullName: adminData.FullName,
-		Email: adminData.Email,
-		NumberPhone: adminData.NumberPhone,
-		Address: adminData.Address,
+		FullName:       adminData.FullName,
+		Email:          adminData.Email,
+		NumberPhone:    adminData.NumberPhone,
+		Address:        adminData.Address,
 		ProfilePicture: adminData.ProfilePicture,
+		Coordinate:     adminData.Coordinate,
 	}
 	return &admin, nil
 }
@@ -106,4 +107,3 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 
 	return nil
 }
-
