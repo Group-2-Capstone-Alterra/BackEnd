@@ -1,9 +1,16 @@
 package helper
 
 import (
+	"PetPalApp/features/admin"
+	"PetPalApp/features/product"
+	"PetPalApp/features/user"
 	"bytes"
 	"fmt"
 	"io"
+	"math"
+	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -14,17 +21,22 @@ type HelperInterface interface {
 	UploadProfilePicture(file io.Reader, fileName string) (string, error)
 	UploadProductPicture(file io.Reader, fileName string) (string, error)
 	DereferenceString(s *string) string
+	SortProductsByDistance(iduser uint, products []product.Core) []product.Core
 }
 
 type helper struct {
 	s3       *s3.S3
 	s3Bucket string
+	admin    admin.AdminModel
+	user     user.DataInterface
 }
 
-func NewHelperService(s3 *s3.S3, s3Bucket string) HelperInterface {
+func NewHelperService(s3 *s3.S3, s3Bucket string, admin admin.AdminModel, user user.DataInterface) HelperInterface {
 	return &helper{
 		s3:       s3,
 		s3Bucket: s3Bucket,
+		admin:    admin,
+		user:     user,
 	}
 }
 
@@ -77,4 +89,58 @@ func (u *helper) UploadProductPicture(file io.Reader, fileName string) (string, 
 		return "", err
 	}
 	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/productpicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
+}
+
+func (u *helper) SortProductsByDistance(userid uint, products []product.Core) []product.Core {
+
+	user, _ := u.user.SelectById(userid)
+	userCoorConv := strings.Split(user.Coordinate, ",")
+	userLat, errUserLat := strconv.ParseFloat(userCoorConv[0], 64)
+	if errUserLat != nil {
+		return nil
+	}
+	userLong, errUserLong := strconv.ParseFloat(userCoorConv[1], 64)
+	if errUserLong != nil {
+		return nil
+	}
+
+	for i := range products {
+		//get coordinate admin
+		adminID := products[i].IdUser
+		dataAdmin, _ := u.admin.AdminById(adminID)
+
+		adminCoor := strings.Split(dataAdmin.Coordinate, ",")
+		adminLat, errAdminLat := strconv.ParseFloat(adminCoor[0], 64)
+		if errAdminLat != nil {
+			return nil
+		}
+		adminLong, errAdminLong := strconv.ParseFloat(adminCoor[1], 64)
+		if errAdminLong != nil {
+			return nil
+		}
+
+		//get distance
+		distance := Distance(userLat, userLong, adminLat, adminLong)
+		products[i].Distance = distance
+	}
+
+	sort.Slice(products, func(i, j int) bool {
+		return products[i].Distance < products[j].Distance
+	})
+
+	return products
+}
+
+func Distance(userLat, userLon, adminLat, adminLon float64) float64 {
+	const R = 6371 // Radius of the Earth in km
+	var dLat, dLon float64
+	dLat = (adminLat - userLat) * math.Pi / 180
+	dLon = (adminLon - userLon) * math.Pi / 180
+	userLat = userLat * math.Pi / 180
+	adminLat = adminLat * math.Pi / 180
+
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) + math.Cos(userLat)*math.Cos(adminLat)*math.Sin(dLon/2)*math.Sin(dLon/2)
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+
+	return R * c
 }

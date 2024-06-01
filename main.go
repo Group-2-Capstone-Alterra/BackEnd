@@ -20,7 +20,7 @@ func main() {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS()) 
+	e.Use(middleware.CORS())
 
 	routers.InitRouter(e, dbMysql, s3Client, s3Bucket)
 	e.Logger.Fatal(e.Start(":8080"))
