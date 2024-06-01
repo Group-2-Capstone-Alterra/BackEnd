@@ -9,12 +9,13 @@ import (
 
 type User struct {
 	gorm.Model
-	FullName       *string `json:"FullName" form:"FullName"`
-	Email          *string `gorm:"unique" json:"email" form:"email"`
-	NumberPhone    *string `gorm:"unique" json:"NumberPhone" form:"NumberPhone"`
-	Address        *string `json:"Address" form:"Address"`
-	Password       *string `json:"Password" form:"Password"`
-	ProfilePicture *string `json:"ProfilePicture" form:"ProfilePicture"`
+	FullName       *string
+	Email          *string `gorm:"unique"`
+	NumberPhone    *string `gorm:"unique"`
+	Address        *string
+	Password       *string
+	ProfilePicture *string
+	Coordinate     *string
 }
 
 func UserCoreToUserGorm(userCore user.Core, helper helper.HelperInterface) User {
@@ -25,6 +26,7 @@ func UserCoreToUserGorm(userCore user.Core, helper helper.HelperInterface) User 
 		Address:        helper.ConvertToNullableString(userCore.Address),
 		Password:       helper.ConvertToNullableString(userCore.Password),
 		ProfilePicture: helper.ConvertToNullableString(userCore.ProfilePicture),
+		Coordinate:     helper.ConvertToNullableString(userCore.Coordinate),
 	}
 	return userGorm
 }
@@ -38,6 +40,7 @@ func UserGormToUserCore(userGorm User, helper helper.HelperInterface) user.Core 
 		Address:        helper.DereferenceString(userGorm.Address),
 		Password:       helper.DereferenceString(userGorm.Password),
 		ProfilePicture: helper.DereferenceString(userGorm.ProfilePicture),
+		Coordinate:     helper.DereferenceString(userGorm.Coordinate),
 		CreatedAt:      userGorm.CreatedAt,
 		UpdatedAt:      userGorm.UpdatedAt,
 	}

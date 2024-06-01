@@ -12,6 +12,7 @@ type UserResponse struct {
 	Address        string `json:"address,omitempty"`
 	Password       string `json:"password,omitempty"`
 	ProfilePicture string `json:"profile_picture,omitempty"`
+	Coordinate     string `json:"coordinate" form:"coordinate"`
 	Token          string `json:"token,omitempty"`
 }
 
@@ -23,6 +24,7 @@ func ResponseProfile(userGorm user.Core) UserResponse {
 		NumberPhone:    userGorm.NumberPhone,
 		Address:        userGorm.Address,
 		ProfilePicture: userGorm.ProfilePicture,
+		Coordinate:     userGorm.Coordinate,
 	}
 	return result
 }
@@ -36,6 +38,7 @@ func CoreToGorm(userGorm user.Core) UserResponse {
 		Address:        userGorm.Address,
 		Password:       userGorm.Password,
 		ProfilePicture: userGorm.ProfilePicture,
+		Coordinate:     userGorm.Coordinate,
 	}
 	return userCore
 }
