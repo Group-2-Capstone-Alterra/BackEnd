@@ -13,6 +13,7 @@ type Core struct {
 	Address        string
 	Password       string
 	ProfilePicture string
+	Coordinate     string
 	Token          string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
