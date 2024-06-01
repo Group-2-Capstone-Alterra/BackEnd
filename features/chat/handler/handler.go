@@ -3,7 +3,9 @@ package handler
 import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/chat"
+	"PetPalApp/features/consultation"
 	"PetPalApp/utils/responses"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -11,54 +13,72 @@ import (
 )
 
 type ChatHandler struct {
-    chatService chat.ChatService
+	chatService      chat.ServiceInterface
+	consultationData consultation.ConsultationModel
 }
 
-func New(cs chat.ChatService) *ChatHandler {
-    return &ChatHandler{
-        chatService: cs,
-    }
+func New(cs chat.ServiceInterface, consultationData consultation.ConsultationModel) *ChatHandler {
+	return &ChatHandler{
+		chatService:      cs,
+		consultationData: consultationData,
+	}
 }
 
 func (ch *ChatHandler) CreateChat(c echo.Context) error {
-    senderID := middlewares.ExtractTokenUserId(c)
-    if senderID == 0 {
-        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
-    }
+	log.Println("[Handler]")
+	roomchatID := c.Param("id")
+	roomchatIDConv, errConv := strconv.Atoi(roomchatID)
+	if errConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
+	}
 
-    newChat := ChatRequest{}
-    if err := c.Bind(&newChat); err != nil {
-        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
-    }
+	senderID := middlewares.ExtractTokenUserId(c)
+	if senderID == 0 {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
 
-    chatData := chat.ChatCore{
-        SenderID:   uint(senderID),
-        ReceiverID: newChat.ReceiverID,
-        Message:    newChat.Message,
-    }
+	newChat := ChatRequest{}
+	if err := c.Bind(&newChat); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
+	}
 
-    if err := ch.chatService.CreateChat(chatData); err != nil {
-        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error creating chat: "+err.Error(), nil))
-    }
+	chatData := chat.ChatCore{
+		ConsultationID: uint(roomchatIDConv),
+		SenderID:       uint(senderID),
+		Message:        newChat.Message,
+	}
 
-    return c.JSON(http.StatusCreated, responses.JSONWebResponse("Chat created successfully", nil))
+	if err := ch.chatService.CreateChat(chatData); err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error creating chat: "+err.Error(), nil))
+	}
+
+	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Chat created successfully", nil))
 }
 
 func (ch *ChatHandler) GetChats(c echo.Context) error {
-    senderID := middlewares.ExtractTokenUserId(c)
-    if senderID == 0 {
-        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
-    }
+	log.Println("[Handler]")
+	roomchatID := c.Param("id")
+	roomchatIDConv, errConv := strconv.Atoi(roomchatID)
+	if errConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
+	}
+	log.Println("[Handler] Roomchat DD", roomchatIDConv)
 
-    receiverID, err := strconv.ParseUint(c.QueryParam("receiver_id"), 10, 32)
-    if err != nil {
-        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid receiver ID", nil))
-    }
+	currentID := middlewares.ExtractTokenUserId(c)
+	if currentID == 0 {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
+	log.Println("[Handler] Current User ID", currentID)
 
-    chats, err := ch.chatService.GetChats(uint(senderID), uint(receiverID))
-    if err != nil {
-        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving chats: "+err.Error(), nil))
-    }
+	chats, err := ch.chatService.GetChats(uint(currentID), uint(roomchatIDConv))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving chats: "+err.Error(), nil))
+	}
 
-    return c.JSON(http.StatusOK, responses.JSONWebResponse("Chats retrieved successfully", chats))
+	var allChat []ChatResponse
+	for _, v := range chats {
+		allChat = append(allChat, AllResponseChat(v))
+	}
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Chats retrieved successfully", allChat))
 }

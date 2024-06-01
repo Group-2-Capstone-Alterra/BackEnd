@@ -1,17 +1,24 @@
 package chat
 
+import "time"
+
 type ChatCore struct {
-	SenderID   uint
-	ReceiverID uint
-	Message    string
+	ID             uint
+	ConsultationID uint
+	SenderID       uint
+	ReceiverID     uint
+	Message        string
+	TimeStamp      time.Time
+	CreatedAt      time.Time
+	UpdateAt       time.Time
 }
 
-type ChatModel interface {
+type DataInterface interface {
 	CreateChat(ChatCore) error
-	GetChats(senderID, receiverID uint) ([]ChatCore, error)
+	GetChats(roomchatID uint) ([]ChatCore, error)
 }
 
-type ChatService interface {
-	CreateChat(ChatCore) error
-	GetChats(senderID, receiverID uint) ([]ChatCore, error)
+type ServiceInterface interface {
+	CreateChat(ChatCore ChatCore) error
+	GetChats(currentID, roomchatID uint) ([]ChatCore, error)
 }
