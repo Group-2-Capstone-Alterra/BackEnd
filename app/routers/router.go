@@ -60,10 +60,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	doctorService := _doctorService.New(doctorData)
 	doctorHandlerAPI := _doctorHandler.New(doctorService)
 
-	chatData := _chatData.New(db)
-	chatService := _chatService.New(chatData)
-	chatHandlerAPI := _chatHandler.New(chatService)
-
 	orderData := _orderData.New(db)
 	orderService := _orderService.New(orderData)
 	orderHandlerAPI := _orderHandler.New(orderService)
@@ -71,6 +67,10 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	consultationData := _consultationData.New(db)
 	consultationService := _consultationService.New(consultationData)
 	consultationHandlerAPI := _consultationHandler.New(consultationService)
+
+	chatData := _chatData.New(db)
+	chatService := _chatService.New(chatData, consultationData)
+	chatHandlerAPI := _chatHandler.New(chatService, consultationData)
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
@@ -97,8 +97,8 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.POST("/doctors", doctorHandlerAPI.AddDoctor, middlewares.JWTMiddleware())
 
 	//chats
-	e.POST("/chats", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
-	e.GET("/chats", chatHandlerAPI.GetChats, middlewares.JWTMiddleware())
+	e.POST("/chats/:id", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
+	e.GET("/chats/:id", chatHandlerAPI.GetChats, middlewares.JWTMiddleware())
 
 	//orders
 	e.POST("/orders", orderHandlerAPI.CreateOrder, middlewares.JWTMiddleware())
