@@ -76,14 +76,14 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.POST("/users/register", userHandlerAPI.Register)
 	e.POST("/users/login", userHandlerAPI.Login)
 	e.GET("/users/profile", userHandlerAPI.Profile, middlewares.JWTMiddleware())
-	e.PUT("/users/profile", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
+	e.PATCH("/users/profile", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
 	e.DELETE("/users", userHandlerAPI.Delete, middlewares.JWTMiddleware())
 
 	//products
 	e.POST("/products/insert", productHandlerAPI.AddProduct, middlewares.JWTMiddleware())
 	e.GET("/products", productHandlerAPI.GetAllProduct)
 	e.GET("/products/:id", productHandlerAPI.GetProductById)
-	e.PUT("/products/:id", productHandlerAPI.UpdateProductById, middlewares.JWTMiddleware())
+	e.PATCH("/products/:id", productHandlerAPI.UpdateProductById, middlewares.JWTMiddleware())
 	e.DELETE("/products/:id", productHandlerAPI.Delete, middlewares.JWTMiddleware())
 
 	//admins
