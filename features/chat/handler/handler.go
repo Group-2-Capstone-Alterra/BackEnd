@@ -82,3 +82,23 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Chats retrieved successfully", allChat))
 }
+
+func (ch *ChatHandler) Delete(c echo.Context) error {
+	roomChatID := c.Param("id")
+	roomChatIDConv, errRoomChatIDConv := strconv.Atoi(roomChatID)
+	if errRoomChatIDConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", roomChatIDConv))
+	}
+	bubbleChat := c.QueryParam("bubble")
+	bubbleChatInt, errBubleChatInt := strconv.Atoi(bubbleChat)
+	if errBubleChatInt != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", errBubleChatInt))
+	}
+	senderID := middlewares.ExtractTokenUserId(c)
+
+	err := ch.chatService.Delete(uint(roomChatIDConv), uint(bubbleChatInt), uint(senderID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", err))
+}

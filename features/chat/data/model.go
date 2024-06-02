@@ -16,7 +16,7 @@ type Chat struct {
 	TimeStamp      time.Time
 }
 
-func (c *Chat) ToCore() chat.ChatCore {
+func ToCore(c Chat) chat.ChatCore {
 	return chat.ChatCore{
 		ID:             c.ID,
 		ConsultationID: c.ConsultationID,

@@ -2,6 +2,7 @@ package data
 
 import (
 	"PetPalApp/features/chat"
+	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -18,6 +19,7 @@ func New(db *gorm.DB) chat.DataInterface {
 }
 
 func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
+	log.Println("[Query - Create Chat] Chat Created")
 	chatGorm := Chat{
 		ConsultationID: chat.ConsultationID,
 		SenderID:       chat.SenderID,
@@ -29,7 +31,6 @@ func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-	log.Println("[Query - Create Chat] Detail Chat", chatGorm)
 	return nil
 }
 
@@ -42,8 +43,31 @@ func (cm *ChatModel) GetChats(receiverID uint) ([]chat.ChatCore, error) {
 
 	var result []chat.ChatCore
 	for _, chat := range chats {
-		result = append(result, chat.ToCore())
+		result = append(result, ToCore(chat))
 	}
 
 	return result, nil
+}
+
+func (cm *ChatModel) VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*chat.ChatCore, error) {
+	var chatData Chat
+	tx := cm.db.Where("consultation_id = ? AND sender_id = ?", roomChatID, senderID).Find(&chatData, bubbleChatID)
+	if tx.Error != nil {
+		return nil, fmt.Errorf("[Query VerAvailConcul] BubbleChat not match with consultation and sender id")
+	}
+	conculDataCore := ToCore(chatData)
+	if conculDataCore.ID == 0 {
+		return nil, fmt.Errorf("[Query VerAvailConcul] BubbleChat not match with consultation and sender id")
+	} else {
+		log.Println("[Query VerAvailConcul] BubbleChat found and match with consultation and sender id")
+	}
+	return &conculDataCore, nil
+}
+
+func (cm *ChatModel) Delete(roomChatID, bubbleChatID, senderID uint) error {
+	tx := cm.db.Where("consultation_id = ? AND sender_id = ?", roomChatID, senderID).Delete(&Chat{}, bubbleChatID)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
