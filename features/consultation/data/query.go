@@ -51,9 +51,10 @@ func (p *ConsultationModel) VerIsAdmin(userid uint, id uint) (*consultation.Cons
 
 	conculDataCore := ToCore(conculData)
 	if conculDataCore.ID == 0 {
-		log.Println("[Query VerIsAdmin] Not Admin - ID Concul", conculDataCore.ID)
+		log.Println("[Query VerIsAdmin] Not Admin - ID Concul")
+	} else {
+		log.Println("[Query VerIsAdmin] Is Admin - ID Concul Notfound")
 	}
-	log.Println("[Query VerIsAdmin] Is Admin - ID Concul Notfound", conculDataCore.ID)
 	return &conculDataCore, nil
 }
 
@@ -66,23 +67,60 @@ func (p *ConsultationModel) VerAvailConcul(currentUserId uint, id uint) (*consul
 
 	conculDataCore := ToCore(conculData)
 	if conculDataCore.ID == 0 {
-		log.Println("[Query VerIsAdmin] Not Admin - ID Concul", conculDataCore.ID)
+		log.Println("[Query VerAvailConcul] Roomchat Not Found")
+	} else {
+		log.Println("[Query VerAvailConcul] Roomchat Has Found")
 	}
-	log.Println("[Query VerIsAdmin] Is Admin - ID Concul Notfound", conculDataCore.ID)
+	return &conculDataCore, nil
+}
+
+func (p *ConsultationModel) VerUser(userID uint, doctorID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
+	var conculData Consultation
+	tx := p.db.Where("doctor_id = ? AND user_id = ?", doctorID, userID).Find(&conculData, roomchatID)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	conculDataCore := ToCore(conculData)
+	if conculDataCore.ID == 0 {
+		log.Printf("\n[Query VerUser] User not found at RoomchatID\n")
+	} else {
+		log.Printf("\n[Query VerUser] User has found at RoomchatID\n")
+
+	}
+	return &conculDataCore, nil
+}
+
+func (p *ConsultationModel) VerAdmin(userID uint, doctorID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
+	var conculData Consultation
+	tx := p.db.Where("user_id = ? AND doctor_id = ?", doctorID, userID).Find(&conculData, roomchatID)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	conculDataCore := ToCore(conculData)
+	if conculDataCore.ID == 0 {
+		log.Printf("\n[Query VerAdmin] Doctor not found at RoomchatID\n")
+	} else {
+		log.Printf("\n[Query VerAdmin] Doctor has found at RoomchatID\n")
+
+	}
 	return &conculDataCore, nil
 }
 
 func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {
-    var consultations []Consultation
-    tx := cm.db.Where("user_id = ?", userID).Find(&consultations)
-    if tx.Error != nil {
-        return nil, tx.Error
-    }
+	var consultations []Consultation
+	tx := cm.db.Where("user_id = ?", userID).Find(&consultations)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
-    var result []consultation.ConsultationCore
-    for _, consultation := range consultations {
-        result = append(result, ToCore(consultation))
-    }
+	var result []consultation.ConsultationCore
+	for _, consultation := range consultations {
+		result = append(result, ToCore(consultation))
+	}
 
-    return result, nil
+	return result, nil
 }
