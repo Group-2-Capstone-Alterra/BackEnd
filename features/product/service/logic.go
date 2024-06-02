@@ -45,7 +45,6 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 }
 
 func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]product.Core, error) {
-
 	log.Println("[Service]")
 	log.Println("[Service] sortStr", sortStr)
 	product, _ := p.productData.VerIsAdmin(userid)
@@ -55,15 +54,16 @@ func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]pro
 		if err != nil {
 			return nil, err
 		}
-		// distance
-		if sortStr == "lowest distance" || sortStr == "higest distance" {
-			productSort := p.helper.SortProductsByDistance(userid, product)
-			log.Println("[service - not admin] distance")
-			return productSort, nil
-		} else {
-			log.Println("[service - not admin] not distance")
-			return product, nil
+		if userid != 0 { // add this check
+			// distance
+			if sortStr == "lowest distance" || sortStr == "higest distance" {
+				productSort := p.helper.SortProductsByDistance(userid, product)
+				log.Println("[service - not admin] distance")
+				return productSort, nil
+			}
 		}
+		log.Println("[service - not admin] not distance")
+		return product, nil
 	} else { //if admin
 		log.Println("[Service - admin]")
 		product, err := p.productData.SelectAllAdmin(userid, offset)
@@ -72,7 +72,6 @@ func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]pro
 		}
 		return product, nil
 	}
-
 }
 
 func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {
