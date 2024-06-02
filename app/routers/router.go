@@ -99,6 +99,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	//chats
 	e.POST("/chats/:id", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
 	e.GET("/chats/:id", chatHandlerAPI.GetChats, middlewares.JWTMiddleware())
+	e.DELETE("/chats/:id", chatHandlerAPI.Delete, middlewares.JWTMiddleware())
 
 	//orders
 	e.POST("/orders", orderHandlerAPI.CreateOrder, middlewares.JWTMiddleware())
