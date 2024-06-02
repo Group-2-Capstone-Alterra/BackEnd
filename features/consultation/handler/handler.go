@@ -42,3 +42,17 @@ func (ch *ConsultationHandler) CreateConsultation(c echo.Context) error {
 
     return c.JSON(http.StatusCreated, responses.JSONWebResponse("Consultation created successfully", nil))
 }
+
+func (ch *ConsultationHandler) GetConsultationsByUserID(c echo.Context) error {
+    userID := middlewares.ExtractTokenUserId(c)
+    if userID == 0 {
+        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+    }
+
+    consultations, err := ch.consultationService.GetConsultationsByUserID(uint(userID))
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving consultations: "+err.Error(), nil))
+    }
+
+    return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", consultations))
+}

@@ -71,3 +71,18 @@ func (p *ConsultationModel) VerAvailConcul(currentUserId uint, id uint) (*consul
 	log.Println("[Query VerIsAdmin] Is Admin - ID Concul Notfound", conculDataCore.ID)
 	return &conculDataCore, nil
 }
+
+func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {
+    var consultations []Consultation
+    tx := cm.db.Where("user_id = ?", userID).Find(&consultations)
+    if tx.Error != nil {
+        return nil, tx.Error
+    }
+
+    var result []consultation.ConsultationCore
+    for _, consultation := range consultations {
+        result = append(result, ToCore(consultation))
+    }
+
+    return result, nil
+}
