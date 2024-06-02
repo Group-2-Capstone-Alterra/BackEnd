@@ -17,6 +17,8 @@ type ConsultationModel interface {
 	GetCuntationsById(id uint) (*ConsultationCore, error)
 	VerIsAdmin(userid uint, id uint) (*ConsultationCore, error)
 	VerAvailConcul(currentUserId uint, id uint) (*ConsultationCore, error)
+	VerUser(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
+	VerAdmin(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 }
 
