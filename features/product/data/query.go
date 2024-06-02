@@ -44,7 +44,6 @@ func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, 
 	} else if sortStr == "highest distance" || sortStr == "highest" {
 		log.Println("[query] highest+distance")
 
-
 		tx := p.db.Order("price desc").Limit(10).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
