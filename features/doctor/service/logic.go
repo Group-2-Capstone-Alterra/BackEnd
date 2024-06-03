@@ -6,18 +6,18 @@ import (
 )
 
 type DoctorService struct {
-    DoctorModel doctor.DoctorModel
+	DoctorModel doctor.DoctorModel
 }
 
 func New(dm doctor.DoctorModel) doctor.DoctorService {
-    return &DoctorService{
-        DoctorModel: dm,
-    }
+	return &DoctorService{
+		DoctorModel: dm,
+	}
 }
 
 func (ds *DoctorService) AddDoctor(doctor doctor.Core) error {
-    if doctor.FullName == "" || doctor.Email == "" || doctor.Specialization == "" {
-        return errors.New("[validation] Fullname/email/specialization tidak boleh kosong")
-    }
-    return ds.DoctorModel.AddDoctor(doctor)
+	if doctor.FullName == "" || doctor.Email == "" || doctor.Specialization == "" {
+		return errors.New("[validation] Fullname/email/specialization tidak boleh kosong")
+	}
+	return ds.DoctorModel.AddDoctor(doctor)
 }
