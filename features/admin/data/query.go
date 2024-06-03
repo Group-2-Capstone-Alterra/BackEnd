@@ -20,10 +20,7 @@ func (am *AdminModel) Register(admin admin.Core) error {
 	adminGorm := Admin{
 		FullName:       admin.FullName,
 		Email:          admin.Email,
-		NumberPhone:    admin.NumberPhone,
-		Address:        admin.Address,
 		Password:       admin.Password,
-		ProfilePicture: admin.ProfilePicture,
 	}
 	tx := am.db.Create(&adminGorm)
 
