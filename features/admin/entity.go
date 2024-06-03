@@ -11,7 +11,6 @@ type Core struct {
 	NumberPhone        string
 	Address            string
 	Password           string
-	KetikUlangPassword string
 	ProfilePicture     string
 	Coordinate         string
 	Token              string

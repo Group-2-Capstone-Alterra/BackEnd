@@ -30,10 +30,7 @@ func (ah *AdminHandler) Register(c echo.Context) error {
 	dataAdmin := admin.Core{
 		FullName:           newAdmin.FullName,
 		Email:              newAdmin.Email,
-		NumberPhone:        newAdmin.NumberPhone,
-		Address:            newAdmin.Address,
 		Password:           newAdmin.Password,
-		KetikUlangPassword: newAdmin.KetikUlangPassword,
 	}
 
 	errInsert := ah.adminService.Register(dataAdmin)
