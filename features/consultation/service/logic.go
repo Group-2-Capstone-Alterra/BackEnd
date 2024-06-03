@@ -21,3 +21,7 @@ func (cs *ConsultationService) CreateConsultation(consultation consultation.Cons
 func (cs *ConsultationService) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {
     return cs.consultationModel.GetConsultationsByUserID(userID)
 }
+
+func (cs *ConsultationService) GetConsultationsByDoctorID(doctorID uint) ([]consultation.ConsultationCore, error) {
+    return cs.consultationModel.GetConsultationsByDoctorID(doctorID)
+}
