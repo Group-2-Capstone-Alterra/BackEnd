@@ -4,7 +4,9 @@ import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/admin"
 	"PetPalApp/utils/responses"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -126,4 +128,34 @@ func (ah *AdminHandler) Update(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Update berhasil", nil))
+}
+
+func (ah *AdminHandler) GetAllClinic(c echo.Context) error {
+	log.Println("[HANDLER]")
+
+	page := c.QueryParam("page")
+	pageInt, err := strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	log.Println("page:", pageInt)
+	offset := (pageInt - 1) * 10
+
+	sortStr := c.QueryParam("sort")
+
+	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	log.Println("idtoken:", idToken)
+
+	log.Println("[HANDLER - result]")
+	result, errResult := ah.adminService.GetAllClinic(uint(idToken), uint(offset), sortStr)
+	if errResult != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+	}
+
+	// var allAdmin []handler.AllClinicResponse
+	// for _, v := range result {
+	// 	allAdmin = append(allAdmin, handler.ResponseAllClinic(v))
+	// }
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", result))
 }

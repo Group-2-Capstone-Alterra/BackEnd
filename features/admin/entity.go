@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"PetPalApp/features/clinic"
 	"time"
 )
 
@@ -25,6 +26,7 @@ type AdminModel interface {
 	AdminById(adminid uint) (*Core, error)
 	Delete(adminid uint) error
 	Update(adminid uint, updateData Core) error
+	SelectAllAdmin() ([]Core, error)
 }
 
 type AdminService interface {
@@ -33,4 +35,5 @@ type AdminService interface {
 	GetProfile(adminid uint) (data *Core, err error)
 	Delete(adminid uint) error
 	Update(adminid uint, updateData Core) error
+	GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error)
 }
