@@ -2,11 +2,13 @@ package helper
 
 import (
 	"PetPalApp/features/admin"
+	"PetPalApp/features/clinic"
 	"PetPalApp/features/product"
 	"PetPalApp/features/user"
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"sort"
 	"strconv"
@@ -22,6 +24,7 @@ type HelperInterface interface {
 	UploadProductPicture(file io.Reader, fileName string) (string, error)
 	DereferenceString(s *string) string
 	SortProductsByDistance(iduser uint, products []product.Core) []product.Core
+	SortClinicsByDistance(userid uint, clnics []clinic.Core) []clinic.Core
 }
 
 type helper struct {
@@ -129,6 +132,46 @@ func (u *helper) SortProductsByDistance(userid uint, products []product.Core) []
 	})
 
 	return products
+}
+
+func (u *helper) SortClinicsByDistance(userid uint, clinics []clinic.Core) []clinic.Core {
+	log.Println("[Helper - SortClinicsByDistance]")
+	user, _ := u.user.SelectById(userid)
+	userCoorConv := strings.Split(user.Coordinate, ",")
+	// log.Println("[Helper - SortClinicsByDistance] - userCoorConv", userCoorConv) //passed
+	userLat, errUserLat := strconv.ParseFloat(userCoorConv[0], 64)
+	if errUserLat != nil {
+		return nil
+	}
+	userLong, errUserLong := strconv.ParseFloat(userCoorConv[1], 64)
+	if errUserLong != nil {
+		return nil
+	}
+
+	for i := range clinics {
+		//get coordinate admin
+		adminID := clinics[i].ID
+		dataAdmin, _ := u.admin.AdminById(adminID)
+
+		adminCoor := strings.Split(dataAdmin.Coordinate, ",")
+		adminLat, errAdminLat := strconv.ParseFloat(adminCoor[0], 64)
+		if errAdminLat != nil {
+			return nil
+		}
+		adminLong, errAdminLong := strconv.ParseFloat(adminCoor[1], 64)
+		if errAdminLong != nil {
+			return nil
+		}
+
+		//get distance
+		distance := Distance(userLat, userLong, adminLat, adminLong)
+		clinics[i].Distance = distance
+	}
+	log.Println("[Helper - SortClinicsByDistance] 2")
+	sort.Slice(clinics, func(i, j int) bool {
+		return clinics[i].Distance < clinics[j].Distance
+	})
+	return clinics
 }
 
 func Distance(userLat, userLon, adminLat, adminLon float64) float64 {
