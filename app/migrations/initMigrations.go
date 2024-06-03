@@ -17,6 +17,7 @@ func InitMigrations(db *gorm.DB) {
 	db.AutoMigrate(&_dataAdmin.Admin{})
 	db.AutoMigrate(&_dataProduct.Product{})
 	db.AutoMigrate(&_dataDoctor.Doctor{})
+	db.AutoMigrate(&_dataDoctor.AvailableDay{})
 	db.AutoMigrate(&_dataChat.Chat{})
 	db.AutoMigrate(&_dataOrder.Order{})
 	db.AutoMigrate(&_dataConsultation.Consultation{})
