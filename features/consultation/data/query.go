@@ -124,3 +124,18 @@ func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultati
 
 	return result, nil
 }
+
+func (cm *ConsultationModel) GetConsultationsByDoctorID(doctorID uint) ([]consultation.ConsultationCore, error) {
+    var consultations []Consultation
+    tx := cm.db.Where("doctor_id = ?", doctorID).Find(&consultations)
+    if tx.Error != nil {
+        return nil, tx.Error
+    }
+
+    var result []consultation.ConsultationCore
+    for _, consultation := range consultations {
+        result = append(result, ToCore(consultation))
+    }
+
+    return result, nil
+}

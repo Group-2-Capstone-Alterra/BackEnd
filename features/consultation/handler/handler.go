@@ -5,6 +5,7 @@ import (
 	"PetPalApp/features/consultation"
 	"PetPalApp/utils/responses"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -50,6 +51,21 @@ func (ch *ConsultationHandler) GetConsultationsByUserID(c echo.Context) error {
     }
 
     consultations, err := ch.consultationService.GetConsultationsByUserID(uint(userID))
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving consultations: "+err.Error(), nil))
+    }
+
+    return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", consultations))
+}
+
+func (ch *ConsultationHandler) GetConsultationsByDoctorID(c echo.Context) error {
+    doctorIDStr := c.Param("doctor_id")
+    doctorID, err := strconv.ParseUint(doctorIDStr, 10, 32)
+    if err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid doctor ID", nil))
+    }
+
+    consultations, err := ch.consultationService.GetConsultationsByDoctorID(uint(doctorID))
     if err != nil {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving consultations: "+err.Error(), nil))
     }
