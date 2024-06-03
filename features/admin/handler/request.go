@@ -2,7 +2,7 @@ package handler
 
 //request
 type AdminRequest struct {
-	FullName           string `json:"fullName" form:"fullName"`
+	FullName           string `json:"full_name" form:"full_name"`
 	Email              string `json:"email" form:"email"`
 	NumberPhone        string `json:"number_phone" form:"number_phone"`
 	Address            string `json:"address" form:"address"`
