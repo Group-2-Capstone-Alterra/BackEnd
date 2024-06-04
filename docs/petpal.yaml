@@ -1,0 +1,1011 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/WFHADIT/PETPAL/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/BAGASAPUTRA31/PetPal-APP/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/FIRMANADISUSANTOO/cobaApitask2/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: Server
+info:
+  version: "1.0.0"
+  title: PetCare
+  description: Application for ordering products and consulting veterinarians
+tags:
+  - name: user
+    description: User operations
+  - name: admin
+    description: Admin operations
+  - name: product
+    description: Product operations
+  - name: konsultasi
+    description: Consultation operations
+  - name: chat
+    description: Chat operations
+  - name: pemesanan
+    description: Order operations
+  - name: clinic
+    description: Clinic operations
+paths:
+  /users/register:
+    post:
+      tags:
+        - user
+      description: Register user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+            example:
+              full_name: "user"
+              email: "user@gmail.com"
+              password: "password"
+      responses:
+        "201":
+          description: Registration Successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Registration Successful
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /users/login:
+    post:
+      tags:
+        - user
+      description: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+            example:
+              email: "user@gmail.com"
+              password: "password"
+      responses:
+        "200":
+          description: Login Successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Login successful
+                data:
+                  id: 1
+                  full_name: "user"
+                  token: "cunsdhshduhsdhfuhyerolsmklnkdsjbcjdhdgfyegfbcvdmkfirfbncmxn"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /users/profile:
+    get:
+      tags:
+        - user
+      description: Displays user profile details
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully got profile details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              example:
+                code: 200
+                message: Successfully got profile details
+                data:
+                  id: 1
+                  profile_picture: "Link Profile Picture"
+                  full_name: "User"
+                  email: "User@Mail.com"
+                  address: "Malang"
+                  coordinate: "6.160387,1.262275"
+                  phone_number: "08123"
+                  password: ""
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+    patch:
+      tags:
+        - user
+      description: Change profile details
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+            example:
+              full_name: "User Full Name"
+              email: "User@mail.com"
+              number_phone: "08123"
+              address: "Malang"
+              password: "Secret Password"
+              profile_picture: "Profile Picture Default"
+      responses:
+        "200":
+          description: Successfully changed profile details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully changed profile details
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
+        "404":
+          description: if page not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Page not found
+        "500":
+          $ref: "#/components/responses/500"
+
+  /users:
+    delete:
+      tags:
+        - user
+      description: Delete user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Successfully Deleted User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully Deleted User
+        404:
+          description: User Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: User Not Found
+        "401":
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+
+  /admins/register:
+    post:
+      tags:
+        - admin
+      description: Register admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Admin"
+            example:
+              full_name: "Admin"
+              email: "Admin@gmail.com"
+              password: "password"
+      responses:
+        "201":
+          description: Registration Was Successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Registration Was Successfula
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /admins/login:
+    post:
+      tags:
+        - admin
+      description: Login admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+            example:
+              email: "admin@gmail.com"
+              password: "password"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Login successful
+                data:
+                  nama: "admin"
+                  email: "admin@gmail.com"
+                  token: "cunsdhshduhsdhfuhyerolsmklnkdsjbcjdhdgfyegfbcvdmkfirfbncmxn"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /admins:
+    get:
+      tags:
+        - admin
+      description: Displays admin profile details
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully got profile details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Admin"
+              example:
+                id: 1
+                ProfilePicture: "Link Profile Picture"
+                FullName: "Admin"
+                VetsName: "Vets Admin"
+                Email: "Admin@Mail.com"
+                Address: "Malang"
+                PhoneNumber: "08123"
+                Password: ""
+        "500":
+          $ref: "#/components/responses/500"
+    patch:
+      tags:
+        - admin
+      description: Change profile details
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+            example:
+              full_name: "User Full Name"
+              email: "User@mail.com"
+              number_phone: "08123"
+              address: "Malang"
+              password: "Secret Password"
+              profile_picture: "Profile Picture Default"
+      responses:
+        "200":
+          description: Successfully changed profile details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully changed profile details
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
+        "404":
+          description: if page not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Page not found
+        "500":
+          $ref: "#/components/responses/500"
+
+    delete:
+      tags:
+        - admin
+      description: Delete admin
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Successfully Deleted Admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully Deleted Admin
+        404:
+          description: Admin Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Admin Not Found
+        "401":
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+
+  /products:
+    post:
+      tags:
+        - product
+      description: Adding New Products
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/product"
+            example:
+              product_name: "Product A"
+              price: 30000
+              description: "Deskripsi product A"
+              stock: 12
+              product_picture: "Link Picture"
+      responses:
+        "201":
+          description: Successfully added product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Successfully added product
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+    get:
+      tags:
+        - product
+      summary: Get all products for user
+      description: Gets the list of products displayed to the user
+      responses:
+        "200":
+          description: Successfully got the product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/product"
+              example:
+                - product_picture: "Link picture"
+                  product_name: "product A"
+                  price: 10000
+                - product_picture: "Link picture"
+                  product_name: "product B"
+                  price: 10000
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /clinics:
+    get:
+      tags:
+        - clinic
+      summary: Get all clinics
+      description: Get all clinics and sort by distance
+      responses:
+        "200":
+          description: Successfully got the clinics list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/clinic"
+              example:
+                - admin_id: 3
+                  clinic_name: "clinic name"
+                  open:
+                    {
+                      id: 3,
+                      doctor_id: 5,
+                      monday: "true",
+                      tuesday: "true",
+                      wednesday: "false",
+                      thursday: "true",
+                      friday: "true",
+                    }
+                  service: "vaksin"
+                  veterinary: "doctor name"
+                  location: "alun-alun"
+                  coordinate: "-7.981966354257,112.63094881813343"
+                  distance: 2.819896742309485
+
+                - admin_id: 3
+                  clinic_name: "clinic name"
+                  open:
+                    {
+                      id: 3,
+                      doctor_id: 5,
+                      monday: "true",
+                      tuesday: "true",
+                      wednesday: "false",
+                      thursday: "true",
+                      friday: "true",
+                    }
+                  service: "vaksin"
+                  veterinary: "doctor name"
+                  location: "alun-alun"
+                  coordinate: "-7.981966354257,112.63094881813343"
+                  distance: 2.819896742309485
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /products/{id}:
+    get:
+      tags:
+        - product
+      summary: Get Product Details
+      description: Get Product Details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successfully got product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/product"
+              example:
+                product_picture: "Link picture"
+                product_name: "product A"
+                price: 10000
+                description: "Deskripsi product A"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Product not found
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+    patch:
+      tags:
+        - product
+      description: Change Product Details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/product"
+            example:
+              nama: "product A1"
+              harga: 15000
+              deskripsi: "Changed product A description"
+      responses:
+        "200":
+          description: Successfully Changed Product Details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully Changed Product Details
+        "400":
+          $ref: "#/components/responses/400"
+        "404":
+          description: Product Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Product Not Found
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+    delete:
+      tags:
+        - product
+      description: Delete Product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successfully Deleted Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully Deleted Product
+        "404":
+          description: Product Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Product Not Found
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /konsultasi:
+    post:
+      tags:
+        - konsultasi
+      description: Membuat jadwal konsultasi
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Konsultasi"
+            example:
+              dokter_id: 1
+              user_id: 1
+              jadwal: "2024-05-28T10:00:00Z"
+              tipe: "online"
+      responses:
+        "201":
+          description: Berhasil menambahkan jadwal konsultasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Berhasil menambahkan jadwal konsultasi
+                data:
+                  id: 1
+                  dokter_id: 1
+                  user_id: 1
+                  jadwal: "2024-05-28T10:00:00Z"
+                  tipe: "online"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /konsultasi/{id}:
+    get:
+      tags:
+        - konsultasi
+      description: Mendapatkan detail konsultasi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Berhasil mendapatkan detail konsultasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Konsultasi"
+              example:
+                id: 1
+                dokter_id: 1
+                user_id: 1
+                jadwal: "2024-05-28T10:00:00Z"
+                tipe: "online"
+        "404":
+          description: Konsultasi tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Konsultasi tidak ditemukan
+        "500":
+          $ref: "#/components/responses/500"
+
+    put:
+      tags:
+        - konsultasi
+      description: Mengubah detail konsultasi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Konsultasi"
+            example:
+              jadwal: "2024-05-28T11:00:00Z"
+              tipe: "offline"
+      responses:
+        "200":
+          description: Berhasil mengubah jadwal konsultasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Berhasil mengubah jadwal konsultasi
+                data:
+                  id: 1
+                  dokter_id: 1
+                  user_id: 1
+                  jadwal: "2024-05-28T11:00:00Z"
+                  tipe: "offline"
+        "400":
+          $ref: "#/components/responses/400"
+        "404":
+          description: Konsultasi tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Konsultasi tidak ditemukan
+        "500":
+          $ref: "#/components/responses/500"
+
+  /chats/{id}:
+    post:
+      tags:
+        - chat
+      description: Create chat
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Chat"
+            example:
+              message: "Halo"
+      responses:
+        "201":
+          description: Message Sent Successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Message Sent Successfully
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+    get:
+      tags:
+        - chat
+      summary: Get Chat History
+      description: Get Chat History
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successfully Get Chat History
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chat"
+              example:
+                id: 6
+                roomchat_id: 1
+                sender_id: 6
+                receiver_id: 1
+                message: "Chat"
+                time_stamp: "2024-06-02T05:15:55.312Z"
+
+        "404":
+          description: Chat History not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Chat History not found
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+    delete:
+      tags:
+        - chat
+      description: Delete Message
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successfully Delete Message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Successfully Delete Message
+        "404":
+          description: Message Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: Message Not Found
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+        number_phone:
+          type: string
+        address:
+          type: string
+        password:
+          type: string
+          format: password
+        profile_picture:
+          type: string
+        coordinate:
+          type: string
+
+    Admin:
+      type: object
+      properties:
+        id:
+          type: integer
+        FullName:
+          type: string
+        VetsName:
+          type: string
+        Email:
+          type: string
+          format: email
+        NumberPhone:
+          type: string
+        Adress:
+          type: string
+        Password:
+          type: string
+          format: password
+        RetypePassword:
+          type: string
+          format: password
+        ProfilePicture:
+          type: string
+
+    product:
+      type: object
+      properties:
+        id:
+          type: integer
+        OwnerName:
+          type: string
+        ProduckName:
+          type: string
+        Price:
+          type: integer
+        Description:
+          type: string
+        Stock:
+          type: integer
+        ProductPicture:
+          type: string
+
+    clinic:
+      type: object
+      properties:
+        admin_id:
+          type: integer
+        clinic_name:
+          title: string
+        open:
+          type: object
+        service:
+          type: string
+        veterinary:
+          type: string
+        location:
+          type: string
+        coordinate:
+          type: string
+        distance:
+          type: integer
+
+    Konsultasi:
+      type: object
+      properties:
+        id:
+          type: integer
+        dokter_id:
+          type: integer
+        user_id:
+          type: integer
+        jadwal:
+          type: string
+          format: date-time
+        tipe:
+          type: string
+
+    ApiDataResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          type: object
+
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+        roomchat_id:
+          type: integer
+        sender_id:
+          type: integer
+        message:
+          type: string
+        time_stamp:
+          type: string
+
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    400:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiResponse"
+          example:
+            code: 400
+            message: Invalid request data
+    401:
+      description: Unauthorized User
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiResponse"
+          example:
+            code: 401
+            message: Unauthorized User
+    500:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiResponse"
+          example:
+            code: 500
+            message: Server error
