@@ -3,13 +3,13 @@ package consultation
 import "time"
 
 type ConsultationCore struct {
-	ID           uint
-	UserID       uint
-	DoctorID     uint
-	Consultation string
-	Response     string
-	Status       string
-	CreatedAt    time.Time
+	ID                 uint
+	UserID             uint
+	DoctorID           uint
+	Consultation       string
+	TransactionStatus  string
+	StatusConsultation string
+	CreatedAt          time.Time
 }
 
 type ConsultationModel interface {

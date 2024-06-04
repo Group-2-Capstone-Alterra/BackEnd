@@ -3,6 +3,8 @@ package handler
 import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/consultation"
+	"PetPalApp/features/doctor"
+	"PetPalApp/features/user"
 	"PetPalApp/utils/responses"
 	"net/http"
 	"strconv"
@@ -12,11 +14,23 @@ import (
 
 type ConsultationHandler struct {
 	consultationService consultation.ConsultationService
+<<<<<<< HEAD
 }
 
 func New(cs consultation.ConsultationService) *ConsultationHandler {
 	return &ConsultationHandler{
 		consultationService: cs,
+=======
+	userData            user.DataInterface
+	doctorData          doctor.DoctorModel
+}
+
+func New(cs consultation.ConsultationService, userData user.DataInterface, doctorData doctor.DoctorModel) *ConsultationHandler {
+	return &ConsultationHandler{
+		consultationService: cs,
+		userData:            userData,
+		doctorData:          doctorData,
+>>>>>>> b689b19 (rev feat:consulations)
 	}
 }
 
@@ -55,6 +69,15 @@ func (ch *ConsultationHandler) GetConsultationsByUserID(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving consultations: "+err.Error(), nil))
 	}
 
+<<<<<<< HEAD
+=======
+	var allConsultation []ConsultationResponse
+	for _, v := range consultations {
+		userData, _ := ch.userData.SelectById(v.UserID)
+		doctorData, _ := ch.doctorData.SelectById(v.DoctorID)
+	}
+
+>>>>>>> b689b19 (rev feat:consulations)
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", consultations))
 }
 

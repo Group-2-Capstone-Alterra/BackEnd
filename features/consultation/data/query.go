@@ -22,7 +22,8 @@ func (cm *ConsultationModel) CreateConsultation(consultationCore consultation.Co
 		UserID:       consultationCore.UserID,
 		DoctorID:     consultationCore.DoctorID,
 		Consultation: consultationCore.Consultation,
-		Status:       "Pending", // default status
+		// Status:       "Pending", // default status
+
 	}
 	tx := cm.db.Create(&consultationGorm)
 	if tx.Error != nil {
