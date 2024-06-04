@@ -22,7 +22,8 @@ func (cm *ConsultationModel) CreateConsultation(consultationCore consultation.Co
 		UserID:       consultationCore.UserID,
 		DoctorID:     consultationCore.DoctorID,
 		Consultation: consultationCore.Consultation,
-		Status:       "Pending", // default status
+		// Status:       "Pending", // default status
+
 	}
 	tx := cm.db.Create(&consultationGorm)
 	if tx.Error != nil {
@@ -108,6 +109,21 @@ func (p *ConsultationModel) VerAdmin(userID uint, doctorID uint, roomchatID uint
 
 	}
 	return &conculDataCore, nil
+}
+
+func (cm *ConsultationModel) GetConsultations(currentID uint) ([]consultation.ConsultationCore, error) {
+	var consultations []Consultation
+	tx := cm.db.Where("user_id = ? OR doctor_id = ?", currentID, currentID).Find(&consultations)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	var result []consultation.ConsultationCore
+	for _, consultation := range consultations {
+		result = append(result, ToCore(consultation))
+	}
+
+	return result, nil
 }
 
 func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {

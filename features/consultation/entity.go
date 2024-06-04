@@ -3,13 +3,13 @@ package consultation
 import "time"
 
 type ConsultationCore struct {
-	ID           uint
-	UserID       uint
-	DoctorID     uint
-	Consultation string
-	Response     string
-	Status       string
-	CreatedAt    time.Time
+	ID                 uint
+	UserID             uint
+	DoctorID           uint
+	Consultation       string
+	TransactionStatus  string
+	StatusConsultation string
+	CreatedAt          time.Time
 }
 
 type ConsultationModel interface {
@@ -19,6 +19,7 @@ type ConsultationModel interface {
 	VerAvailConcul(currentUserId uint, id uint) (*ConsultationCore, error)
 	VerUser(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
 	VerAdmin(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
+	GetConsultations(currentID uint) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
 	UpdateConsultationResponse(consultationID uint, response string) error
@@ -26,6 +27,7 @@ type ConsultationModel interface {
 
 type ConsultationService interface {
 	CreateConsultation(ConsultationCore) error
+	GetConsultations(currentID uint) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
 	UpdateConsultationResponse(consultationID uint, response string) error
