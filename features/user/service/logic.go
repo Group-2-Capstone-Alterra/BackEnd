@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 )
 
@@ -82,15 +83,20 @@ func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handl
 		}
 		input.Password = result
 	}
+	log.Println("[Service - UpdateById]")
 
+	log.Println("[Service - UpdateById] file ", file)
+	log.Println("[Service - UpdateById] handlerFilename ", handlerFilename)
 	if file != nil && handlerFilename != "" {
 		timestamp := time.Now().Unix()
 		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+		log.Println("[Service - UpdateById] fileName ", fileName)
 		photoFileName, errPhoto := u.helperService.UploadProfilePicture(file, fileName)
 		if errPhoto != nil {
 			return "", errPhoto
 		}
 		input.ProfilePicture = photoFileName
+		log.Println("[Service - UpdateById] input.ProfilePicture ", input.ProfilePicture)
 	}
 
 	err := u.userData.PutById(id, input)

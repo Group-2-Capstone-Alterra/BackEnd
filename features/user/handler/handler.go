@@ -88,7 +88,7 @@ func (uh *UserHandler) UpdateUserById(c echo.Context) error {
 	var handler *multipart.FileHeader
 	var err error
 
-	file, handler, err = c.Request().FormFile("ProfilePicture")
+	file, handler, err = c.Request().FormFile("profile_picture")
 	if err != nil {
 		if err != http.ErrMissingFile {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
