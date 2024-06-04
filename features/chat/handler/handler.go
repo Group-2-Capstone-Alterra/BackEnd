@@ -4,6 +4,8 @@ import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/chat"
 	"PetPalApp/features/consultation"
+	"PetPalApp/features/doctor"
+	"PetPalApp/features/user"
 	"PetPalApp/utils/responses"
 	"log"
 	"net/http"
@@ -15,12 +17,16 @@ import (
 type ChatHandler struct {
 	chatService      chat.ServiceInterface
 	consultationData consultation.ConsultationModel
+	userData         user.DataInterface
+	doctorData       doctor.DoctorModel
 }
 
-func New(cs chat.ServiceInterface, consultationData consultation.ConsultationModel) *ChatHandler {
+func New(cs chat.ServiceInterface, consultationData consultation.ConsultationModel, userData user.DataInterface, doctorData doctor.DoctorModel) *ChatHandler {
 	return &ChatHandler{
 		chatService:      cs,
 		consultationData: consultationData,
+		userData:         userData,
+		doctorData:       doctorData,
 	}
 }
 
@@ -62,7 +68,7 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 	if errConv != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
 	}
-	log.Println("[Handler] Roomchat DD", roomchatIDConv)
+	log.Println("[Handler] Roomchat ID", roomchatIDConv)
 
 	currentID := middlewares.ExtractTokenUserId(c)
 	if currentID == 0 {
@@ -77,9 +83,23 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 
 	var allChat []ChatResponse
 	for _, v := range chats {
-		allChat = append(allChat, AllResponseChat(v))
-	}
+		log.Println("[Handler] for _, v")
+		consulData, _ := ch.consultationData.GetCuntationsById(uint(roomchatIDConv))
+		// log.Println("[Handler - Chats] consulData", consulData)
 
+		// log.Println("[Handler - Chats] doctorData", doctorData)
+		if v.SenderID == consulData.DoctorID { //if sender doctor
+			log.Println("[Handler] if sender doctor")
+			doctorData, _ := ch.doctorData.SelectDoctorById(v.SenderID)
+			userData, _ := ch.userData.SelectById(v.ReceiverID)
+			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData))
+		} else {
+			log.Println("[Handler] if sender user")
+			userData, _ := ch.userData.SelectById(v.SenderID)
+			doctorData, _ := ch.doctorData.SelectDoctorById(v.ReceiverID)
+			allChat = append(allChat, AllResponseChatFromUser(v, *userData, *doctorData))
+		}
+	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Chats retrieved successfully", allChat))
 }
 

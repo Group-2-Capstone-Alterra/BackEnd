@@ -34,9 +34,29 @@ func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
 	return nil
 }
 
-func (cm *ChatModel) GetChats(receiverID uint) ([]chat.ChatCore, error) {
+func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
-	tx := cm.db.Find(&chats)
+	log.Println("[QUERY - GetChats] currentID", currentID)
+	log.Println("[QUERY - GetChats] roomchatID", roomchatID)
+	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	var result []chat.ChatCore
+	for _, chat := range chats {
+
+		result = append(result, ToCore(chat))
+	}
+
+	return result, nil
+}
+
+func (cm *ChatModel) GetChatsDoctor(currentID, roomchatID uint) ([]chat.ChatCore, error) {
+	var chats []Chat
+	log.Println("[QUERY - GetChats] currentID", currentID)
+	log.Println("[QUERY - GetChats] roomchatID", roomchatID)
+	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -51,7 +71,7 @@ func (cm *ChatModel) GetChats(receiverID uint) ([]chat.ChatCore, error) {
 
 func (cm *ChatModel) VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*chat.ChatCore, error) {
 	var chatData Chat
-	tx := cm.db.Where("consultation_id = ? AND sender_id = ?", roomChatID, senderID).Find(&chatData, bubbleChatID)
+	tx := cm.db.Where("consultation_id = ?", roomChatID).Where("sender_id = ?", senderID).Find(&chatData, bubbleChatID)
 	if tx.Error != nil {
 		return nil, fmt.Errorf("[Query VerAvailConcul] BubbleChat not match with consultation and sender id")
 	}
@@ -65,7 +85,7 @@ func (cm *ChatModel) VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*cha
 }
 
 func (cm *ChatModel) Delete(roomChatID, bubbleChatID, senderID uint) error {
-	tx := cm.db.Where("consultation_id = ? AND sender_id = ?", roomChatID, senderID).Delete(&Chat{}, bubbleChatID)
+	tx := cm.db.Where("consultation_id = ?", roomChatID).Where("sender_id = ?", senderID).Delete(&Chat{}, bubbleChatID)
 	if tx.Error != nil {
 		return tx.Error
 	}
