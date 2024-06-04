@@ -13,6 +13,7 @@ type Doctor struct {
 	FullName       string
 	Email          string
 	Specialization string
+	ProfilePicture string
 }
 
 type AvailableDay struct {
@@ -32,6 +33,7 @@ func GormToCore(doctorGorm Doctor) doctor.Core {
 		FullName:       doctorGorm.FullName,
 		Email:          doctorGorm.Email,
 		Specialization: doctorGorm.Specialization,
+		ProfilePicture: doctorGorm.ProfilePicture,
 	}
 	return result
 }

@@ -11,12 +11,14 @@ type Core struct {
 	FullName       string
 	Email          string
 	Specialization string
+	ProfilePicture string
 	AvailableDay   clinic.Core
 }
 
 type DoctorModel interface {
 	AddDoctor(Core) error
-	SelectById(id uint) (*Core, error)
+	SelectByAdminId(id uint) (*Core, error)
+	SelectDoctorById(id uint) (*Core, error)
 	SelectAvailDayById(id uint) (*availdaydoctor.Core, error)
 	SelectAllDoctor() ([]Core, error)
 }
