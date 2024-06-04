@@ -21,10 +21,12 @@ type ConsultationModel interface {
 	VerAdmin(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
+	UpdateConsultationResponse(consultationID uint, response string) error
 }
 
 type ConsultationService interface {
 	CreateConsultation(ConsultationCore) error
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
+	UpdateConsultationResponse(consultationID uint, response string) error
 }
