@@ -31,11 +31,25 @@ func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
 	return nil
 }
 
-func (dm *DoctorModel) SelectById(id uint) (*doctor.Core, error) {
+func (dm *DoctorModel) SelectByAdminId(id uint) (*doctor.Core, error) {
 	log.Println("[Query Doctor - SelectById]")
 	var doctorData Doctor
 	log.Println("[Query Doctor - SelectById] AdminID", id)
 	tx := dm.db.Where("admin_id = ?", id).Find(&doctorData)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var doctorCore = GormToCore(doctorData)
+	log.Println("[Query Doctor - SelectById] doctorCore", doctorCore)
+
+	return &doctorCore, nil
+}
+
+func (dm *DoctorModel) SelectDoctorById(id uint) (*doctor.Core, error) {
+	log.Println("[Query Doctor - SelectById]")
+	var doctorData Doctor
+	log.Println("[Query Doctor - SelectById] AdminID", id)
+	tx := dm.db.Find(&doctorData, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
