@@ -73,8 +73,8 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	consultationHandlerAPI := _consultationHandler.New(consultationService)
 
 	chatData := _chatData.New(db)
-	chatService := _chatService.New(chatData, consultationData)
-	chatHandlerAPI := _chatHandler.New(chatService, consultationData)
+	chatService := _chatService.New(chatData, consultationData, doctorData, userData, adminData)
+	chatHandlerAPI := _chatHandler.New(chatService, consultationData, userData, doctorData)
 
 	order_ProductData := _order_ProductData.New(db)
 	order_ProductService := _order_ProductService.New(order_ProductData)
@@ -123,5 +123,3 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	//order_products
 	e.POST("/order_products", order_productHandlerAPI.CreateOrderProduct, middlewares.JWTMiddleware())
 }
-
-
