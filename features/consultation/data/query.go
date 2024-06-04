@@ -139,3 +139,11 @@ func (cm *ConsultationModel) GetConsultationsByDoctorID(doctorID uint) ([]consul
 
     return result, nil
 }
+
+func (cm *ConsultationModel) UpdateConsultationResponse(consultationID uint, response string) error {
+    tx := cm.db.Model(&Consultation{}).Where("id = ?", consultationID).Update("response", response)
+    if tx.Error != nil {
+        return tx.Error
+    }
+    return nil
+}

@@ -72,3 +72,22 @@ func (ch *ConsultationHandler) GetConsultationsByDoctorID(c echo.Context) error 
 
     return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", consultations))
 }
+
+func (ch *ConsultationHandler) UpdateConsultationResponse(c echo.Context) error {
+    consultationIDStr := c.Param("consultation_id")
+    consultationID, err := strconv.ParseUint(consultationIDStr, 10, 32)
+    if err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid consultation ID", nil))
+    }
+
+    responseRequest := ConsultationResponse{}
+    if err := c.Bind(&responseRequest); err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
+    }
+
+    if err := ch.consultationService.UpdateConsultationResponse(uint(consultationID), responseRequest.Response); err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error updating consultation response: "+err.Error(), nil))
+    }
+
+    return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", responseRequest))
+}
