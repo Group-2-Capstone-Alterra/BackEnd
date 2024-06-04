@@ -8,9 +8,9 @@ type Admin struct {
 	gorm.Model
 	FullName       string
 	Email          string `gorm:"unique"`
-	NumberPhone    string `gorm:"unique"`
-	Address        string
 	Password       string
-	ProfilePicture string
-	Coordinate     string
+	NumberPhone    *string `gorm:"unique"`
+	Address        *string
+	ProfilePicture *string
+	Coordinate     *string
 }

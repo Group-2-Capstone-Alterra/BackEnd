@@ -2,7 +2,6 @@ package data
 
 import (
 	"PetPalApp/features/admin"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -22,6 +21,10 @@ func (am *AdminModel) Register(admin admin.Core) error {
 		FullName:       admin.FullName,
 		Email:          admin.Email,
 		Password:       admin.Password,
+		NumberPhone: 	nil,
+		Address: 		nil,
+		ProfilePicture: nil,
+		Coordinate: 	nil,
 	}
 	tx := am.db.Create(&adminGorm)
 
@@ -38,36 +41,67 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
+	
+	var numberPhone, address, profilePicture string
+	
+	if adminData.NumberPhone != nil {
+		numberPhone = *adminData.NumberPhone
+	}
+	
+	if adminData.Address != nil {
+		address = *adminData.Address
+	}
+	
+	if adminData.ProfilePicture != nil {
+		profilePicture = *adminData.ProfilePicture
+	}
+	
 	var admins = admin.Core{
 		ID:             adminData.ID,
 		FullName:       adminData.FullName,
 		Email:          adminData.Email,
-		NumberPhone:    adminData.NumberPhone,
-		Address:        adminData.Address,
+		NumberPhone:    numberPhone,
+		Address:        address,
 		Password:       adminData.Password,
-		ProfilePicture: adminData.ProfilePicture,
+		ProfilePicture: profilePicture,
 	}
 	return &admins, nil
 }
 
+
 func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 	var adminData Admin
-	log.Println("[AdminById] admin id", adminid)
-	tx := am.db.Find(&adminData, adminid)
+	tx := am.db.First(&adminData, adminid)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
+	
+	var numberPhone, address, profilePicture string
+	
+	if adminData.NumberPhone != nil {
+		numberPhone = *adminData.NumberPhone
+	}
+	
+	if adminData.Address != nil {
+		address = *adminData.Address
+	}
+	
+	if adminData.ProfilePicture != nil {
+		profilePicture = *adminData.ProfilePicture
+	}
+	
 	var admin = admin.Core{
 		ID:             adminData.ID,
 		FullName:       adminData.FullName,
 		Email:          adminData.Email,
-		NumberPhone:    adminData.NumberPhone,
-		Address:        adminData.Address,
-		ProfilePicture: adminData.ProfilePicture,
-		Coordinate:     adminData.Coordinate,
+		NumberPhone:    numberPhone,
+		Address:        address,
+		ProfilePicture: profilePicture,
+		Password:       adminData.Password,
 	}
 	return &admin, nil
 }
+
 
 func (am *AdminModel) Delete(adminid uint) error {
 	tx := am.db.Delete(&Admin{}, adminid)
@@ -91,13 +125,25 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 		adminData.Email = updateData.Email
 	}
 	if updateData.NumberPhone != "" {
-		adminData.NumberPhone = updateData.NumberPhone
+		if updateData.NumberPhone != "" {
+			adminData.NumberPhone = &updateData.NumberPhone
+		} else {
+			adminData.NumberPhone = nil
+		}
 	}
 	if updateData.Address != "" {
-		adminData.Address = updateData.Address
+		if updateData.Address != "" {
+			adminData.Address = &updateData.Address
+		} else {
+			adminData.Address = nil
+		}
 	}
 	if updateData.ProfilePicture != "" {
-		adminData.ProfilePicture = updateData.ProfilePicture
+		if updateData.ProfilePicture != "" {
+			adminData.ProfilePicture = &updateData.ProfilePicture
+		} else {
+			adminData.ProfilePicture = nil
+		}
 	}
 
 	txSave := am.db.Save(&adminData)
@@ -107,6 +153,7 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 
 	return nil
 }
+
 
 // func (am *AdminModel) SelectAll(offset uint, sortStr string) ([]admin.AllClinicResponseCore, error) {
 // 	var allClinic []AllClinicResponse
@@ -123,13 +170,26 @@ func (am *AdminModel) SelectAllAdmin() ([]admin.Core, error) {
 
 	var allAdminCore []admin.Core
 	for _, v := range allAdmin {
+		var address, coordinate, profilePicture string
+
+		if v.Address != nil {
+			address = *v.Address
+		}
+		if v.Coordinate != nil {
+			coordinate = *v.Coordinate
+		}
+		if v.ProfilePicture != nil {
+			profilePicture = *v.ProfilePicture
+		}
+
 		allAdminCore = append(allAdminCore, admin.Core{
 			ID:             v.ID,
 			FullName:       v.FullName,
-			Address:        v.Address,
-			Coordinate:     v.Coordinate,
-			ProfilePicture: v.ProfilePicture,
+			Address:        address,
+			Coordinate:     coordinate,
+			ProfilePicture: profilePicture,
 		})
 	}
 	return allAdminCore, nil
 }
+
