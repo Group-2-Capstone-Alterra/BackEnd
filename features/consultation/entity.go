@@ -19,6 +19,7 @@ type ConsultationModel interface {
 	VerAvailConcul(currentUserId uint, id uint) (*ConsultationCore, error)
 	VerUser(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
 	VerAdmin(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
+	GetConsultations(currentID uint) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
 	UpdateConsultationResponse(consultationID uint, response string) error
@@ -26,6 +27,7 @@ type ConsultationModel interface {
 
 type ConsultationService interface {
 	CreateConsultation(ConsultationCore) error
+	GetConsultations(currentID uint) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
 	UpdateConsultationResponse(consultationID uint, response string) error
