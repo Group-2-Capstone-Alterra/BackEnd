@@ -6,6 +6,7 @@ import (
 	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
@@ -117,8 +118,33 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind data: "+errBind.Error(), nil))
 	}
 
-	err := ph.productService.UpdateById(uint(idConv), uint(idToken), RequestToCore(updatedProduct))
+	var file multipart.File
+	var handler *multipart.FileHeader
+	var err error
+
+	file, handler, err = c.Request().FormFile("product_picture")
 	if err != nil {
+		if err != http.ErrMissingFile {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Unable to upload photo: " + err.Error(),
+			})
+		}
+		// Handle the case where no file was uploaded
+		file = nil
+		handler = nil
+	} else {
+		defer file.Close()
+	}
+
+	inputCore := RequestToCore(updatedProduct)
+
+	var filename string
+	if handler != nil {
+		filename = handler.Filename
+	}
+
+	_, errUpdate := ph.productService.UpdateById(uint(idConv), uint(idToken), inputCore, file, filename)
+	if errUpdate != nil {
 		// Handle error from userService.UpdateById
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))
 	}

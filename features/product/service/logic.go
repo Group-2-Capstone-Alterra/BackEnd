@@ -87,15 +87,26 @@ func (p *productService) GetProductById(id uint, userid uint) (data *product.Cor
 	}
 }
 
-func (p *productService) UpdateById(id uint, userid uint, input product.Core) error {
+func (p *productService) UpdateById(id uint, userid uint, input product.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
-		return errors.New("id not valid")
+		return "", errors.New("id not valid")
 	}
+
+	if file != nil && handlerFilename != "" {
+		timestamp := time.Now().Unix()
+		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+		photoFileName, errPhoto := p.helper.UploadProductPicture(file, fileName)
+		if errPhoto != nil {
+			return "", errPhoto
+		}
+		input.ProductPicture = photoFileName
+	}
+
 	err := p.productData.PutById(id, userid, input)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return input.ProductPicture, nil
 }
 
 func (p *productService) Delete(id uint, userid uint) error {

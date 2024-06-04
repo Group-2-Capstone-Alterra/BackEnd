@@ -33,6 +33,6 @@ type ServiceInterface interface {
 	Create(id uint, input Core, file io.Reader, handlerFilename string) (string, error)
 	GetAll(userid uint, offset uint, sortStr string) ([]Core, error)
 	GetProductById(id uint, userid uint) (data *Core, err error)
-	UpdateById(id uint, userid uint, input Core) error
+	UpdateById(id uint, userid uint, input Core, file io.Reader, handlerFilename string) (string, error)
 	Delete(id uint, userid uint) error
 }
