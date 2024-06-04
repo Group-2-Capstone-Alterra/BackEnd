@@ -15,7 +15,7 @@ type ConsultationCore struct {
 type ConsultationModel interface {
 	CreateConsultation(ConsultationCore) error
 	GetCuntationsById(id uint) (*ConsultationCore, error)
-	VerIsAdmin(userid uint, id uint) (*ConsultationCore, error)
+	VerIsDoctor(userid uint, id uint) (*ConsultationCore, error)
 	VerAvailConcul(currentUserId uint, id uint) (*ConsultationCore, error)
 	VerUser(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)
 	VerAdmin(userID uint, doctorID uint, roomchatID uint) (*ConsultationCore, error)

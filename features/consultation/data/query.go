@@ -42,7 +42,7 @@ func (cm *ConsultationModel) GetCuntationsById(id uint) (*consultation.Consultat
 	return &consultationCore, nil
 }
 
-func (p *ConsultationModel) VerIsAdmin(userid uint, id uint) (*consultation.ConsultationCore, error) {
+func (p *ConsultationModel) VerIsDoctor(userid uint, id uint) (*consultation.ConsultationCore, error) {
 	var conculData Consultation
 	tx := p.db.Where("doctor_id = ?", userid).Find(&conculData)
 	if tx.Error != nil {
@@ -51,9 +51,9 @@ func (p *ConsultationModel) VerIsAdmin(userid uint, id uint) (*consultation.Cons
 
 	conculDataCore := ToCore(conculData)
 	if conculDataCore.ID == 0 {
-		log.Println("[Query VerIsAdmin] Not Admin - ID Concul")
+		log.Println("[Query VerIsAdmin] Not Admin")
 	} else {
-		log.Println("[Query VerIsAdmin] Is Admin - ID Concul Notfound")
+		log.Println("[Query VerIsAdmin] Is Admin")
 	}
 	return &conculDataCore, nil
 }
@@ -126,24 +126,24 @@ func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultati
 }
 
 func (cm *ConsultationModel) GetConsultationsByDoctorID(doctorID uint) ([]consultation.ConsultationCore, error) {
-    var consultations []Consultation
-    tx := cm.db.Where("doctor_id = ?", doctorID).Find(&consultations)
-    if tx.Error != nil {
-        return nil, tx.Error
-    }
+	var consultations []Consultation
+	tx := cm.db.Where("doctor_id = ?", doctorID).Find(&consultations)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
 
-    var result []consultation.ConsultationCore
-    for _, consultation := range consultations {
-        result = append(result, ToCore(consultation))
-    }
+	var result []consultation.ConsultationCore
+	for _, consultation := range consultations {
+		result = append(result, ToCore(consultation))
+	}
 
-    return result, nil
+	return result, nil
 }
 
 func (cm *ConsultationModel) UpdateConsultationResponse(consultationID uint, response string) error {
-    tx := cm.db.Model(&Consultation{}).Where("id = ?", consultationID).Update("response", response)
-    if tx.Error != nil {
-        return tx.Error
-    }
-    return nil
+	tx := cm.db.Model(&Consultation{}).Where("id = ?", consultationID).Update("response", response)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }
