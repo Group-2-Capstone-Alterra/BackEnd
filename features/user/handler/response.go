@@ -9,12 +9,27 @@ type UserResponse struct {
 	FullName       string `json:"full_name,omitempty"`
 	Email          string `json:"email,omitempty"`
 	NumberPhone    string `json:"number_phone,omitempty"`
+	Role           string `json:"role,omitempty"`
 	Address        string `json:"address,omitempty"`
 	Password       string `json:"password,omitempty"`
 	ProfilePicture string `json:"profile_picture,omitempty"`
 	Coordinate     string `json:"coordinate,omitempty"`
-	Role           string `json:"role,omitempty"`
 	Token          string `json:"token,omitempty"`
+}
+
+type ConsulUserReponse struct {
+	ID             uint   `json:"id,omitempty"`
+	FullName       string `json:"full_name,omitempty"`
+	ProfilePicture string `json:"profile_picture,omitempty"`
+}
+
+func ConsulCoreToGorm(userGorm user.Core) ConsulUserReponse {
+	userCore := ConsulUserReponse{
+		ID:             userGorm.ID,
+		FullName:       userGorm.FullName,
+		ProfilePicture: userGorm.ProfilePicture,
+	}
+	return userCore
 }
 
 func ResponseProfile(userGorm user.Core) UserResponse {
@@ -23,10 +38,10 @@ func ResponseProfile(userGorm user.Core) UserResponse {
 		FullName:       userGorm.FullName,
 		Email:          userGorm.Email,
 		NumberPhone:    userGorm.NumberPhone,
+		Role:           userGorm.Role,
 		Address:        userGorm.Address,
 		ProfilePicture: userGorm.ProfilePicture,
 		Coordinate:     userGorm.Coordinate,
-		Role:           userGorm.Role,
 	}
 	return result
 }

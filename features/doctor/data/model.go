@@ -10,8 +10,8 @@ type Doctor struct {
 	gorm.Model
 	AdminID        uint
 	FullName       string
-	Email          string
-	Specialization string
+	About          string
+	Price          float32
 	ProfilePicture string
 }
 
@@ -20,8 +20,8 @@ func GormToCore(doctorGorm Doctor) doctor.Core {
 		ID:             doctorGorm.ID,
 		AdminID:        doctorGorm.AdminID,
 		FullName:       doctorGorm.FullName,
-		Email:          doctorGorm.Email,
-		Specialization: doctorGorm.Specialization,
+		About:          doctorGorm.About,
+		Price:          doctorGorm.Price,
 		ProfilePicture: doctorGorm.ProfilePicture,
 	}
 	return result

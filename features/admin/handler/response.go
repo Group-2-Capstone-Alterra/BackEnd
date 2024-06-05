@@ -15,6 +15,7 @@ type AdminResponse struct {
 
 type LoginResponse struct {
 	ID       uint   `json:"id"`
+	Role     string `json:"role"`
 	FullName string `json:"full_name"`
 	Email    string `json:"email"`
 	Token    string `json:"token"`
@@ -37,6 +38,7 @@ func ResponseProfile(adminResponse admin.Core) AdminResponse {
 func ResponseLogin(adminResponse *admin.Core) LoginResponse {
 	result := LoginResponse{
 		ID:       adminResponse.ID,
+		Role:     adminResponse.Role,
 		FullName: adminResponse.FullName,
 		Email:    adminResponse.Email,
 		Token:    adminResponse.Token,
