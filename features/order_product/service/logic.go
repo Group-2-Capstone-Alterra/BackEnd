@@ -18,3 +18,6 @@ func (ops *OrderProductService) CreateOrderProduct(opCore order_product.OrderPro
 	return ops.OrderProductModel.CreateOrderProduct(opCore)
 }
 
+func (ops *OrderProductService) GetOrderProductsByOrderID(orderID uint) ([]order_product.OrderProductCore, error) {
+	return ops.OrderProductModel.GetOrderProductsByOrderID(orderID)
+}

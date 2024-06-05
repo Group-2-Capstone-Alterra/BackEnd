@@ -123,4 +123,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	//order_products
 	e.POST("/order_products", order_productHandlerAPI.CreateOrderProduct, middlewares.JWTMiddleware())
+	e.GET("/order-products/:order_id", order_productHandlerAPI.GetOrderProductsByOrderID, middlewares.JWTMiddleware())
+
 }
