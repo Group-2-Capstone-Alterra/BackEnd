@@ -20,8 +20,6 @@ type AvailableDay struct {
 func AvailGormToCore(availGorm AvailableDay) availdaydoctor.Core {
 	result := availdaydoctor.Core{
 
-		ID:        availGorm.ID,
-		DoctorID:  availGorm.DoctorID,
 		Monday:    availGorm.Monday,
 		Tuesday:   availGorm.Tuesday,
 		Wednesday: availGorm.Wednesday,

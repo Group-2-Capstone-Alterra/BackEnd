@@ -5,7 +5,6 @@ import (
 	"PetPalApp/features/doctor"
 	"PetPalApp/utils/responses"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"strings"
 
@@ -14,12 +13,14 @@ import (
 
 type DoctorHandler struct {
 	doctorService doctor.DoctorService
+	doctorData    doctor.DoctorModel
 	// availDaysDoctData
 }
 
-func New(ds doctor.DoctorService) *DoctorHandler {
+func New(ds doctor.DoctorService, doctorData doctor.DoctorModel) *DoctorHandler {
 	return &DoctorHandler{
 		doctorService: ds,
+		doctorData:    doctorData,
 	}
 }
 
@@ -96,13 +97,18 @@ func (dh *DoctorHandler) ProfileDoctor(c echo.Context) error {
 	}
 	log.Println("[Handler Doctor - ProfileDoctor] availDaysDoct ", availDaysDoct)
 
-	doctorResponse := GormToCore(*doctorDetails, *availDaysDoct)
+	serviceDoctor, errServiceDoctor := dh.doctorData.SelectServiceById(doctorDetails.ID)
+	if errServiceDoctor != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+	}
+
+	doctorResponse := GormToCore(*doctorDetails, *availDaysDoct, *serviceDoctor)
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get detail doctor profile", doctorResponse))
 }
 
 func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
-	adminID, _, _ := middlewares.ExtractTokenUserId(c)
-	if adminID == 0 {
+	adminID, role, _ := middlewares.ExtractTokenUserId(c)
+	if role == "user" {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
 	log.Println("[Handler Doctor - AddDoctor] adminID ", adminID)
@@ -113,11 +119,27 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding doctor data: "+errBind.Error(), nil))
 	}
 
-	var file multipart.File
-	var handler *multipart.FileHeader
-	var err error
+	// Manually populate the AvailableDays field
+	req.AvailableDays = make(map[string]bool)
+	for key, value := range c.Request().Form {
+		if strings.HasPrefix(key, "available_days[") {
+			day := strings.TrimPrefix(key, "available_days[")
+			day = strings.TrimSuffix(day, "]")
+			req.AvailableDays[day] = value[0] == "true"
+		}
+	}
 
-	file, handler, err = c.Request().FormFile("profile_picture")
+	// Manually populate the AvailableDays field
+	req.ServiceDoctors = make(map[string]bool)
+	for key, value := range c.Request().Form {
+		if strings.HasPrefix(key, "services[") {
+			service := strings.TrimPrefix(key, "services[")
+			service = strings.TrimSuffix(service, "]")
+			req.ServiceDoctors[service] = value[0] == "true"
+		}
+	}
+
+	file, handler, err := c.Request().FormFile("profile_picture")
 	if err != nil {
 		if err != http.ErrMissingFile {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -133,16 +155,11 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 
 	log.Println("[Handler Doctor - AddDoctor] req ", req)
 	inputCore := AddRequestToCore(req)
+
 	// inputCore.AdminID = uint(adminID)
-	// log.Println("[Handler Doctor - AddDoctor] inputCore.AdminID ", inputCore.AdminID)
 	log.Println("[Handler Doctor - AddDoctor] inputCore ", inputCore)
 
-	var filename string
-	if handler != nil {
-		filename = handler.Filename
-	}
-
-	_, errUpdate := dh.doctorService.UpdateByIdAdmin(uint(adminID), inputCore, file, filename)
+	_, errUpdate := dh.doctorService.UpdateByIdAdmin(uint(adminID), inputCore, file, handler.Filename)
 	if errUpdate != nil {
 		// Handle error from userService.UpdateById
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))

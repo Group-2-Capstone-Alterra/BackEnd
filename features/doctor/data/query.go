@@ -3,7 +3,9 @@ package data
 import (
 	"PetPalApp/features/availdaydoctor"
 	"PetPalApp/features/availdaydoctor/data"
+	"PetPalApp/features/servicedoctor"
 	_dataService "PetPalApp/features/servicedoctor/data"
+	_serviceData "PetPalApp/features/servicedoctor/data"
 
 	"PetPalApp/features/doctor"
 	"log"
@@ -112,6 +114,20 @@ func (dm *DoctorModel) SelectAvailDayById(id uint) (*availdaydoctor.Core, error)
 	return &availDayCore, nil
 }
 
+func (dm *DoctorModel) SelectServiceById(id uint) (*servicedoctor.Core, error) {
+	var serviceDoctor _serviceData.ServiceDoctor
+	log.Println("[Query Doctor - SelectServiceById] iD Param", id)
+
+	tx := dm.db.Where("doctor_id = ?", id).Find(&serviceDoctor)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	var serviceDoctorCore = _serviceData.ServiceGormToCore(serviceDoctor)
+	return &serviceDoctorCore, nil
+
+}
+
 func (dm *DoctorModel) SelectAllDoctor() ([]doctor.Core, error) {
 	var allDoctor []Doctor
 
@@ -137,9 +153,11 @@ func (dm *DoctorModel) SelectAllDoctor() ([]doctor.Core, error) {
 func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 
 	doctorGorm := Doctor{
-		// AdminID:        input.AdminID,
+		AdminID:        input.AdminID,
 		FullName:       input.FullName,
 		ProfilePicture: input.ProfilePicture,
+		About:          input.About,
+		Price:          input.Price,
 	}
 
 	tx := dm.db.Model(&Doctor{}).Where("admin_id = ?", AdminID).Updates(&doctorGorm)
@@ -156,16 +174,26 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 	var doctorCore = GormToCore(doctorData)
 
 	availdayGorm := data.AvailableDay{
-		DoctorID:  doctorCore.ID,
 		Monday:    input.AvailableDay.Monday,
 		Tuesday:   input.AvailableDay.Tuesday,
 		Wednesday: input.AvailableDay.Wednesday,
 		Thursday:  input.AvailableDay.Thursday,
 		Friday:    input.AvailableDay.Friday,
 	}
-	txAvail := dm.db.Model(&Doctor{}).Where("doctor_id = ?", doctorCore.ID).Updates(&availdayGorm)
+	txAvail := dm.db.Model(&data.AvailableDay{}).Where("doctor_id = ?", doctorCore.ID).Updates(&availdayGorm)
 	if txAvail.Error != nil {
 		return tx.Error
+	}
+
+	serviceGorm := _dataService.ServiceDoctor{
+		Vaccinations: input.ServiceDoctor.Vaccinations,
+		Operations:   input.ServiceDoctor.Operations,
+		MCU:          input.ServiceDoctor.MCU,
+	}
+	log.Println("[QUERY]serviceGorm", serviceGorm)
+	txService := dm.db.Model(&_dataService.ServiceDoctor{}).Where("doctor_id = ?", doctorCore.ID).Updates(&serviceGorm)
+	if txService.Error != nil {
+		return txService.Error
 	}
 
 	return nil

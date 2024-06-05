@@ -66,7 +66,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	doctorData := _doctorData.New(db)
 	doctorService := _doctorService.New(doctorData, helperService)
-	doctorHandlerAPI := _doctorHandler.New(doctorService)
+	doctorHandlerAPI := _doctorHandler.New(doctorService, doctorData)
 
 	adminData := _adminData.New(db)
 	adminService := _adminService.New(adminData, hashService, doctorData, helperService)
@@ -116,7 +116,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.GET("/admins", adminHandlerAPI.GetProfile, middlewares.JWTMiddleware())
 	e.DELETE("/admins", adminHandlerAPI.Delete, middlewares.JWTMiddleware())
 	e.PUT("/admins", adminHandlerAPI.Update, middlewares.JWTMiddleware())
-	e.GET("/clinics", adminHandlerAPI.GetAllClinic)
+	e.GET("/clinics", adminHandlerAPI.GetAllClinic, middlewares.JWTMiddleware())
 
 	//doctors
 	e.POST("/doctors", doctorHandlerAPI.AddDoctor, middlewares.JWTMiddleware())
