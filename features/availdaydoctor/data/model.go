@@ -2,6 +2,7 @@ package data
 
 import (
 	"PetPalApp/features/availdaydoctor"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -27,5 +28,6 @@ func AvailGormToCore(availGorm AvailableDay) availdaydoctor.Core {
 		Thursday:  availGorm.Thursday,
 		Friday:    availGorm.Friday,
 	}
+	log.Println("[Data - Availdoc] availGorm", availGorm)
 	return result
 }
