@@ -22,6 +22,7 @@ type HelperInterface interface {
 	ConvertToNullableString(value string) *string
 	UploadProfilePicture(file io.Reader, fileName string) (string, error)
 	UploadProductPicture(file io.Reader, fileName string) (string, error)
+	UploadDoctorPicture(file io.Reader, fileName string) (string, error)
 	DereferenceString(s *string) string
 	SortProductsByDistance(iduser uint, products []product.Core) []product.Core
 	SortClinicsByDistance(userid uint, clnics []clinic.Core) []clinic.Core
@@ -92,6 +93,24 @@ func (u *helper) UploadProductPicture(file io.Reader, fileName string) (string, 
 		return "", err
 	}
 	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/productpicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
+}
+
+func (u *helper) UploadDoctorPicture(file io.Reader, fileName string) (string, error) {
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, file); err != nil {
+		return "", err
+	}
+
+	_, err := u.s3.PutObject(&s3.PutObjectInput{
+		Bucket: aws.String(u.s3Bucket),
+		Key:    aws.String("doctorpicture/" + fileName),
+		Body:   bytes.NewReader(buf.Bytes()),
+		ACL:    aws.String("public-read"),
+	})
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/doctorpicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
 }
 
 func (u *helper) SortProductsByDistance(userid uint, products []product.Core) []product.Core {
