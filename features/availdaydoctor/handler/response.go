@@ -3,7 +3,7 @@ package handler
 import "PetPalApp/features/availdaydoctor"
 
 type AvailableDayResponse struct {
-	DoctorID  uint `json:"doctor_id"`
+	DoctorID  uint `json:"doctor_id,omitempty"`
 	Monday    bool `json:"monday"`
 	Tuesday   bool `json:"tuesday"`
 	Wednesday bool `json:"wednesday"`
@@ -13,7 +13,6 @@ type AvailableDayResponse struct {
 
 func GormToCore(gorm availdaydoctor.Core) AvailableDayResponse {
 	return AvailableDayResponse{
-		DoctorID:  gorm.DoctorID,
 		Monday:    gorm.Monday,
 		Tuesday:   gorm.Tuesday,
 		Wednesday: gorm.Wednesday,

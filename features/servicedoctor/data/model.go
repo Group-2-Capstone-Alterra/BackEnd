@@ -17,8 +17,6 @@ type ServiceDoctor struct {
 
 func ServiceGormToCore(serviceGorm ServiceDoctor) servicedoctor.Core {
 	result := servicedoctor.Core{
-		ID:           serviceGorm.ID,
-		DoctorID:     serviceGorm.DoctorID,
 		Vaccinations: serviceGorm.Vaccinations,
 		Operations:   serviceGorm.Operations,
 		MCU:          serviceGorm.MCU,

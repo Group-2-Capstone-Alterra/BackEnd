@@ -2,6 +2,7 @@ package doctor
 
 import (
 	_avail "PetPalApp/features/availdaydoctor"
+	"PetPalApp/features/servicedoctor"
 	_service "PetPalApp/features/servicedoctor"
 	"io"
 )
@@ -22,6 +23,7 @@ type DoctorModel interface {
 	SelectByAdminId(id uint) (*Core, error)
 	SelectDoctorById(id uint) (*Core, error)
 	SelectAvailDayById(id uint) (*_avail.Core, error)
+	SelectServiceById(id uint) (*servicedoctor.Core, error)
 	SelectAllDoctor() ([]Core, error)
 	PutByIdAdmin(AdminID uint, input Core) error
 }
