@@ -47,31 +47,27 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 	return input.ProductPicture, nil
 }
 
-func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]product.Core, error) {
+func (p *productService) GetAll(userid uint, role string, offset uint, sortStr string) ([]product.Core, error) {
 	if userid <= 0 {
 		return nil, errors.New("[validation] jwt not valid / expired")
 	}
 
 	log.Println("[Service]")
-	log.Println("[Service] sortStr", sortStr)
-	isAdmin, _ := p.adminData.AdminById(userid)
-	if isAdmin.ID == 0 { // not admin
-		log.Println("[Service - not admin]")
+	log.Println("[Service] role", role)
+
+	if role == "user" { // is user
+		log.Println("[Service - is user]")
 		product, err := p.productData.SelectAll(offset, sortStr)
 		if err != nil {
 			return nil, err
 		}
-		if userid != 0 { // add this check
-			// distance
-			if sortStr == "lowest distance" || sortStr == "higest distance" {
-				productSort := p.helper.SortProductsByDistance(userid, product)
-				log.Println("[service - not admin] distance")
-				return productSort, nil
-			}
+		if sortStr == "lowest distance" || sortStr == "higest distance" {
+			productSort := p.helper.SortProductsByDistance(userid, product)
+			log.Println("[service - not admin] distance")
+			return productSort, nil
 		}
-		log.Println("[service - not admin] not distance")
 		return product, nil
-	} else { //if admin
+	} else { //is admin
 		log.Println("[Service - admin]")
 		product, err := p.productData.SelectAllAdmin(userid, offset)
 		if err != nil {
