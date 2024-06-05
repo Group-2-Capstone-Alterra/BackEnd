@@ -36,8 +36,6 @@ func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
 
 func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
-	log.Println("[QUERY - GetChats] currentID", currentID)
-	log.Println("[QUERY - GetChats] roomchatID", roomchatID)
 	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -54,8 +52,7 @@ func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, 
 
 func (cm *ChatModel) GetChatsDoctor(currentID, roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
-	log.Println("[QUERY - GetChats] currentID", currentID)
-	log.Println("[QUERY - GetChats] roomchatID", roomchatID)
+
 	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
