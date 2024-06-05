@@ -57,7 +57,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	productHandlerAPI := _productHandler.New(productService, helperService)
 
 	doctorData := _doctorData.New(db)
-	doctorService := _doctorService.New(doctorData)
+	doctorService := _doctorService.New(doctorData, helperService)
 	doctorHandlerAPI := _doctorHandler.New(doctorService)
 
 	adminData := _adminData.New(db)
@@ -104,6 +104,8 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	//doctors
 	e.POST("/doctors", doctorHandlerAPI.AddDoctor, middlewares.JWTMiddleware())
+	e.GET("/doctors", doctorHandlerAPI.ProfileDoctor, middlewares.JWTMiddleware())
+	e.PATCH("/doctors", doctorHandlerAPI.UpdateProfile, middlewares.JWTMiddleware())
 
 	//chats
 	e.POST("/chats/:id", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
