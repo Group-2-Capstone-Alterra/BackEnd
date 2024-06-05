@@ -38,7 +38,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
 	}
 
-	senderID, _, _ := middlewares.ExtractTokenUserId(c)
+	senderID, role, _ := middlewares.ExtractTokenUserId(c)
 	if senderID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
@@ -54,7 +54,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 		Message:        newChat.Message,
 	}
 
-	if err := ch.chatService.CreateChat(chatData); err != nil {
+	if err := ch.chatService.CreateChat(chatData, role); err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error creating chat: "+err.Error(), nil))
 	}
 
@@ -70,13 +70,13 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 	}
 	log.Println("[Handler] Roomchat ID", roomchatIDConv)
 
-	currentID, _, _ := middlewares.ExtractTokenUserId(c)
+	currentID, role, _ := middlewares.ExtractTokenUserId(c)
 	if currentID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
 	log.Println("[Handler] Current User ID", currentID)
 
-	chats, err := ch.chatService.GetChats(uint(currentID), uint(roomchatIDConv))
+	chats, err := ch.chatService.GetChats(uint(currentID), role, uint(roomchatIDConv))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving chats: "+err.Error(), nil))
 	}
