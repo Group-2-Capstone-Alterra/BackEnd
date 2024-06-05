@@ -85,18 +85,18 @@ func (as *AdminService) Update(adminid uint, updateData admin.Core) error {
 
 func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error) {
 	log.Println("[Service]")
-	log.Println("[Service] sortStr", sortStr)
-	log.Println("[Service] userid", userid)
+	// log.Println("[Service] sortStr", sortStr)
+	// log.Println("[Service] userid", userid)
 	allDoctor, errAllDoctor := as.DoctorModel.SelectAllDoctor()
 	if errAllDoctor != nil {
 		return nil, errAllDoctor
 	}
-	log.Println("[Service - Admin] allDoctor", allDoctor)
+	// log.Println("[Service - Admin] allDoctor", allDoctor)
 
 	var allClinic []clinic.Core
 	for _, v := range allDoctor {
-		log.Println("[Service] value", v)
-		log.Println("[Service] value", v.AdminID)
+		// log.Println("[Service] value", v)
+		// log.Println("[Service] value", v.AdminID)
 		adminDetail, errAdminDetail := as.AdminModel.AdminById(v.AdminID)
 		if errAdminDetail != nil {
 			return nil, errAdminDetail
@@ -116,7 +116,7 @@ func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) (
 		})
 	}
 	clinicSort := as.helper.SortClinicsByDistance(userid, allClinic)
-	log.Println("[Service - Admin] clinicSort", clinicSort)
-	log.Println("[Service - Admin] allClinic", allClinic)
+	// log.Println("[Service - Admin] clinicSort", clinicSort)
+	// log.Println("[Service - Admin] allClinic", allClinic)
 	return clinicSort, nil
 }

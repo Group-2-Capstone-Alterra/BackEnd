@@ -21,10 +21,10 @@ func (am *AdminModel) Register(admin admin.Core) error {
 		FullName:       admin.FullName,
 		Email:          admin.Email,
 		Password:       admin.Password,
-		NumberPhone: 	nil,
-		Address: 		nil,
+		NumberPhone:    nil,
+		Address:        nil,
 		ProfilePicture: nil,
-		Coordinate: 	nil,
+		Coordinate:     nil,
 	}
 	tx := am.db.Create(&adminGorm)
 
@@ -41,21 +41,21 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	
+
 	var numberPhone, address, profilePicture string
-	
+
 	if adminData.NumberPhone != nil {
 		numberPhone = *adminData.NumberPhone
 	}
-	
+
 	if adminData.Address != nil {
 		address = *adminData.Address
 	}
-	
+
 	if adminData.ProfilePicture != nil {
 		profilePicture = *adminData.ProfilePicture
 	}
-	
+
 	var admins = admin.Core{
 		ID:             adminData.ID,
 		FullName:       adminData.FullName,
@@ -68,28 +68,27 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 	return &admins, nil
 }
 
-
 func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 	var adminData Admin
 	tx := am.db.First(&adminData, adminid)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	
+
 	var numberPhone, address, profilePicture string
-	
+
 	if adminData.NumberPhone != nil {
 		numberPhone = *adminData.NumberPhone
 	}
-	
+
 	if adminData.Address != nil {
 		address = *adminData.Address
 	}
-	
+
 	if adminData.ProfilePicture != nil {
 		profilePicture = *adminData.ProfilePicture
 	}
-	
+
 	var admin = admin.Core{
 		ID:             adminData.ID,
 		FullName:       adminData.FullName,
@@ -98,10 +97,10 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 		Address:        address,
 		ProfilePicture: profilePicture,
 		Password:       adminData.Password,
+		Coordinate:     *adminData.Coordinate,
 	}
 	return &admin, nil
 }
-
 
 func (am *AdminModel) Delete(adminid uint) error {
 	tx := am.db.Delete(&Admin{}, adminid)
@@ -154,7 +153,6 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 	return nil
 }
 
-
 // func (am *AdminModel) SelectAll(offset uint, sortStr string) ([]admin.AllClinicResponseCore, error) {
 // 	var allClinic []AllClinicResponse
 
@@ -192,4 +190,3 @@ func (am *AdminModel) SelectAllAdmin() ([]admin.Core, error) {
 	}
 	return allAdminCore, nil
 }
-
