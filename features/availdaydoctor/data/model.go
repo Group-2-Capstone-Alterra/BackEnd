@@ -10,11 +10,11 @@ import (
 type AvailableDay struct {
 	gorm.Model
 	DoctorID  uint
-	Monday    bool
-	Tuesday   bool
-	Wednesday bool
-	Thursday  bool
-	Friday    bool
+	Monday    bool `gorm:"default:null"`
+	Tuesday   bool `gorm:"default:null"`
+	Wednesday bool `gorm:"default:null"`
+	Thursday  bool `gorm:"default:null"`
+	Friday    bool `gorm:"default:null"`
 }
 
 func AvailGormToCore(availGorm AvailableDay) availdaydoctor.Core {

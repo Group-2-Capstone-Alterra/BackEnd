@@ -105,11 +105,11 @@ func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) (
 		if errDoctorAvailDay != nil {
 			return nil, errDoctorAvailDay
 		}
+
 		allClinic = append(allClinic, clinic.Core{
 			ID:         adminDetail.ID,
 			ClinicName: adminDetail.FullName,
 			Open:       *doctorAvailDay,
-			Service:    v.Specialization,
 			Veterinary: v.FullName,
 			Location:   adminDetail.Address,
 			Coordinate: adminDetail.Coordinate,

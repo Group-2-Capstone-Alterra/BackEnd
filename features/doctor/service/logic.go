@@ -23,16 +23,29 @@ func New(dm doctor.DoctorModel, helper helper.HelperInterface) doctor.DoctorServ
 	}
 }
 
-func (ds *DoctorService) AddDoctor(doctor doctor.Core) error {
+func (ds *DoctorService) AddDoctor(doctor doctor.Core, file io.Reader, handlerFilename string) (string, error) {
 	//valisadminhavedoctor
 	isAdminHaveDoct, _ := ds.DoctorModel.SelectByAdminId(doctor.AdminID)
 	if isAdminHaveDoct.ID != 0 {
-		return errors.New("Anda sudah mempunyai dokter !")
+		return "", errors.New("Anda sudah mempunyai dokter !")
 	} else {
-		if doctor.FullName == "" || doctor.Specialization == "" {
-			return errors.New("[validation] Fullname/specialization tidak boleh kosong")
+		if doctor.FullName == "" {
+			return "", errors.New("[validation] Fullname/specialization tidak boleh kosong")
 		}
-		return ds.DoctorModel.AddDoctor(doctor)
+
+		timestamp := time.Now().Unix()
+		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+		photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
+		if errPhoto != nil {
+			return "", errPhoto
+		}
+		doctor.ProfilePicture = photoFileName
+
+		err := ds.DoctorModel.AddDoctor(doctor)
+		if err != nil {
+			return "", err
+		}
+		return doctor.ProfilePicture, nil
 	}
 
 }

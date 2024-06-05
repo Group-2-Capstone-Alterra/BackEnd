@@ -7,7 +7,6 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -36,13 +35,40 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 	if errBind != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding doctor data: "+errBind.Error(), nil))
 	}
-	log.Println("[Handler Doctor - AddDoctor] req ", req)
-	inputCore := RequestToCore(req)
-	inputCore.AdminID = uint(adminID)
-	log.Println("[Handler Doctor - AddDoctor] inputCore.AdminID ", inputCore.AdminID)
-	log.Println("[Handler Doctor - AddDoctor] inputCore ", inputCore)
 
-	errAdd := dh.doctorService.AddDoctor(inputCore)
+	// Manually populate the AvailableDays field
+	req.AvailableDays = make(map[string]bool)
+	for key, value := range c.Request().Form {
+		if strings.HasPrefix(key, "available_days[") {
+			day := strings.TrimPrefix(key, "available_days[")
+			day = strings.TrimSuffix(day, "]")
+			req.AvailableDays[day] = value[0] == "true"
+		}
+	}
+
+	// Manually populate the AvailableDays field
+	req.ServiceDoctors = make(map[string]bool)
+	for key, value := range c.Request().Form {
+		if strings.HasPrefix(key, "services[") {
+			service := strings.TrimPrefix(key, "services[")
+			service = strings.TrimSuffix(service, "]")
+			req.ServiceDoctors[service] = value[0] == "true"
+		}
+	}
+
+	file, handler, err := c.Request().FormFile("profile_picture")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Unable to upload photo: " + err.Error(),
+		})
+	}
+	defer file.Close()
+
+	inputCore := AddRequestToCore(req)
+	inputCore.AdminID = uint(adminID)
+
+	log.Println("[Handler]inputCore.ServiceDoctor", inputCore.ServiceDoctor)
+	_, errAdd := dh.doctorService.AddDoctor(inputCore, file, handler.Filename)
 	if errAdd != nil {
 		if strings.Contains(errAdd.Error(), "validation") {
 			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Tambah dokter gagal: "+errAdd.Error(), nil))
@@ -50,7 +76,7 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Tambah dokter gagal: "+errAdd.Error(), nil))
 	}
 
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Tambah dokter berhasil. Dokter ID: "+strconv.Itoa(int(inputCore.ID)), nil))
+	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Tambah dokter berhasil. ", nil))
 }
 
 func (dh *DoctorHandler) ProfileDoctor(c echo.Context) error {
@@ -106,7 +132,7 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 	}
 
 	log.Println("[Handler Doctor - AddDoctor] req ", req)
-	inputCore := RequestToCore(req)
+	inputCore := AddRequestToCore(req)
 	// inputCore.AdminID = uint(adminID)
 	// log.Println("[Handler Doctor - AddDoctor] inputCore.AdminID ", inputCore.AdminID)
 	log.Println("[Handler Doctor - AddDoctor] inputCore ", inputCore)

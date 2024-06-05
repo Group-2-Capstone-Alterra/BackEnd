@@ -27,7 +27,7 @@ type ConsultationModel interface {
 
 type ConsultationService interface {
 	CreateConsultation(ConsultationCore) error
-	GetConsultations(currentID uint) ([]ConsultationCore, error)
+	GetConsultations(currentID uint, role string) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
 	UpdateConsultationResponse(consultationID uint, response string) error

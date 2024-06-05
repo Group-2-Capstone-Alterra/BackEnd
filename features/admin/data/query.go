@@ -58,6 +58,7 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 
 	var admins = admin.Core{
 		ID:             adminData.ID,
+		Role:           adminData.Role,
 		FullName:       adminData.FullName,
 		Email:          adminData.Email,
 		NumberPhone:    numberPhone,

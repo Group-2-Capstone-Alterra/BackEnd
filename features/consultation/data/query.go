@@ -77,7 +77,7 @@ func (p *ConsultationModel) VerAvailConcul(currentUserId uint, id uint) (*consul
 
 func (p *ConsultationModel) VerUser(userID uint, doctorID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
 	var conculData Consultation
-	tx := p.db.Where("doctor_id = ? AND user_id = ?", doctorID, userID).Find(&conculData, roomchatID)
+	tx := p.db.Where("user_id = ?", userID).Where("doctor_id = ?", doctorID).Find(&conculData, roomchatID)
 
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -93,9 +93,9 @@ func (p *ConsultationModel) VerUser(userID uint, doctorID uint, roomchatID uint)
 	return &conculDataCore, nil
 }
 
-func (p *ConsultationModel) VerAdmin(userID uint, doctorID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
+func (p *ConsultationModel) VerAdmin(doctorID uint, userID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
 	var conculData Consultation
-	tx := p.db.Where("user_id = ? AND doctor_id = ?", doctorID, userID).Find(&conculData, roomchatID)
+	tx := p.db.Where("doctor_id = ?", doctorID).Where("user_id = ?", userID).Find(&conculData, roomchatID)
 
 	if tx.Error != nil {
 		return nil, tx.Error

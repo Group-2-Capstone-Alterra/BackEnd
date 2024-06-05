@@ -25,18 +25,16 @@ func (cs *ConsultationService) CreateConsultation(consultation consultation.Cons
 	return cs.consultationModel.CreateConsultation(consultation)
 }
 
-func (cs *ConsultationService) GetConsultations(currentID uint) ([]consultation.ConsultationCore, error) {
+func (cs *ConsultationService) GetConsultations(currentID uint, role string) ([]consultation.ConsultationCore, error) {
+	log.Println("[Service - GetConsultations] Role : ", role)
 	//check doctor or not
-	isDoctor, _ := cs.dataDoctor.SelectByAdminId(currentID)
-	// isAdmin, _ := cs.dataAdmin.AdminById(currentID)
-	if isDoctor.ID != 0 { //is doctor
-		log.Println("[Service - GetConsultations] Doctor")
-		return cs.consultationModel.GetConsultationsByDoctorID(isDoctor.ID)
-	} else { //not doctor
-		log.Println("[Service - GetConsultations] User")
+	if role == "user" {
+		log.Println("[Service - GetConsultations] Role User")
 		return cs.consultationModel.GetConsultationsByUserID(currentID)
+	} else {
+		log.Println("[Service - GetConsultations] Role Admin")
+		return cs.consultationModel.GetConsultationsByDoctorID(currentID)
 	}
-
 }
 
 func (cs *ConsultationService) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {

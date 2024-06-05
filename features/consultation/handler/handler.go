@@ -50,12 +50,12 @@ func (ch *ConsultationHandler) CreateConsultation(c echo.Context) error {
 }
 
 func (ch *ConsultationHandler) GetConsultations(c echo.Context) error {
-	currentID, _, _ := middlewares.ExtractTokenUserId(c)
+	currentID, role, _ := middlewares.ExtractTokenUserId(c)
 	if currentID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
 
-	consultations, err := ch.consultationService.GetConsultations(uint(currentID))
+	consultations, err := ch.consultationService.GetConsultations(uint(currentID), role)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving consultations: "+err.Error(), nil))
 	}
@@ -64,7 +64,7 @@ func (ch *ConsultationHandler) GetConsultations(c echo.Context) error {
 	for _, v := range consultations {
 		userData, _ := ch.userData.SelectById(v.UserID)
 		doctorData, _ := ch.doctorData.SelectDoctorById(v.DoctorID)
-		allConsultation = append(allConsultation, AllConsultationResponseUser(v, *userData, *doctorData))
+		allConsultation = append(allConsultation, GormToCore(v, *userData, *doctorData))
 	}
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", allConsultation))

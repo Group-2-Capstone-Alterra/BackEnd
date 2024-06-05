@@ -20,7 +20,6 @@ func ResponseAllClinic(admin admin.Core, doctor doctor.Core) AllClinicResponse {
 		ID:         admin.ID,
 		ClinicName: admin.FullName,
 		Open:       availdaydoctor.Core{},
-		Service:    doctor.Specialization,
 		Veterinary: doctor.FullName,
 		Location:   admin.Address,
 	}

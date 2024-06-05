@@ -3,6 +3,8 @@ package data
 import (
 	"PetPalApp/features/availdaydoctor"
 	"PetPalApp/features/availdaydoctor/data"
+	_dataService "PetPalApp/features/servicedoctor/data"
+
 	"PetPalApp/features/doctor"
 	"log"
 
@@ -23,7 +25,9 @@ func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
 	doctorGorm := Doctor{
 		AdminID:        doctor.AdminID,
 		FullName:       doctor.FullName,
-		Specialization: doctor.Specialization,
+		ProfilePicture: doctor.ProfilePicture,
+		About:          doctor.About,
+		Price:          doctor.Price,
 	}
 	tx := dm.db.Create(&doctorGorm)
 	if tx.Error != nil {
@@ -48,7 +52,19 @@ func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
 	}
 	txAvail := dm.db.Create(&availdayGorm)
 	if txAvail.Error != nil {
-		return tx.Error
+		return txAvail.Error
+	}
+
+	serviceGorm := _dataService.ServiceDoctor{
+		DoctorID:     doctorCore.ID,
+		Vaccinations: doctor.ServiceDoctor.Vaccinations,
+		Operations:   doctor.ServiceDoctor.Operations,
+		MCU:          doctor.ServiceDoctor.MCU,
+	}
+	log.Println("[QUERY]serviceGorm", serviceGorm)
+	txService := dm.db.Create(&serviceGorm)
+	if txService.Error != nil {
+		return txService.Error
 	}
 
 	return nil
@@ -63,7 +79,6 @@ func (dm *DoctorModel) SelectByAdminId(id uint) (*doctor.Core, error) {
 		return nil, tx.Error
 	}
 	var doctorCore = GormToCore(doctorData)
-	log.Println("[Query Doctor - SelectByAdminId] doctorCore", doctorCore)
 
 	return &doctorCore, nil
 }
@@ -111,8 +126,9 @@ func (dm *DoctorModel) SelectAllDoctor() ([]doctor.Core, error) {
 			ID:             v.ID,
 			AdminID:        v.AdminID,
 			FullName:       v.FullName,
-			Email:          v.Email,
-			Specialization: v.Specialization,
+			About:          v.About,
+			Price:          v.Price,
+			ProfilePicture: v.ProfilePicture,
 		})
 	}
 	return allDoctorCore, nil
@@ -123,7 +139,6 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 	doctorGorm := Doctor{
 		// AdminID:        input.AdminID,
 		FullName:       input.FullName,
-		Specialization: input.Specialization,
 		ProfilePicture: input.ProfilePicture,
 	}
 
