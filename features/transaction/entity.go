@@ -14,8 +14,10 @@ type TransactionCore struct {
 
 type TransactionModel interface {
 	Create(transaction TransactionCore) error
+	GetByUserID(userID uint) ([]TransactionCore, error)
 }
 
 type TransactionService interface {
 	CreateTransaction(transaction TransactionCore) error
+	GetTransactionsByUserID(userID uint) ([]TransactionCore, error)
 }

@@ -29,3 +29,16 @@ func (tm *TransactionModel) Create(transaction transaction.TransactionCore) erro
 	return nil
 }
 
+func (tm *TransactionModel) GetByUserID(userID uint) ([]transaction.TransactionCore, error) {
+	var transactions []Transaction
+	tx := tm.db.Where("user_id = ?", userID).Find(&transactions)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	var result []transaction.TransactionCore
+	for _, t := range transactions {
+		result = append(result, t.ToCore())
+	}
+	return result, nil
+}

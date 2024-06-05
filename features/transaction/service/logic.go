@@ -21,3 +21,7 @@ func (ts *TransactionService) CreateTransaction(transaction transaction.Transact
 	}
 	return ts.TransactionModel.Create(transaction)
 }
+
+func (ts *TransactionService) GetTransactionsByUserID(userID uint) ([]transaction.TransactionCore, error) {
+	return ts.TransactionModel.GetByUserID(userID)
+}

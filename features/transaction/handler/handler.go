@@ -4,6 +4,7 @@ import (
 	"PetPalApp/features/transaction"
 	"PetPalApp/utils/responses"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -37,4 +38,18 @@ func (th *TransactionHandler) CreateTransaction(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse("transaction created successfully", nil))
+}
+
+func (th *TransactionHandler) GetTransactionsByUserID(c echo.Context) error {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("invalid user ID", nil))
+	}
+
+	transactions, err := th.transactionService.GetTransactionsByUserID(uint(userID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error retrieving transactions: "+err.Error(), nil))
+	}
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("transactions retrieved successfully", transactions))
 }

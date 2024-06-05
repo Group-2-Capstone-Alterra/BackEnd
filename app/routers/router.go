@@ -135,4 +135,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	//transactions
 	e.POST("/transactions", transactionHandlerAPI.CreateTransaction, middlewares.JWTMiddleware())
+	e.GET("/transactions/:user_id", transactionHandlerAPI.GetTransactionsByUserID, middlewares.JWTMiddleware())
+
 }
