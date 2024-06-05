@@ -8,6 +8,7 @@ import (
 	_dataDoctor "PetPalApp/features/doctor/data"
 	_dataOrder "PetPalApp/features/order/data"
 	_dataOrder_Product "PetPalApp/features/order_product/data"
+	_dataPayment "PetPalApp/features/payment/data"
 	_dataProduct "PetPalApp/features/product/data"
 	_dataTransaction "PetPalApp/features/transaction/data"
 	_dataUser "PetPalApp/features/user/data"
@@ -26,5 +27,5 @@ func InitMigrations(db *gorm.DB) {
 	db.AutoMigrate(&_dataConsultation.Consultation{})
 	db.AutoMigrate(&_dataOrder_Product.OrderProduct{})
 	db.AutoMigrate(&_dataTransaction.Transaction{})
-
+	db.AutoMigrate(&_dataPayment.Payment{})
 }
