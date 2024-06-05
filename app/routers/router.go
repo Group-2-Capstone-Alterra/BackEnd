@@ -61,7 +61,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	productHandlerAPI := _productHandler.New(productService, helperService)
 
 	doctorData := _doctorData.New(db)
-	doctorService := _doctorService.New(doctorData)
+	doctorService := _doctorService.New(doctorData, helperService)
 	doctorHandlerAPI := _doctorHandler.New(doctorService)
 
 	adminData := _adminData.New(db)
