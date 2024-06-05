@@ -158,10 +158,8 @@ func (ph *ProductHandler) Delete(c echo.Context) error {
 	if errConv != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
 	}
-	log.Println("[Hanlder Product - Delete] Param ID", idConv)
 
 	idToken := middlewares.ExtractTokenUserId(c)
-	log.Println("[Hanlder Product - Delete] Token", idToken)
 	err := ph.productService.Delete(uint(idConv), uint(idToken))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
