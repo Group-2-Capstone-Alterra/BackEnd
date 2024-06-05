@@ -52,7 +52,7 @@ func (as *AdminService) Login(email string, password string) (data *admin.Core, 
 		return nil, "", errors.New("email atau password tidak sesuai")
 	}
 
-	token, errJWT := middlewares.CreateToken(int(data.ID))
+	token, errJWT := middlewares.CreateToken(int(data.ID), data.Role)
 	if errJWT != nil {
 		return nil, "", errJWT
 	}

@@ -15,6 +15,7 @@ type Core struct {
 	ProfilePicture string
 	Coordinate     string
 	Token          string
+	Role           string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

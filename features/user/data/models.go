@@ -16,6 +16,7 @@ type User struct {
 	Password       *string
 	ProfilePicture *string
 	Coordinate     *string
+	Role           string `gorm:"default:'user'"`
 }
 
 func UserCoreToUserGorm(userCore user.Core, helper helperuser.HelperuserInterface) User {
@@ -41,6 +42,7 @@ func UserGormToUserCore(userGorm User, helper helperuser.HelperuserInterface) us
 		Password:       helper.DereferenceString(userGorm.Password),
 		ProfilePicture: helper.DereferenceString(userGorm.ProfilePicture),
 		Coordinate:     helper.DereferenceString(userGorm.Coordinate),
+		Role:           userGorm.Role,
 		CreatedAt:      userGorm.CreatedAt,
 		UpdatedAt:      userGorm.UpdatedAt,
 	}

@@ -66,7 +66,7 @@ func (ah *AdminHandler) Login(c echo.Context) error {
 }
 
 func (ah *AdminHandler) GetProfile(c echo.Context) error {
-	adminID := middlewares.ExtractTokenUserId(c)
+	adminID, _, _ := middlewares.ExtractTokenUserId(c)
 	if adminID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("unauthorized", nil))
 	}
@@ -81,7 +81,7 @@ func (ah *AdminHandler) GetProfile(c echo.Context) error {
 }
 
 func (ah *AdminHandler) Delete(c echo.Context) error {
-	adminID := middlewares.ExtractTokenUserId(c)
+	adminID, _, _ := middlewares.ExtractTokenUserId(c)
 	if adminID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("unauthorized", nil))
 	}
@@ -94,7 +94,7 @@ func (ah *AdminHandler) Delete(c echo.Context) error {
 }
 
 func (ah *AdminHandler) Update(c echo.Context) error {
-	adminID := middlewares.ExtractTokenUserId(c)
+	adminID, _, _ := middlewares.ExtractTokenUserId(c)
 	if adminID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("unauthorized", nil))
 	}
@@ -137,7 +137,7 @@ func (ah *AdminHandler) GetAllClinic(c echo.Context) error {
 
 	sortStr := c.QueryParam("sort")
 
-	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	log.Println("[HANDLER - result]")

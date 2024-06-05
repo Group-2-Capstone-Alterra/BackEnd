@@ -38,7 +38,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
 	}
 
-	senderID := middlewares.ExtractTokenUserId(c)
+	senderID, _, _ := middlewares.ExtractTokenUserId(c)
 	if senderID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
@@ -70,7 +70,7 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 	}
 	log.Println("[Handler] Roomchat ID", roomchatIDConv)
 
-	currentID := middlewares.ExtractTokenUserId(c)
+	currentID, _, _ := middlewares.ExtractTokenUserId(c)
 	if currentID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
@@ -114,7 +114,7 @@ func (ch *ChatHandler) Delete(c echo.Context) error {
 	if errBubleChatInt != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", errBubleChatInt))
 	}
-	senderID := middlewares.ExtractTokenUserId(c)
+	senderID, _, _ := middlewares.ExtractTokenUserId(c)
 
 	err := ch.chatService.Delete(uint(roomChatIDConv), uint(bubbleChatInt), uint(senderID))
 	if err != nil {

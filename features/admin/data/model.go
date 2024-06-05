@@ -13,4 +13,5 @@ type Admin struct {
 	Address        *string
 	ProfilePicture *string
 	Coordinate     *string
+	Role           string `gorm:"default:'admin'"`
 }

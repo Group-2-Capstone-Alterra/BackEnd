@@ -28,7 +28,7 @@ func New(ps product.ServiceInterface, helper helper.HelperInterface) *ProductHan
 
 func (ph *ProductHandler) AddProduct(c echo.Context) error {
 
-	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	newProduct := ProductRequest{}
@@ -67,7 +67,7 @@ func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
 
 	sortStr := c.QueryParam("sort")
 
-	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	result, errResult := ph.productService.GetAll(uint(idToken), uint(offset), sortStr)
@@ -91,7 +91,7 @@ func (ph *ProductHandler) GetProductById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get id", idConv))
 	}
 
-	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	productData, errProductData := ph.productService.GetProductById(uint(idConv), uint(idToken))
@@ -110,7 +110,7 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
 	}
 
-	idToken := middlewares.ExtractTokenUserId(c)
+	idToken, _, _ := middlewares.ExtractTokenUserId(c)
 
 	updatedProduct := ProductRequest{}
 	errBind := c.Bind(&updatedProduct)
@@ -159,7 +159,7 @@ func (ph *ProductHandler) Delete(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
 	}
 
-	idToken := middlewares.ExtractTokenUserId(c)
+	idToken, _, _ := middlewares.ExtractTokenUserId(c)
 	err := ph.productService.Delete(uint(idConv), uint(idToken))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))

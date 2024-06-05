@@ -66,6 +66,8 @@ func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, 
 
 func (p *productrQuery) SelectAllAdmin(userid uint, offset uint) ([]product.Core, error) {
 	var allProduct []Product
+	log.Println("[Query - admin] SelectAllAdmin, userid: ", userid)
+
 	tx := p.db.Where("id_user = ?", userid).Find(&allProduct)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -108,9 +110,11 @@ func (p *productrQuery) VerIsAdmin(userid uint) (*product.Core, error) {
 
 	projectcore := GormToCore(productData)
 	if projectcore.ID == 0 {
-		log.Println("[Query VerIsAdmin] projectcore 1", projectcore.ID)
+		log.Println("[Query VerIsAdmin] not admin", projectcore.ID)
+	} else {
+		log.Println("[Query VerIsAdmin] is admin", projectcore.ID)
 	}
-	log.Println("[Query VerIsAdmin] projectcore 2", projectcore.ID)
+
 	return &projectcore, nil
 }
 

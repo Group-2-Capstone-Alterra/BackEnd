@@ -1,6 +1,7 @@
 package service
 
 import (
+	"PetPalApp/features/admin"
 	"PetPalApp/features/product"
 	"PetPalApp/utils/helper"
 	"errors"
@@ -13,12 +14,14 @@ import (
 type productService struct {
 	productData product.DataInterface
 	helper      helper.HelperInterface
+	adminData   admin.AdminModel
 }
 
-func New(pd product.DataInterface, helper helper.HelperInterface) product.ServiceInterface {
+func New(pd product.DataInterface, helper helper.HelperInterface, adminData admin.AdminModel) product.ServiceInterface {
 	return &productService{
 		productData: pd,
 		helper:      helper,
+		adminData:   adminData,
 	}
 }
 
@@ -51,8 +54,8 @@ func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]pro
 
 	log.Println("[Service]")
 	log.Println("[Service] sortStr", sortStr)
-	product, _ := p.productData.VerIsAdmin(userid)
-	if product.ID == 0 { // not admin
+	isAdmin, _ := p.adminData.AdminById(userid)
+	if isAdmin.ID == 0 { // not admin
 		log.Println("[Service - not admin]")
 		product, err := p.productData.SelectAll(offset, sortStr)
 		if err != nil {
@@ -74,6 +77,7 @@ func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]pro
 		if err != nil {
 			return nil, err
 		}
+		log.Println("[Service - admin] product", product)
 		return product, nil
 	}
 }

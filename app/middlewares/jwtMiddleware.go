@@ -19,40 +19,21 @@ func JWTMiddleware() echo.MiddlewareFunc {
 }
 
 // Generate token jwt
-func CreateToken(userId int) (string, error) {
+func CreateToken(userId int, role string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["userId"] = userId
+	claims["role"] = role
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //Token expires after 1 hour
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(configs.JWT_SECRET))
 
 }
 
-// extract token jwt
-// func ExtractTokenUserId(e echo.Context) int {
-// 	header := e.Request().Header.Get("Authorization")
-// 	headerToken := strings.Split(header, " ")
-// 	token := headerToken[len(headerToken)-1]
-// 	tokenJWT, _ := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-// 		return []byte(configs.JWT_SECRET), nil
-// 	})
-
-// 	if tokenJWT.Valid {
-// 		claims := tokenJWT.Claims.(jwt.MapClaims)
-// 		userId, isValidUserId := claims["userId"].(float64)
-// 		if !isValidUserId {
-// 			return 0
-// 		}
-// 		return int(userId)
-// 	}
-// 	return 0
-// }
-
-func ExtractTokenUserId(e echo.Context) int {
+func ExtractTokenUserId(e echo.Context) (int, string, error) {
 	header := e.Request().Header.Get("Authorization")
 	if header == "" {
-		return 0
+		return 0, "", errors.New("authorization header is empty")
 	}
 
 	headerToken := strings.Split(header, " ")
@@ -63,19 +44,20 @@ func ExtractTokenUserId(e echo.Context) int {
 
 	if err != nil {
 		e.Error(err)
-		return 0
+		return 0, "", err
 	}
 
 	if tokenJWT.Valid {
 		claims := tokenJWT.Claims.(jwt.MapClaims)
 		userId, isValidUserId := claims["userId"].(float64)
-		if !isValidUserId {
+		role, isValidRole := claims["role"].(string)
+		if !isValidUserId || !isValidRole {
 			e.Error(errors.New("jwt not found"))
-			return 0
+			return 0, "", errors.New("jwt not found")
 		}
-		return int(userId)
+		return int(userId), role, nil
 	}
 
 	e.Error(errors.New("jwt not found"))
-	return 0
+	return 0, "", errors.New("jwt not found")
 }
