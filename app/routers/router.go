@@ -38,6 +38,10 @@ import (
 	_order_ProductHandler "PetPalApp/features/order_product/handler"
 	_order_ProductService "PetPalApp/features/order_product/service"
 
+	_transactionData "PetPalApp/features/transaction/data"
+	_transactionHandler "PetPalApp/features/transaction/handler"
+	_transactionService "PetPalApp/features/transaction/service"
+
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -79,6 +83,10 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	order_ProductData := _order_ProductData.New(db)
 	order_ProductService := _order_ProductService.New(order_ProductData)
 	order_productHandlerAPI := _order_ProductHandler.New(order_ProductService)
+
+	transactionData := _transactionData.New(db)
+	transactionService := _transactionService.New(transactionData)
+	transactionHandlerAPI := _transactionHandler.New(transactionService)
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
@@ -125,4 +133,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.POST("/order_products", order_productHandlerAPI.CreateOrderProduct, middlewares.JWTMiddleware())
 	e.GET("/order-products/:order_id", order_productHandlerAPI.GetOrderProductsByOrderID, middlewares.JWTMiddleware())
 
+	//transactions
+	e.POST("/transactions", transactionHandlerAPI.CreateTransaction, middlewares.JWTMiddleware())
 }
