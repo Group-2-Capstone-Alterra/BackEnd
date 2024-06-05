@@ -25,7 +25,7 @@ func New(ds doctor.DoctorService) *DoctorHandler {
 }
 
 func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
-	adminID := middlewares.ExtractTokenUserId(c)
+	adminID, _, _ := middlewares.ExtractTokenUserId(c)
 	if adminID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
@@ -56,7 +56,7 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 func (dh *DoctorHandler) ProfileDoctor(c echo.Context) error {
 	log.Println("[handler]")
 
-	idToken := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	doctorDetails, errDoctorDetails := dh.doctorService.GetDoctorByIdAdmin(uint(idToken))
@@ -75,7 +75,7 @@ func (dh *DoctorHandler) ProfileDoctor(c echo.Context) error {
 }
 
 func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
-	adminID := middlewares.ExtractTokenUserId(c)
+	adminID, _, _ := middlewares.ExtractTokenUserId(c)
 	if adminID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}

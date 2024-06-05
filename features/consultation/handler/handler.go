@@ -27,7 +27,7 @@ func New(cs consultation.ConsultationService, userData user.DataInterface, docto
 }
 
 func (ch *ConsultationHandler) CreateConsultation(c echo.Context) error {
-	userID := middlewares.ExtractTokenUserId(c)
+	userID, _, _ := middlewares.ExtractTokenUserId(c)
 	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
@@ -50,7 +50,7 @@ func (ch *ConsultationHandler) CreateConsultation(c echo.Context) error {
 }
 
 func (ch *ConsultationHandler) GetConsultations(c echo.Context) error {
-	currentID := middlewares.ExtractTokenUserId(c)
+	currentID, _, _ := middlewares.ExtractTokenUserId(c)
 	if currentID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
