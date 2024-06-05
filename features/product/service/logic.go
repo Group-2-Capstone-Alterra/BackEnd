@@ -45,6 +45,10 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 }
 
 func (p *productService) GetAll(userid uint, offset uint, sortStr string) ([]product.Core, error) {
+	if userid <= 0 {
+		return nil, errors.New("[validation] jwt not valid / expired")
+	}
+
 	log.Println("[Service]")
 	log.Println("[Service] sortStr", sortStr)
 	product, _ := p.productData.VerIsAdmin(userid)
