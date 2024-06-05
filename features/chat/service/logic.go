@@ -64,16 +64,25 @@ func (cs *ChatService) GetChats(currentID, roomchatID uint) ([]chat.ChatCore, er
 
 	log.Println("[Service - GetChats]")
 	//get doctorID
-	// doctorDetail, _ := cs.doctorData.SelectByAdminId(currentID)
-	// log.Println("[Query - GetChats] doctorDetail.AvailableDay.ID", doctorDetail.ID)
-
-	//verif is roomchat and current user is match
-	verCurrent, _ := cs.consultationData.VerAvailConcul(currentID, roomchatID)
-	if verCurrent.ID == 0 {
-		return nil, fmt.Errorf("[Service GetChats - verCurrent] roomchat not found")
-	} else {
-		log.Println("[Service - GetChats] verCurrent.ID != 0")
-		return cs.chatModel.GetChatsUser(currentID, roomchatID)
+	doctorDetail, _ := cs.doctorData.SelectByAdminId(currentID)
+	log.Println("[Query - GetChats] doctorDetail.AvailableDay.ID", doctorDetail.ID)
+	if doctorDetail.ID == 0 {
+		verCurrent, _ := cs.consultationData.VerAvailConcul(currentID, roomchatID)
+		if verCurrent.ID == 0 {
+			return nil, fmt.Errorf("[Service GetChats - verCurrent] roomchat not found")
+		} else {
+			log.Println("[Service - GetChats] verCurrent.ID != 0")
+			return cs.chatModel.GetChatsUser(currentID, roomchatID)
+		}
+	} else { //current is doctor
+		//verif is roomchat and current user is match
+		verCurrent, _ := cs.consultationData.VerAvailConcul(doctorDetail.ID, roomchatID)
+		if verCurrent.ID == 0 {
+			return nil, fmt.Errorf("[Service GetChats - verCurrent] roomchat not found")
+		} else {
+			log.Println("[Service - GetChats] verCurrent.ID != 0")
+			return cs.chatModel.GetChatsUser(doctorDetail.ID, roomchatID)
+		}
 	}
 
 	//Verif admin or not
