@@ -3,6 +3,7 @@ package handler
 import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/admin"
+	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
 	"log"
 	"net/http"
@@ -14,11 +15,13 @@ import (
 
 type AdminHandler struct {
 	adminService admin.AdminService
+	helper       helper.HelperInterface
 }
 
-func New(as admin.AdminService) *AdminHandler {
+func New(as admin.AdminService, helper helper.HelperInterface) *AdminHandler {
 	return &AdminHandler{
 		adminService: as,
+		helper:       helper,
 	}
 }
 
@@ -30,9 +33,9 @@ func (ah *AdminHandler) Register(c echo.Context) error {
 	}
 
 	dataAdmin := admin.Core{
-		FullName:           newAdmin.FullName,
-		Email:              newAdmin.Email,
-		Password:           newAdmin.Password,
+		FullName: newAdmin.FullName,
+		Email:    newAdmin.Email,
+		Password: newAdmin.Password,
 	}
 
 	errInsert := ah.adminService.Register(dataAdmin)
@@ -149,10 +152,8 @@ func (ah *AdminHandler) GetAllClinic(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
 	}
 
-	// var allAdmin []handler.AllClinicResponse
-	// for _, v := range result {
-	// 	allAdmin = append(allAdmin, handler.ResponseAllClinic(v))
-	// }
+	// clinicSort := ah.helper.SortClinicsByDistance(uint(idToken), result)
+	log.Println("[HANDLER - result]", result)
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", result))
 }

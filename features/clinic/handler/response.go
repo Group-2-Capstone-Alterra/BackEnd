@@ -13,8 +13,6 @@ type AllClinicResponse struct {
 	Service    string              `json:"service"`
 	Veterinary string              `json:"veterinary"`
 	Location   string              `json:"location"`
-	Coordinate string              `json:"coordinat"`
-	Distance   float64             `json:"distance"`
 }
 
 func ResponseAllClinic(admin admin.Core, doctor doctor.Core) AllClinicResponse {

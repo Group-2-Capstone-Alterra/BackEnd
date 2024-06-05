@@ -11,6 +11,6 @@ type Core struct {
 	Service    string              `json:"service"`
 	Veterinary string              `json:"veterinary"`
 	Location   string              `json:"location"`
-	Coordinate string              `json:"coordinat"`
+	Coordinate string              `json:"coordinate"`
 	Distance   float64             `json:"distance"`
 }

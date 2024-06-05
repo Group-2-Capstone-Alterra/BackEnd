@@ -6,17 +6,17 @@ import (
 )
 
 type Core struct {
-	ID                 uint
-	FullName           string
-	Email              string
-	NumberPhone        string
-	Address            string
-	Password           string
-	ProfilePicture     string
-	Coordinate         string
-	Token              string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
+	ID             uint
+	FullName       string
+	Email          string
+	NumberPhone    string
+	Address        string
+	Password       string
+	ProfilePicture string
+	Coordinate     string
+	Token          string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type AdminModel interface {
