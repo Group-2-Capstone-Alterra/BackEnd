@@ -70,7 +70,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	adminData := _adminData.New(db)
 	adminService := _adminService.New(adminData, hashService, doctorData, helperService)
-	adminHandlerAPI := _adminHandler.New(adminService)
+	adminHandlerAPI := _adminHandler.New(adminService, helperService)
 
 	orderData := _orderData.New(db)
 	orderService := _orderService.New(orderData)
@@ -95,7 +95,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	paymentData := _paymentData.New(db)
 	paymentService := _paymentService.New(paymentData)
 	paymentHandlerAPI := _paymentHandler.New(paymentService)
-
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
