@@ -2,6 +2,7 @@ package migrations
 
 import (
 	_dataAdmin "PetPalApp/features/admin/data"
+	_dataAvailday "PetPalApp/features/availdaydoctor/data"
 	_dataChat "PetPalApp/features/chat/data"
 	_dataConsultation "PetPalApp/features/consultation/data"
 	_dataDoctor "PetPalApp/features/doctor/data"
@@ -18,7 +19,7 @@ func InitMigrations(db *gorm.DB) {
 	db.AutoMigrate(&_dataAdmin.Admin{})
 	db.AutoMigrate(&_dataProduct.Product{})
 	db.AutoMigrate(&_dataDoctor.Doctor{})
-	db.AutoMigrate(&_dataDoctor.AvailableDay{})
+	db.AutoMigrate(&_dataAvailday.AvailableDay{})
 	db.AutoMigrate(&_dataChat.Chat{})
 	db.AutoMigrate(&_dataOrder.Order{})
 	db.AutoMigrate(&_dataConsultation.Consultation{})
