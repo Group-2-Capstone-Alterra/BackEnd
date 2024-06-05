@@ -48,9 +48,6 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 }
 
 func (p *productService) GetAll(userid uint, role string, offset uint, sortStr string) ([]product.Core, error) {
-	if userid <= 0 {
-		return nil, errors.New("[validation] jwt not valid / expired")
-	}
 
 	log.Println("[Service]")
 	log.Println("[Service] role", role)
@@ -65,6 +62,14 @@ func (p *productService) GetAll(userid uint, role string, offset uint, sortStr s
 			productSort := p.helper.SortProductsByDistance(userid, product)
 			log.Println("[service - not admin] distance")
 			return productSort, nil
+		} else {
+			return product, nil
+		}
+	} else if userid == 0 { // guest
+		log.Println("[service - guest]")
+		product, err := p.productData.SelectAll(offset, sortStr)
+		if err != nil {
+			return nil, err
 		}
 		return product, nil
 	} else { //is admin
