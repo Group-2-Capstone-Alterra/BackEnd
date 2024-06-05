@@ -2,7 +2,7 @@ package doctor
 
 import (
 	"PetPalApp/features/availdaydoctor"
-	"PetPalApp/features/clinic"
+	"io"
 )
 
 type Core struct {
@@ -12,7 +12,7 @@ type Core struct {
 	Email          string
 	Specialization string
 	ProfilePicture string
-	AvailableDay   clinic.Core
+	AvailableDay   availdaydoctor.Core
 }
 
 type DoctorModel interface {
@@ -21,8 +21,12 @@ type DoctorModel interface {
 	SelectDoctorById(id uint) (*Core, error)
 	SelectAvailDayById(id uint) (*availdaydoctor.Core, error)
 	SelectAllDoctor() ([]Core, error)
+	PutByIdAdmin(AdminID uint, input Core) error
 }
 
 type DoctorService interface {
 	AddDoctor(Core) error
+	GetDoctorByIdAdmin(adminID uint) (*Core, error)
+	GetAvailDoctorByIdDoctor(doctorID uint) (*availdaydoctor.Core, error)
+	UpdateByIdAdmin(AdminId uint, input Core, file io.Reader, handlerFilename string) (string, error)
 }
