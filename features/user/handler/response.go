@@ -23,6 +23,18 @@ type ConsulUserReponse struct {
 	ProfilePicture string `json:"profile_picture,omitempty"`
 }
 
+type OrderResponse struct {
+	ID       uint   `json:"id"`
+	FullName string `json:"full_name"`
+}
+
+func OrderCoreToResponse(core user.Core) OrderResponse {
+	return OrderResponse{
+		ID:       core.ID,
+		FullName: core.FullName,
+	}
+}
+
 func ConsulCoreToGorm(userGorm user.Core) ConsulUserReponse {
 	userCore := ConsulUserReponse{
 		ID:             userGorm.ID,

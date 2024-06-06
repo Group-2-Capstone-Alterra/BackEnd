@@ -3,6 +3,8 @@ package handler
 import (
 	"PetPalApp/app/middlewares"
 	"PetPalApp/features/order"
+	"PetPalApp/features/product"
+	"PetPalApp/features/user"
 	"PetPalApp/utils/responses"
 	"net/http"
 
@@ -11,11 +13,15 @@ import (
 
 type OrderHandler struct {
 	orderService order.OrderService
+	userData     user.DataInterface
+	productData  product.DataInterface
 }
 
-func New(os order.OrderService) *OrderHandler {
+func New(os order.OrderService, userData user.DataInterface, productData product.DataInterface) *OrderHandler {
 	return &OrderHandler{
 		orderService: os,
+		userData:     userData,
+		productData:  productData,
 	}
 }
 
@@ -56,5 +62,15 @@ func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
 	}
 
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", orders))
+	var resultResponse []OrderResponse
+	for _, v := range orders {
+
+		userData, _ := oh.userData.SelectById(v.UserID)
+		productData, _ := oh.productData.SelectById(v.ProductID)
+
+		resultResponse = append(resultResponse, CoreToResponse(v, *userData, *productData))
+
+	}
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", resultResponse))
 }
