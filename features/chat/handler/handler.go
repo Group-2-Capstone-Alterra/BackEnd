@@ -38,8 +38,8 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
 	}
 
-	senderID, role, _ := middlewares.ExtractTokenUserId(c)
-	if senderID == 0 {
+	userID, role, _ := middlewares.ExtractTokenUserId(c)
+	if userID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
 
@@ -50,7 +50,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 
 	chatData := chat.ChatCore{
 		ConsultationID: uint(roomchatIDConv),
-		SenderID:       uint(senderID),
+		UserID:       uint(userID),
 		Message:        newChat.Message,
 	}
 
@@ -88,15 +88,15 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 		// log.Println("[Handler - Chats] consulData", consulData)
 
 		// log.Println("[Handler - Chats] doctorData", doctorData)
-		if v.SenderID == consulData.DoctorID { //if sender doctor
+		if v.AdminID == consulData.DoctorID { //if sender doctor
 			log.Println("[Handler] if sender doctor")
-			doctorData, _ := ch.doctorData.SelectDoctorById(v.SenderID)
-			userData, _ := ch.userData.SelectById(v.ReceiverID)
+			doctorData, _ := ch.doctorData.SelectDoctorById(v.AdminID)
+			userData, _ := ch.userData.SelectById(v.UserID)
 			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData))
 		} else {
 			log.Println("[Handler] if sender user")
-			userData, _ := ch.userData.SelectById(v.SenderID)
-			doctorData, _ := ch.doctorData.SelectDoctorById(v.ReceiverID)
+			userData, _ := ch.userData.SelectById(v.UserID)
+			doctorData, _ := ch.doctorData.SelectDoctorById(v.AdminID)
 			allChat = append(allChat, AllResponseChatFromUser(v, *userData, *doctorData))
 		}
 	}

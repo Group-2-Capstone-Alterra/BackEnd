@@ -1,6 +1,7 @@
 package data
 
 import (
+	chat "PetPalApp/features/chat/data"
 	consultation "PetPalApp/features/consultation/data"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/helperuser"
@@ -19,6 +20,8 @@ type User struct {
 	Coordinate     *string
 	Role           string 					   `gorm:"default:'user'"`
 	Consultations  []consultation.Consultation `gorm:"foreign_key:UserID"`
+	Chats		   []chat.Chat  			   `gorm:"foreign_key:UserID"`
+
 	
 }
 
