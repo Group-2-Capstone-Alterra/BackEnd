@@ -8,7 +8,10 @@ import (
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/helper"
 	"errors"
+	"fmt"
+	"io"
 	"log"
+	"time"
 )
 
 type AdminService struct {
@@ -79,13 +82,36 @@ func (as *AdminService) Delete(adminid uint) error {
 	return nil
 }
 
-func (as *AdminService) Update(adminid uint, updateData admin.Core) error {
-	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" && updateData.Address == "" && updateData.ProfilePicture == "" {
+func (as *AdminService) Update(adminid uint, updateData admin.Core, file io.Reader, handlerFilename string) error {
+	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" && 
+	updateData.Address == "" && updateData.Coordinate == "" && updateData.Password == "" && file == nil {
 		return errors.New("[validation] Tidak ada data yang diupdate")
+	}
+
+	if updateData.Password != "" {
+		result, errHash := as.hashService.HashPassword(updateData.Password)
+		if errHash != nil {
+			return errHash
+		}
+		updateData.Password = result
+	}
+
+	if file != nil && handlerFilename != "" {
+		timestamp := time.Now().Unix()
+		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+		photoFileName, errPhoto := as.helper.UploadAdminPicture(file, fileName)
+		if errPhoto != nil {
+			return errPhoto
+		}
+		updateData.ProfilePicture = photoFileName
+	} else if updateData.ProfilePicture == "" {
+		updateData.ProfilePicture = "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg"
 	}
 
 	return as.AdminModel.Update(adminid, updateData)
 }
+
+
 
 func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error) {
 	log.Println("[Service]")

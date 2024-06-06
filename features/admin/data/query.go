@@ -90,6 +90,7 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 
 	var admin = admin.Core{
 		ID:             adminData.ID,
+		Role: 			adminData.Role,
 		FullName:       adminData.FullName,
 		Email:          adminData.Email,
 		NumberPhone:    numberPhone,
@@ -115,26 +116,23 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-
 	if updateData.FullName != "" {
 		adminData.FullName = updateData.FullName
 	}
 	if updateData.Email != "" {
 		adminData.Email = updateData.Email
 	}
+	if updateData.Password != "" {
+		adminData.Password = updateData.Password
+	}
+	if updateData.Coordinate != "" {
+		adminData.Coordinate = &updateData.Coordinate
+	}
 	if updateData.NumberPhone != "" {
-		if updateData.NumberPhone != "" {
-			adminData.NumberPhone = &updateData.NumberPhone
-		} else {
-			adminData.NumberPhone = nil
-		}
+		adminData.NumberPhone = &updateData.NumberPhone
 	}
 	if updateData.Address != "" {
-		if updateData.Address != "" {
-			adminData.Address = &updateData.Address
-		} else {
-			adminData.Address = nil
-		}
+		adminData.Address = &updateData.Address
 	}
 	if updateData.ProfilePicture != "" {
 		adminData.ProfilePicture = updateData.ProfilePicture
@@ -147,6 +145,8 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 
 	return nil
 }
+
+
 
 // func (am *AdminModel) SelectAll(offset uint, sortStr string) ([]admin.AllClinicResponseCore, error) {
 // 	var allClinic []AllClinicResponse
