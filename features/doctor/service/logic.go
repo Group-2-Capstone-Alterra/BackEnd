@@ -33,13 +33,17 @@ func (ds *DoctorService) AddDoctor(doctor doctor.Core, file io.Reader, handlerFi
 			return "", errors.New("[validation] Fullname/specialization tidak boleh kosong")
 		}
 
-		timestamp := time.Now().Unix()
-		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
-		photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
-		if errPhoto != nil {
-			return "", errPhoto
+		if file != nil { //foto is not nil
+			timestamp := time.Now().Unix()
+			fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+			photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
+			if errPhoto != nil {
+				return "", errPhoto
+			}
+			doctor.ProfilePicture = photoFileName
+		} else { //foto is nil
+			doctor.ProfilePicture = "https://air-bnb.s3.ap-southeast-2.amazonaws.com/default.jpg"
 		}
-		doctor.ProfilePicture = photoFileName
 
 		err := ds.DoctorModel.AddDoctor(doctor)
 		if err != nil {

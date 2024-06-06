@@ -122,6 +122,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.POST("/doctors", doctorHandlerAPI.AddDoctor, middlewares.JWTMiddleware())
 	e.GET("/doctors", doctorHandlerAPI.ProfileDoctor, middlewares.JWTMiddleware())
 	e.PATCH("/doctors", doctorHandlerAPI.UpdateProfile, middlewares.JWTMiddleware())
+	e.PATCH("/doctors/uploadpicture", doctorHandlerAPI.UploadDoctorPicture, middlewares.JWTMiddleware())
 
 	//chats
 	e.POST("/chats/:id", chatHandlerAPI.CreateChat, middlewares.JWTMiddleware())
