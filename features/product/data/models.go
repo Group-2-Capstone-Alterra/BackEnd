@@ -8,7 +8,7 @@ import (
 
 type Product struct {
 	gorm.Model
-	IdUser         uint
+	AdminID        uint
 	ProductName    string
 	Price          float32
 	Stock          uint
@@ -18,7 +18,7 @@ type Product struct {
 
 func CoreToGorm(core product.Core) Product {
 	gorm := Product{
-		IdUser:         core.IdUser,
+		AdminID:        core.AdminID,
 		ProductName:    core.ProductName,
 		Price:          core.Price,
 		Stock:          core.Stock,
@@ -31,7 +31,7 @@ func CoreToGorm(core product.Core) Product {
 func GormToCore(gorm Product) product.Core {
 	core := product.Core{
 		ID:             gorm.ID,
-		IdUser:         gorm.IdUser,
+		AdminID:        gorm.AdminID,
 		ProductName:    gorm.ProductName,
 		Price:          gorm.Price,
 		Stock:          gorm.Stock,

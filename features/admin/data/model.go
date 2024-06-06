@@ -1,6 +1,8 @@
 package data
 
 import (
+	product "PetPalApp/features/product/data"
+
 	"gorm.io/gorm"
 )
 
@@ -14,4 +16,5 @@ type Admin struct {
 	ProfilePicture string 
 	Coordinate     *string
 	Role           string `gorm:"default:'admin'"`
+	Products	   []product.Product `gorm:"foreign_key:AdminID"`
 }
