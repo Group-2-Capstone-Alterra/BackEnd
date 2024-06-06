@@ -30,12 +30,16 @@ func New(am admin.AdminModel, hash encrypts.HashInterface, DoctorModel doctor.Do
 func (as *AdminService) Register(admin admin.Core) error {
 
 	if admin.FullName == "" || admin.Email == "" || admin.Password == "" {
-		return errors.New("[validation] Fullname/email/numberphone/address/password tidak boleh kosong")
+		return errors.New("[validation] Fullname/email/password tidak boleh kosong")
 	}
 
 	var errHash error
 	if admin.Password, errHash = as.hashService.HashPassword(admin.Password); errHash != nil {
 		return errHash
+	}
+
+	if admin.ProfilePicture == "" {
+		admin.ProfilePicture = "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg"
 	}
 
 	return as.AdminModel.Register(admin)

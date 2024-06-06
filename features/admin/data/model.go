@@ -11,7 +11,7 @@ type Admin struct {
 	Password       string
 	NumberPhone    *string `gorm:"unique"`
 	Address        *string
-	ProfilePicture *string
+	ProfilePicture string 
 	Coordinate     *string
 	Role           string `gorm:"default:'admin'"`
 }
