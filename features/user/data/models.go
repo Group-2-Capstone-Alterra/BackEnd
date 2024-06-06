@@ -1,6 +1,7 @@
 package data
 
 import (
+	consultation "PetPalApp/features/consultation/data"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/helperuser"
 
@@ -10,13 +11,15 @@ import (
 type User struct {
 	gorm.Model
 	FullName       *string
-	Email          *string `gorm:"unique"`
-	NumberPhone    *string `gorm:"unique"`
+	Email          *string 						`gorm:"unique"`
+	NumberPhone    *string 						`gorm:"unique"`
 	Address        *string
 	Password       *string
 	ProfilePicture *string
 	Coordinate     *string
-	Role           string `gorm:"default:'user'"`
+	Role           string 					   `gorm:"default:'user'"`
+	Consultations  []consultation.Consultation `gorm:"foreign_key:UserID"`
+	
 }
 
 func UserCoreToUserGorm(userCore user.Core, helper helperuser.HelperuserInterface) User {
