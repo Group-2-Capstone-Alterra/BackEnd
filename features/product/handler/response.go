@@ -19,6 +19,18 @@ type AllProductResponse struct {
 	ProductPicture string  `json:"product_picture" form:"product_picture"`
 }
 
+type OrderResponse struct {
+	ID          uint   `json:"id"`
+	ProductName string `json:"product_name"`
+}
+
+func OrderCoreToResponse(core product.Core) OrderResponse {
+	return OrderResponse{
+		ID:          core.ID,
+		ProductName: core.ProductName,
+	}
+}
+
 func GormToCore(gorm product.Core) ProductResponse {
 	core := ProductResponse{
 		ProductName:    gorm.ProductName,
