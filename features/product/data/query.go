@@ -64,11 +64,11 @@ func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, 
 	return allProductCore, nil
 }
 
-func (p *productrQuery) SelectAllAdmin(userid uint, offset uint) ([]product.Core, error) {
+func (p *productrQuery) SelectAllAdmin(adminid uint, offset uint) ([]product.Core, error) {
 	var allProduct []Product
-	log.Println("[Query - admin] SelectAllAdmin, userid: ", userid)
+	log.Println("[Query - admin] SelectAllAdmin, userid: ", adminid)
 
-	tx := p.db.Where("id_user = ?", userid).Find(&allProduct)
+	tx := p.db.Where("admin_id = ?", adminid).Find(&allProduct)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -90,9 +90,9 @@ func (p *productrQuery) SelectById(id uint) (*product.Core, error) {
 	return &projectcore, nil
 }
 
-func (p *productrQuery) SelectByIdAdmin(id uint, userid uint) (*product.Core, error) {
+func (p *productrQuery) SelectByIdAdmin(id uint, adminid uint) (*product.Core, error) {
 	var productData Product
-	tx := p.db.Where("id_user = ?", userid).First(&productData, id)
+	tx := p.db.Where("admin_id = ?", adminid).First(&productData, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -101,9 +101,9 @@ func (p *productrQuery) SelectByIdAdmin(id uint, userid uint) (*product.Core, er
 	return &projectcore, nil
 }
 
-func (p *productrQuery) VerIsAdmin(userid uint) (*product.Core, error) {
+func (p *productrQuery) VerIsAdmin(adminid uint) (*product.Core, error) {
 	var productData Product
-	tx := p.db.Where("id_user = ?", userid).Find(&productData)
+	tx := p.db.Where("admin_id = ?", adminid).Find(&productData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -118,11 +118,11 @@ func (p *productrQuery) VerIsAdmin(userid uint) (*product.Core, error) {
 	return &projectcore, nil
 }
 
-func (p *productrQuery) PutById(id uint, userid uint, input product.Core) error {
+func (p *productrQuery) PutById(id uint, adminid uint, input product.Core) error {
 
 	userGorm := CoreToGorm(input)
 
-	tx := p.db.Model(&Product{}).Where("id = ? AND id_user = ?", id, userid).Updates(&userGorm)
+	tx := p.db.Model(&Product{}).Where("id = ? AND admin_id = ?", id, adminid).Updates(&userGorm)
 	if tx.Error != nil {
 		return tx.Error
 	}
@@ -130,8 +130,8 @@ func (p *productrQuery) PutById(id uint, userid uint, input product.Core) error 
 	return nil
 }
 
-func (p *productrQuery) Delete(id uint, userid uint) error {
-	tx := p.db.Where("id_user = ?", userid).Delete(&Product{}, id)
+func (p *productrQuery) Delete(id uint, adminid uint) error {
+	tx := p.db.Where("admin_id = ?", adminid).Delete(&Product{}, id)
 	if tx.Error != nil {
 		return tx.Error
 	}

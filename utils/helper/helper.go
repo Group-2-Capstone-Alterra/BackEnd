@@ -27,8 +27,8 @@ type HelperInterface interface {
 	UploadProductPicture(file io.Reader, fileName string) (string, error)
 	UploadDoctorPicture(file io.Reader, fileName string) (string, error)
 	DereferenceString(s *string) string
-	SortProductsByDistance(iduser uint, products []product.Core) []product.Core
-	SortClinicsByDistance(userid uint, clnics []clinic.Core) []clinic.Core
+	SortProductsByDistance(adminid uint, products []product.Core) []product.Core
+	SortClinicsByDistance(adminid uint, clnics []clinic.Core) []clinic.Core
 }
 
 type helper struct {
@@ -181,7 +181,7 @@ func (u *helper) SortProductsByDistance(userid uint, products []product.Core) []
 
 	for i := range products {
 		//get coordinate admin
-		adminID := products[i].IdUser
+		adminID := products[i].AdminID
 		dataAdmin, _ := u.admin.AdminById(adminID)
 		log.Println("[Helper - SortClinicsByDistance] dataAdmin", dataAdmin)
 
