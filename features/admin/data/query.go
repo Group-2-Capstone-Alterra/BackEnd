@@ -23,7 +23,7 @@ func (am *AdminModel) Register(admin admin.Core) error {
 		Password:       admin.Password,
 		NumberPhone:    nil,
 		Address:        nil,
-		ProfilePicture: nil,
+		ProfilePicture: admin.ProfilePicture,
 		Coordinate:     nil,
 	}
 	tx := am.db.Create(&adminGorm)
@@ -52,9 +52,6 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 		address = *adminData.Address
 	}
 
-	if adminData.ProfilePicture != nil {
-		profilePicture = *adminData.ProfilePicture
-	}
 
 	var admins = admin.Core{
 		ID:             adminData.ID,
@@ -76,7 +73,7 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 		return nil, tx.Error
 	}
 
-	var numberPhone, address, profilePicture string
+	var numberPhone, address, coordinate string
 
 	if adminData.NumberPhone != nil {
 		numberPhone = *adminData.NumberPhone
@@ -86,8 +83,9 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 		address = *adminData.Address
 	}
 
-	if adminData.ProfilePicture != nil {
-		profilePicture = *adminData.ProfilePicture
+
+	if adminData.Coordinate != nil {
+		coordinate = *adminData.Coordinate
 	}
 
 	var admin = admin.Core{
@@ -96,9 +94,9 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 		Email:          adminData.Email,
 		NumberPhone:    numberPhone,
 		Address:        address,
-		ProfilePicture: profilePicture,
+		ProfilePicture: adminData.ProfilePicture,
 		Password:       adminData.Password,
-		Coordinate:     *adminData.Coordinate,
+		Coordinate:     coordinate,
 	}
 	return &admin, nil
 }
@@ -139,11 +137,7 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 		}
 	}
 	if updateData.ProfilePicture != "" {
-		if updateData.ProfilePicture != "" {
-			adminData.ProfilePicture = &updateData.ProfilePicture
-		} else {
-			adminData.ProfilePicture = nil
-		}
+		adminData.ProfilePicture = updateData.ProfilePicture
 	}
 
 	txSave := am.db.Save(&adminData)
@@ -176,9 +170,6 @@ func (am *AdminModel) SelectAllAdmin() ([]admin.Core, error) {
 		}
 		if v.Coordinate != nil {
 			coordinate = *v.Coordinate
-		}
-		if v.ProfilePicture != nil {
-			profilePicture = *v.ProfilePicture
 		}
 
 		allAdminCore = append(allAdminCore, admin.Core{
