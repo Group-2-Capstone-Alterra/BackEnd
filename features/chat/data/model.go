@@ -10,8 +10,8 @@ import (
 type Chat struct {
 	gorm.Model
 	ConsultationID uint
-	UserID         uint
-	AdminID        uint
+	SenderID       uint
+	ReceiverID     uint
 	Message        string
 	TimeStamp      time.Time
 }
@@ -20,8 +20,8 @@ func ToCore(c Chat) chat.ChatCore {
 	return chat.ChatCore{
 		ID:             c.ID,
 		ConsultationID: c.ConsultationID,
-		UserID:         c.UserID,
-		AdminID:        c.AdminID,
+		SenderID:       c.SenderID,
+		ReceiverID:     c.ReceiverID,
 		Message:        c.Message,
 		TimeStamp:      c.TimeStamp,
 	}

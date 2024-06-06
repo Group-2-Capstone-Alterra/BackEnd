@@ -8,7 +8,7 @@ import (
 
 type ProductRequest struct {
 	gorm.Model
-	AdminID        uint
+	IdUser         uint
 	ProductName    string  `json:"product_name" form:"product_name"`
 	Price          float32 `json:"price" form:"price"`
 	Stock          uint    `json:"stock" form:"stock"`
@@ -18,7 +18,7 @@ type ProductRequest struct {
 
 func RequestToCore(input ProductRequest) product.Core {
 	inputCore := product.Core{
-		AdminID:        input.AdminID,
+		IdUser:         input.IdUser,
 		ProductName:    input.ProductName,
 		Price:          input.Price,
 		Stock:          input.Stock,

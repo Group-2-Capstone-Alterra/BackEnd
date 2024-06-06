@@ -28,7 +28,7 @@ func New(ps product.ServiceInterface, helper helper.HelperInterface) *ProductHan
 
 func (ph *ProductHandler) AddProduct(c echo.Context) error {
 
-	idToken, _, _ := middlewares.ExtractTokenUserId(c) 
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	newProduct := ProductRequest{}
@@ -67,7 +67,7 @@ func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
 
 	sortStr := c.QueryParam("sort")
 
-	idToken, role, _ := middlewares.ExtractTokenUserId(c) 
+	idToken, role, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	result, errResult := ph.productService.GetAll(uint(idToken), role, uint(offset), sortStr)
@@ -91,7 +91,7 @@ func (ph *ProductHandler) GetProductById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get id", idConv))
 	}
 
-	idToken, _, _ := middlewares.ExtractTokenUserId(c) 
+	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
 	productData, errProductData := ph.productService.GetProductById(uint(idConv), uint(idToken))
@@ -107,7 +107,7 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get admin id", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
@@ -145,10 +145,10 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 
 	_, errUpdate := ph.productService.UpdateById(uint(idConv), uint(idToken), inputCore, file, filename)
 	if errUpdate != nil {
-		
+		// Handle error from userService.UpdateById
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))
 	}
-	
+	// Return success response
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", err))
 }
 
@@ -156,7 +156,7 @@ func (ph *ProductHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get admin id", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
