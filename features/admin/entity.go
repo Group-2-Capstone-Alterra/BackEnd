@@ -2,6 +2,7 @@ package admin
 
 import (
 	"PetPalApp/features/clinic"
+	"io"
 	"time"
 )
 
@@ -34,6 +35,6 @@ type AdminService interface {
 	Login(email string, password string) (data *Core, token string, err error)
 	GetProfile(adminid uint) (data *Core, err error)
 	Delete(adminid uint) error
-	Update(adminid uint, updateData Core) error
+	Update(adminid uint, updateData Core, file io.Reader, handlerFilename string) error
 	GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error)
 }

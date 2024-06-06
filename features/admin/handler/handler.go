@@ -6,6 +6,7 @@ import (
 	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
@@ -105,15 +106,39 @@ func (ah *AdminHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error binding data: "+errBind.Error(), nil))
 	}
 
+	var file multipart.File
+	var handler *multipart.FileHeader
+	var err error
+
+	file, handler, err = c.Request().FormFile("profile_picture")
+	if err != nil {
+		if err != http.ErrMissingFile {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "Unable to upload photo: " + err.Error(),
+			})
+		}
+		file = nil
+		handler = nil
+	} else {
+		defer file.Close()
+	}
+
 	updateData := admin.Core{
 		FullName:       updateReq.FullName,
 		Email:          updateReq.Email,
+		Password:       updateReq.Password,
+		Coordinate:     updateReq.Coordinate,
 		NumberPhone:    updateReq.NumberPhone,
 		Address:        updateReq.Address,
 		ProfilePicture: updateReq.ProfilePicture,
 	}
 
-	errUpdate := ah.adminService.Update(uint(adminID), updateData)
+	var filename string
+	if handler != nil {
+		filename = handler.Filename
+	}
+
+	errUpdate := ah.adminService.Update(uint(adminID), updateData, file, filename)
 	if errUpdate != nil {
 		if strings.Contains(errUpdate.Error(), "validation") {
 			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("update failed: "+errUpdate.Error(), nil))
@@ -121,8 +146,10 @@ func (ah *AdminHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("update failed: "+errUpdate.Error(), nil))
 	}
 
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("update successfull", nil))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("update successful", nil))
 }
+
+
 
 func (ah *AdminHandler) GetAllClinic(c echo.Context) error {
 	log.Println("[HANDLER]")

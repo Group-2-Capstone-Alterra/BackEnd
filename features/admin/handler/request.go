@@ -7,6 +7,7 @@ type AdminRequest struct {
 	Address        string `json:"address" form:"address"`
 	Password       string `json:"password" form:"password"`
 	ProfilePicture string `json:"profile_picture" form:"profile_picture"`
+	Coordinate     string `json:"coordinate" form:"coordinate"`
 }
 
 type LoginRequest struct {
