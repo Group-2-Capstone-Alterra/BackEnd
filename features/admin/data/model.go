@@ -1,6 +1,7 @@
 package data
 
 import (
+	chat "PetPalApp/features/chat/data"
 	doctor "PetPalApp/features/doctor/data"
 	product "PetPalApp/features/product/data"
 
@@ -19,4 +20,5 @@ type Admin struct {
 	Role           string 				`gorm:"default:'admin'"`
 	Products	   []product.Product 	`gorm:"foreign_key:AdminID"`
 	Doctors		   []doctor.Doctor 		`gorm:"foreign_key:AdminID"`
+	Chats		   []chat.Chat  		`gorm:"foreign_key:AdminID"`
 }
