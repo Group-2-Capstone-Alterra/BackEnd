@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 	"math"
+	"mime"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -66,11 +68,19 @@ func (u *helper) UploadProfilePicture(file io.Reader, fileName string) (string, 
 		return "", err
 	}
 
+	// Determine the content type based on the file extension
+	contentType := mime.TypeByExtension(filepath.Ext(fileName))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
 	_, err := u.s3.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(u.s3Bucket),
-		Key:    aws.String("profilepicture/" + fileName),
-		Body:   bytes.NewReader(buf.Bytes()),
-		ACL:    aws.String("public-read"),
+		Bucket:             aws.String(u.s3Bucket),
+		Key:                aws.String("profilepicture/" + fileName),
+		Body:               bytes.NewReader(buf.Bytes()),
+		ACL:                aws.String("public-read"),
+		ContentType:        aws.String(contentType),
+		ContentDisposition: aws.String("inline; filename=\"" + fileName + "\""),
 	})
 	if err != nil {
 		return "", err
@@ -84,16 +94,24 @@ func (u *helper) UploadAdminPicture(file io.Reader, fileName string) (string, er
 		return "", err
 	}
 
+	// Determine the content type based on the file extension
+	contentType := mime.TypeByExtension(filepath.Ext(fileName))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
 	_, err := u.s3.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(u.s3Bucket),
-		Key:    aws.String("adminpicture/" + fileName),
-		Body:   bytes.NewReader(buf.Bytes()),
-		ACL:    aws.String("public-read"),
+		Bucket:             aws.String(u.s3Bucket),
+		Key:                aws.String("adminpicture/" + fileName),
+		Body:               bytes.NewReader(buf.Bytes()),
+		ACL:                aws.String("public-read"),
+		ContentType:        aws.String(contentType),
+		ContentDisposition: aws.String("inline; filename=\"" + fileName + "\""),
 	})
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/profilepicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
+	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/adminpicture/%s", u.s3Bucket, aws.StringValue(u.s3.Config.Region), fileName), err
 }
 
 func (u *helper) UploadProductPicture(file io.Reader, fileName string) (string, error) {
@@ -102,11 +120,19 @@ func (u *helper) UploadProductPicture(file io.Reader, fileName string) (string, 
 		return "", err
 	}
 
+	// Determine the content type based on the file extension
+	contentType := mime.TypeByExtension(filepath.Ext(fileName))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
 	_, err := u.s3.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(u.s3Bucket),
-		Key:    aws.String("productpicture/" + fileName),
-		Body:   bytes.NewReader(buf.Bytes()),
-		ACL:    aws.String("public-read"),
+		Bucket:             aws.String(u.s3Bucket),
+		Key:                aws.String("productpicture/" + fileName),
+		Body:               bytes.NewReader(buf.Bytes()),
+		ACL:                aws.String("public-read"),
+		ContentType:        aws.String(contentType),
+		ContentDisposition: aws.String("inline; filename=\"" + fileName + "\""),
 	})
 	if err != nil {
 		return "", err
@@ -120,11 +146,19 @@ func (u *helper) UploadDoctorPicture(file io.Reader, fileName string) (string, e
 		return "", err
 	}
 
+	// Determine the content type based on the file extension
+	contentType := mime.TypeByExtension(filepath.Ext(fileName))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
 	_, err := u.s3.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(u.s3Bucket),
-		Key:    aws.String("doctorpicture/" + fileName),
-		Body:   bytes.NewReader(buf.Bytes()),
-		ACL:    aws.String("public-read"),
+		Bucket:             aws.String(u.s3Bucket),
+		Key:                aws.String("doctorpicture/" + fileName),
+		Body:               bytes.NewReader(buf.Bytes()),
+		ACL:                aws.String("public-read"),
+		ContentType:        aws.String(contentType),
+		ContentDisposition: aws.String("inline; filename=\"" + fileName + "\""),
 	})
 	if err != nil {
 		return "", err
