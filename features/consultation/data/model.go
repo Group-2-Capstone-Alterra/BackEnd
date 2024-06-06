@@ -1,7 +1,6 @@
 package data
 
 import (
-	chat "PetPalApp/features/chat/data"
 	"PetPalApp/features/consultation"
 
 	"gorm.io/gorm"
@@ -12,9 +11,8 @@ type Consultation struct {
 	UserID             uint
 	DoctorID           uint
 	Consultation       string
-	TransactionStatus  string 		`gorm:"default:'Pending'"`
-	StatusConsultation string 		`gorm:"default:'New Consultation'"`
-	Chats			   []chat.Chat  `gorm:"foreign_key:ConsultationID"`
+	TransactionStatus  string `gorm:"default:'Pending'"`
+	StatusConsultation string `gorm:"default:'New Consultation'"`
 }
 
 const (

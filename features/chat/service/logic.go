@@ -38,8 +38,8 @@ func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
 		if errconsulData != nil {
 			return fmt.Errorf("roomchat not found")
 		}
-		chat.AdminID = consulData.DoctorID                                                            // receiver is doctor
-		valConcul, _ := cs.consultationData.VerUser(chat.UserID, chat.AdminID, chat.ConsultationID) //valid is current id and receiver is avail in roomchat id
+		chat.ReceiverID = consulData.DoctorID                                                            // receiver is doctor
+		valConcul, _ := cs.consultationData.VerUser(chat.SenderID, chat.ReceiverID, chat.ConsultationID) //valid is current id and receiver is avail in roomchat id
 		if valConcul.ID == 0 {
 			return fmt.Errorf("[Sender User] UserID and DoctorID not match at Roomchat")
 		}
@@ -48,8 +48,8 @@ func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
 		if errconsulData != nil {
 			return fmt.Errorf("roomchat not found")
 		}
-		chat.UserID = consulData.UserID //penerima adalah user
-		valConcul, _ := cs.consultationData.VerAdmin(chat.AdminID, chat.UserID, chat.ConsultationID)
+		chat.ReceiverID = consulData.UserID //penerima adalah user
+		valConcul, _ := cs.consultationData.VerAdmin(chat.SenderID, chat.ReceiverID, chat.ConsultationID)
 		if valConcul.ID == 0 {
 			return fmt.Errorf("[Sender Admin] UserID and DoctorID not match at Roomchat")
 		}
@@ -67,8 +67,8 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 		if roomChatAvail.ID == 0 {
 			return nil, fmt.Errorf("[Role Admin] RoomChat Not Found")
 		} else {
-			AdminID := roomChatAvail.UserID
-			valRoomchat, _ := cs.consultationData.VerAdmin(currentID, AdminID, roomchatID)
+			receiverID := roomChatAvail.UserID
+			valRoomchat, _ := cs.consultationData.VerAdmin(currentID, receiverID, roomchatID)
 			if valRoomchat.ID == 0 {
 				return nil, fmt.Errorf("[Sender Admin] UserID and DoctorID not match at current Roomchat")
 			} else {
@@ -81,8 +81,8 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 		if roomChatAvail.ID == 0 {
 			return nil, fmt.Errorf("[Role User] RoomChat Not Found")
 		} else {
-			userID := roomChatAvail.DoctorID
-			valRoomchat, _ := cs.consultationData.VerUser(currentID, userID, roomchatID)
+			receiverID := roomChatAvail.DoctorID
+			valRoomchat, _ := cs.consultationData.VerUser(currentID, receiverID, roomchatID)
 			if valRoomchat.ID == 0 {
 				return nil, fmt.Errorf("[Sender User] UserID and DoctorID not match at current Roomchat")
 			} else {
@@ -93,18 +93,18 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 	}
 }
 
-func (cs *ChatService) Delete(roomChatID, bubbleChatID, userID uint) error {
+func (cs *ChatService) Delete(roomChatID, bubbleChatID, senderID uint) error {
 	if roomChatID <= 0 {
 		return errors.New("id not valid")
 	}
 	log.Println("[Query]")
 	//Verif admin or not
-	valConcul, _ := cs.chatModel.VerAvailChat(roomChatID, bubbleChatID, userID)
+	valConcul, _ := cs.chatModel.VerAvailChat(roomChatID, bubbleChatID, senderID)
 	if valConcul == nil { // CurrentID and RoomChat not match (Roomchat not found)
 		log.Println("[Query - Delete] valConcul NotFound")
 		return errors.New("[Query - Delete] valConcul NotFound")
 	} else { // CurrentID and RoomChat is match (Roomchat has found)
 		log.Println("[Query - Delete] valConcul is found")
-		return cs.chatModel.Delete(roomChatID, bubbleChatID, userID)
+		return cs.chatModel.Delete(roomChatID, bubbleChatID, senderID)
 	}
 }

@@ -149,8 +149,6 @@ func (ah *AdminHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("update successful", nil))
 }
 
-
-
 func (ah *AdminHandler) GetAllClinic(c echo.Context) error {
 	log.Println("[HANDLER]")
 
