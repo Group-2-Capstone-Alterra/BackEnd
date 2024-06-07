@@ -5,11 +5,9 @@ import (
 	"PetPalApp/features/product"
 	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -29,18 +27,15 @@ func New(ps product.ServiceInterface, helper helper.HelperInterface) *ProductHan
 func (ph *ProductHandler) AddProduct(c echo.Context) error {
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
-	log.Println("idtoken:", idToken)
-
 	newProduct := ProductRequest{}
 	errBind := c.Bind(&newProduct)
 	if errBind != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("err bind"+errBind.Error(), nil))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error bind data"+errBind.Error(), nil))
 	}
-
 	file, handler, err := c.Request().FormFile("product_picture")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Unable to upload photo: " + err.Error(),
+			"message": "Photo is required. Please upload a valid photo.",
 		})
 	}
 	defer file.Close()
@@ -48,46 +43,37 @@ func (ph *ProductHandler) AddProduct(c echo.Context) error {
 	inputCore := RequestToCore(newProduct)
 	_, errInsert := ph.productService.Create(uint(idToken), inputCore, file, handler.Filename)
 	if errInsert != nil {
-		if strings.Contains(errInsert.Error(), "validation") {
-			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error add data", errInsert))
-		}
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error add data", errInsert))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to add product. Please ensure all fields are filled in correctly.", nil))
 	}
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("success add data", nil))
+	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Add product successful!", nil))
 }
 
 func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
-	log.Println("[handler]")
 	page := c.QueryParam("page")
 	pageInt, err := strconv.Atoi(page)
 	if err != nil || pageInt < 1 {
 		pageInt = 1
 	}
 	offset := (pageInt - 1) * 1
-
 	sortStr := c.QueryParam("sort")
-
 	limitProduct := c.QueryParam("limit")
 	limit, errlimit := strconv.Atoi(limitProduct)
 	if errlimit != nil || pageInt < 1 {
 		pageInt = 1
 	}
-	log.Println("[Limit = ]", limit)
 
 	idToken, role, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
-	log.Println("idtoken:", idToken)
 
 	result, errResult := ph.productService.GetAll(uint(idToken), uint(limit), role, uint(offset), sortStr)
 	if errResult != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to retrieve products", nil))
 	}
 
 	var allProduct []AllProductResponse
 	for _, v := range result {
 		allProduct = append(allProduct, AllGormToCore(v))
 	}
-
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", allProduct))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Products retrieved successfully", allProduct))
 }
 
 func (ph *ProductHandler) GetProductById(c echo.Context) error {
@@ -95,26 +81,25 @@ func (ph *ProductHandler) GetProductById(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get id", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
-	log.Println("idtoken:", idToken)
 
 	productData, errProductData := ph.productService.GetProductById(uint(idConv), uint(idToken))
 	if errProductData != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to retrieve products", nil))
 	}
 
 	productResponse := GormToCore(*productData)
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get detail product", productResponse))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Products retrieved successfully", productResponse))
 }
 
 func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
@@ -122,27 +107,17 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 	updatedProduct := ProductRequest{}
 	errBind := c.Bind(&updatedProduct)
 	if errBind != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error bind data: "+errBind.Error(), nil))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error bind data: "+errBind.Error(), nil))
 	}
 
 	var file multipart.File
 	var handler *multipart.FileHeader
-	var err error
 
-	file, handler, err = c.Request().FormFile("product_picture")
-	if err != nil {
-		if err != http.ErrMissingFile {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"message": "Unable to upload photo: " + err.Error(),
-			})
-		}
-		// Handle the case where no file was uploaded
+	file, handler, _ = c.Request().FormFile("product_picture")
+	if file == nil && handler == nil {
 		file = nil
 		handler = nil
-	} else {
-		defer file.Close()
 	}
-
 	inputCore := RequestToCore(updatedProduct)
 
 	var filename string
@@ -152,25 +127,22 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 
 	_, errUpdate := ph.productService.UpdateById(uint(idConv), uint(idToken), inputCore, file, filename)
 	if errUpdate != nil {
-		// Handle error from userService.UpdateById
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to update product", errUpdate))
 	}
-	// Return success response
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", err))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Product updated successfully", nil))
 }
 
 func (ph *ProductHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
 	err := ph.productService.Delete(uint(idConv), uint(idToken))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to delete product", err))
 	}
-
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", err))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Product deleted successfully", nil))
 }

@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
+	"net/http"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type productService struct {
@@ -26,17 +28,18 @@ func New(pd product.DataInterface, helper helper.HelperInterface, adminData admi
 }
 
 func (p *productService) Create(id uint, input product.Core, file io.Reader, handlerFilename string) (string, error) {
-	if id <= 0 || input.ProductName == "" || input.Price <= 0 || file == nil {
-		return "", errors.New("Nama Produk / Harga / Foto Produk tidak boleh kosong!")
+	if id <= 0 {
+		return "", echo.NewHTTPError(http.StatusBadRequest, "ID must be a positive integer")
 	}
-
+	if input.ProductName == "" || input.Price <= 0 || file == nil || input.Stock == 0 || input.Description == "" {
+		return "", echo.NewHTTPError(http.StatusBadRequest, "Failed to add product. Please ensure all fields are filled in correctly.")
+	}
 	timestamp := time.Now().Unix()
 	fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
 	photoFileName, errPhoto := p.helper.UploadProductPicture(file, fileName)
 	if errPhoto != nil {
 		return "", errPhoto
 	}
-
 	input.IdUser = id
 	input.ProductPicture = photoFileName
 
@@ -48,45 +51,36 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 }
 
 func (p *productService) GetAll(userid uint, limit uint, role string, offset uint, sortStr string) ([]product.Core, error) {
-
-	log.Println("[Service]")
-	log.Println("[Service] role", role)
-
 	if role == "user" { // is user
-		log.Println("[Service - is user]")
 		product, err := p.productData.SelectAll(limit, offset, sortStr)
 		if err != nil {
 			return nil, err
 		}
 		if sortStr == "lowest distance" || sortStr == "higest distance" {
 			productSort := p.helper.SortProductsByDistance(userid, product)
-			log.Println("[service - not admin] distance")
 			return productSort, nil
 		} else {
 			return product, nil
 		}
-	} else if userid == 0 { // guest
-		log.Println("[service - guest]")
+	} else if role == "admin" { // admin
+		product, err := p.productData.SelectAllAdmin(limit, userid, offset)
+		if err != nil {
+			return nil, err
+		}
+		return product, nil
+
+	} else { //is guest
 		product, err := p.productData.SelectAll(limit, offset, sortStr)
 		if err != nil {
 			return nil, err
 		}
 		return product, nil
-	} else { //is admin
-		log.Println("[Service - admin]")
-		product, err := p.productData.SelectAllAdmin(limit, userid, offset)
-		if err != nil {
-			return nil, err
-		}
-		log.Println("[Service - admin] product", product)
-		return product, nil
 	}
 }
 
 func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {
-
 	if id <= 0 {
-		return nil, errors.New("[validation] product id not valid")
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "ID must be a positive integer")
 	}
 
 	if userid != 0 {
@@ -98,7 +92,7 @@ func (p *productService) GetProductById(id uint, userid uint) (data *product.Cor
 
 func (p *productService) UpdateById(id uint, userid uint, input product.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
-		return "", errors.New("id not valid")
+		return "", errors.New("ID must be a positive integer")
 	}
 
 	if file != nil && handlerFilename != "" {
@@ -120,7 +114,7 @@ func (p *productService) UpdateById(id uint, userid uint, input product.Core, fi
 
 func (p *productService) Delete(id uint, userid uint) error {
 	if id <= 0 {
-		return errors.New("id not valid")
+		return errors.New("ID must be a positive integer")
 	}
 	return p.productData.Delete(id, userid)
 }
