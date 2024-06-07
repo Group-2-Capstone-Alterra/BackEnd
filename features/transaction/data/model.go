@@ -1,6 +1,7 @@
 package data
 
 import (
+	payment "PetPalApp/features/payment/data"
 	"PetPalApp/features/transaction"
 
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ type Transaction struct {
 	UserID     uint
 	Amount     float64
 	Status     string
+	Payments   []payment.Payment `gorm:"foreign_key:TransactionID"`
 }
 
 func (t *Transaction) ToCore() transaction.TransactionCore {

@@ -1,14 +1,14 @@
 package data
 
 import (
-	"time"
+	"gorm.io/gorm"
 )
 
 type Payment struct {
-	ID              uint `gorm:"primaryKey"`
+	gorm.Model
+	TransactionID   uint
 	PaymentMethod   string
 	PaymentStatus   string
 	PaymentAmount   float64
-	TransactionTime time.Time
 }
 

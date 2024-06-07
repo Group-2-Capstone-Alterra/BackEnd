@@ -2,7 +2,6 @@ package data
 
 import (
 	"PetPalApp/features/payment"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -20,7 +19,6 @@ func (pm *PaymentModel) Create(payment payment.PaymentCore) error {
 		PaymentMethod:   payment.PaymentMethod,
 		PaymentStatus:   payment.PaymentStatus,
 		PaymentAmount:   payment.PaymentAmount,
-		TransactionTime: time.Now(),
 	}
 	tx := pm.db.Create(&paymentGorm)
 	if tx.Error != nil {
@@ -41,6 +39,5 @@ func (pm *PaymentModel) GetPaymentByID(id uint) (payment.PaymentCore, error) {
 		PaymentMethod:   paymentGorm.PaymentMethod,
 		PaymentStatus:   paymentGorm.PaymentStatus,
 		PaymentAmount:   paymentGorm.PaymentAmount,
-		TransactionTime: paymentGorm.TransactionTime,
 	}, nil
 }
