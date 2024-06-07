@@ -20,7 +20,7 @@ type ChatCore struct {
 type DataInterface interface {
 	CreateChat(ChatCore) error
 	GetChatsUser(currentID, roomchatID uint) ([]ChatCore, error)
-	GetChatsDoctor(currentID, roomchatID uint) ([]ChatCore, error)
+	GetChatsDoctor(roomchatID uint) ([]ChatCore, error)
 	VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*ChatCore, error)
 	Delete(roomChatID, bubbleChatID, senderID uint) error
 }

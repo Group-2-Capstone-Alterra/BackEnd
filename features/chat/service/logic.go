@@ -63,17 +63,18 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 	log.Println("[Service - GetChats]")
 	//ver role
 	if role == "admin" { //role is admin
+		doctorData, _ := cs.doctorData.SelectByAdminId(currentID)
 		roomChatAvail, _ := cs.consultationData.GetCuntationsById(roomchatID)
 		if roomChatAvail.ID == 0 {
 			return nil, fmt.Errorf("[Role Admin] RoomChat Not Found")
 		} else {
 			receiverID := roomChatAvail.UserID
-			valRoomchat, _ := cs.consultationData.VerAdmin(currentID, receiverID, roomchatID)
+			valRoomchat, _ := cs.consultationData.VerAdmin(doctorData.ID, receiverID, roomchatID)
 			if valRoomchat.ID == 0 {
 				return nil, fmt.Errorf("[Sender Admin] UserID and DoctorID not match at current Roomchat")
 			} else {
 				log.Println("[Service - GetChats] Data has been found")
-				return cs.chatModel.GetChatsUser(currentID, roomchatID)
+				return cs.chatModel.GetChatsDoctor(roomchatID)
 			}
 		}
 	} else { //role is user
