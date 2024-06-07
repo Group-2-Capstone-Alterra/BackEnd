@@ -78,7 +78,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	chatData := _chatData.New(db)
 	chatService := _chatService.New(chatData, consultationData, doctorData, userData, adminData)
-	chatHandlerAPI := _chatHandler.New(chatService, consultationData, userData, doctorData)
+	chatHandlerAPI := _chatHandler.New(chatService, consultationData, userData, doctorData, adminData)
 
 	transactionData := _transactionData.New(db)
 	transactionService := _transactionService.New(transactionData)
