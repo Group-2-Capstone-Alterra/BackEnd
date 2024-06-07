@@ -21,18 +21,33 @@ func New(ops order_product.OrderProductService) *OrderProductHandler {
 }
 
 func (oph *OrderProductHandler) CreateOrderProduct(c echo.Context) error {
-	var newOrderProduct order_product.OrderProductCore
-	if err := c.Bind(&newOrderProduct); err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid input", nil))
-	}
+    var newOrderProductReq OrderProductRequest
+    if err := c.Bind(&newOrderProductReq); err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid input", nil))
+    }
 
-	err := oph.OrderProductService.CreateOrderProduct(newOrderProduct)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create order product", nil))
-	}
+    product, err := oph.OrderProductService.GetProductById(newOrderProductReq.ProductID)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to get product", nil))
+    }
 
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Order product created successfully", nil))
+    newOrderProduct := order_product.OrderProductCore{
+        OrderID:   newOrderProductReq.OrderID,
+        ProductID: newOrderProductReq.ProductID,
+        Quantity:  uint(newOrderProductReq.Quantity),
+        Price:     product.Price * float64(newOrderProductReq.Quantity), 
+    }
+
+    err = oph.OrderProductService.CreateOrderProduct(newOrderProduct)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create order product", nil))
+    }
+
+    return c.JSON(http.StatusCreated, responses.JSONWebResponse("Order product created successfully", nil))
 }
+
+
+
 
 func (oph *OrderProductHandler) GetOrderProductsByOrderID(c echo.Context) error {
 	orderID, err := strconv.Atoi(c.Param("order_id"))

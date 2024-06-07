@@ -2,6 +2,7 @@ package data
 
 import (
 	"PetPalApp/features/order_product"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -17,14 +18,22 @@ func New(db *gorm.DB) order_product.OrderProductModel {
 }
 
 func (opm *OrderProductModel) CreateOrderProduct(opCore order_product.OrderProductCore) error {
-	op := OrderProduct{
-		OrderID:   opCore.OrderID,
-		ProductID: opCore.ProductID,
-		Quantity:  opCore.Quantity,
-		Price:     opCore.Price,
-	}
-	tx := opm.db.Create(&op)
-	return tx.Error
+    var product order_product.Product
+    if err := opm.db.First(&product, "id = ?", opCore.ProductID).Error; err != nil {
+        return fmt.Errorf("failed to find product with ID %d: %v", opCore.ProductID, err)
+    }
+
+    totalPrice := product.Price * float64(opCore.Quantity)
+
+    op := OrderProduct{
+        OrderID:   opCore.OrderID,
+        ProductID: opCore.ProductID,
+        Quantity:  opCore.Quantity,
+        Price:     totalPrice, 
+    }
+
+    tx := opm.db.Create(&op)
+    return tx.Error
 }
 
 func (opm *OrderProductModel) GetOrderProductsByOrderID(orderID uint) ([]order_product.OrderProductCore, error) {
@@ -40,4 +49,13 @@ func (opm *OrderProductModel) GetOrderProductsByOrderID(orderID uint) ([]order_p
 	}
 
 	return result, nil
+}
+
+func (opm *OrderProductModel) GetPriceByProductID(productID uint) (*order_product.Product, error) {
+	var result order_product.Product
+	if err := opm.db.Where("id = ?", productID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
 }

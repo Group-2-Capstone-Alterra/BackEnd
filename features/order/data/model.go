@@ -23,7 +23,6 @@ func (o *Order) ToCore() order.OrderCore {
         UserID:    o.UserID,
         Total:     o.Total,
         Status:    o.Status,
-        CreatedAt: o.CreatedAt,
     }
 }
 
