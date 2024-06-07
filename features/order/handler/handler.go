@@ -1,10 +1,9 @@
+// features/order_product/handler/handler.go
 package handler
 
 import (
 	"PetPalApp/app/middlewares"
-	"PetPalApp/features/order"
-	"PetPalApp/features/product"
-	"PetPalApp/features/user"
+	order "PetPalApp/features/order"
 	"PetPalApp/utils/responses"
 	"net/http"
 
@@ -12,55 +11,67 @@ import (
 )
 
 type OrderHandler struct {
-	orderService order.OrderService
-	userData     user.DataInterface
-	productData  product.DataInterface
+	OrderService order.OrderService
 }
 
-func New(os order.OrderService, userData user.DataInterface, productData product.DataInterface) *OrderHandler {
+func New(os order.OrderService) *OrderHandler {
 	return &OrderHandler{
-		orderService: os,
-		userData:     userData,
-		productData:  productData,
+		OrderService: os,
 	}
 }
 
 func (oh *OrderHandler) CreateOrder(c echo.Context) error {
-	userID, _, _ := middlewares.ExtractTokenUserId(c)
-	if userID == 0 {
-		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
-	}
+    userID, _, _ := middlewares.ExtractTokenUserId(c)
+    if userID == 0 {
+        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+    }
 
-	newOrder := OrderRequest{}
-	if err := c.Bind(&newOrder); err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
-	}
+    var newOrderReq OrderRequest
+    if err := c.Bind(&newOrderReq); err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid input", nil))
+    }
 
-	orderData := order.OrderCore{
-		UserID:    uint(userID),
-		Status:    "Pending", // default status
-	}
+    product, err := oh.OrderService.GetProductById(newOrderReq.ProductID)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to get product", nil))
+    }
 
-	if err := oh.orderService.CreateOrder(orderData); err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error creating order: "+err.Error(), nil))
-	}
+    newOrder := order.OrderCore{
+        UserID:         uint(userID),
+        ProductID:      newOrderReq.ProductID,
+        ProductName:    product.ProductName,
+        ProductPicture: product.ProductPicture,
+        Quantity:       uint(newOrderReq.Quantity),
+        Price:          product.Price * float64(newOrderReq.Quantity), 
+        Status:         "Pending",
+    }
 
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Order created successfully", nil))
+    err = oh.OrderService.CreateOrder(newOrder)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create order", nil))
+    }
+
+    return c.JSON(http.StatusCreated, responses.JSONWebResponse("Order created successfully", nil))
 }
 
+
+
+
 func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
-	userID, _, _ := middlewares.ExtractTokenUserId(c)
-	if userID == 0 {
-		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
-	}
+    userID, _, _ := middlewares.ExtractTokenUserId(c)
+    if userID == 0 {
+        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+    }
 
-	_, err := oh.orderService.GetOrdersByUserID(uint(userID))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
-	}
+    orders, err := oh.OrderService.GetOrdersByUserID(uint(userID))
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
+    }
 
-	var resultResponse []OrderResponse
+    var resultResponse []OrderResponse
+    for _, order := range orders {
+        resultResponse = append(resultResponse, CoreToResponse(order))
+    }
 
-
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", resultResponse))
+    return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", resultResponse))
 }
