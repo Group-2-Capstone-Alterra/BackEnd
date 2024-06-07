@@ -1,6 +1,7 @@
 package data
 
 import (
+	order "PetPalApp/features/order/data"
 	"PetPalApp/features/product"
 
 	"gorm.io/gorm"
@@ -14,6 +15,7 @@ type Product struct {
 	Stock          uint
 	Description    string
 	ProductPicture string
+	Orders		   []order.Order `gorm:"foreign_key:ProductID"`
 }
 
 func CoreToGorm(core product.Core) Product {
