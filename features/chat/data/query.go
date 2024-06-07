@@ -50,7 +50,7 @@ func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, 
 	return result, nil
 }
 
-func (cm *ChatModel) GetChatsDoctor(currentID, roomchatID uint) ([]chat.ChatCore, error) {
+func (cm *ChatModel) GetChatsDoctor(roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
 
 	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
