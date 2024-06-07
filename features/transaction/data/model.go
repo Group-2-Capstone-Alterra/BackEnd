@@ -8,6 +8,7 @@ import (
 
 type Transaction struct {
 	gorm.Model
+	OrderID	   uint
 	UserID     uint
 	Amount     float64
 	Status     string

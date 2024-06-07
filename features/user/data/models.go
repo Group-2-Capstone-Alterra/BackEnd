@@ -2,6 +2,7 @@ package data
 
 import (
 	order "PetPalApp/features/order/data"
+	transaction "PetPalApp/features/transaction/data"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/helperuser"
 
@@ -11,14 +12,15 @@ import (
 type User struct {
 	gorm.Model
 	FullName       *string
-	Email          *string `gorm:"unique"`
-	NumberPhone    *string `gorm:"unique"`
+	Email          *string 						`gorm:"unique"`
+	NumberPhone    *string 						`gorm:"unique"`
 	Address        *string
 	Password       *string
 	ProfilePicture *string
 	Coordinate     *string
-	Role           string `gorm:"default:'user'"`
-	Orders		   []order.Order `gorm:"foreign_key:UserID"`
+	Role           string 						`gorm:"default:'user'"`
+	Orders		   []order.Order 				`gorm:"foreign_key:UserID"`
+	Transactions   []transaction.Transaction 	`gorm:"foreign_key:UserID"`
 }
 
 func UserCoreToUserGorm(userCore user.Core, helper helperuser.HelperuserInterface) User {
