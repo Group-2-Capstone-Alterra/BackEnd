@@ -34,10 +34,6 @@ import (
 	_consultationHandler "PetPalApp/features/consultation/handler"
 	_consultationService "PetPalApp/features/consultation/service"
 
-	_order_ProductData "PetPalApp/features/order_product/data"
-	_order_ProductHandler "PetPalApp/features/order_product/handler"
-	_order_ProductService "PetPalApp/features/order_product/service"
-
 	_transactionData "PetPalApp/features/transaction/data"
 	_transactionHandler "PetPalApp/features/transaction/handler"
 	_transactionService "PetPalApp/features/transaction/service"
@@ -74,7 +70,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 
 	orderData := _orderData.New(db)
 	orderService := _orderService.New(orderData)
-	orderHandlerAPI := _orderHandler.New(orderService, userData, productData)
+	orderHandlerAPI := _orderHandler.New(orderService)
 
 	consultationData := _consultationData.New(db)
 	consultationService := _consultationService.New(consultationData, doctorData, adminData)
@@ -83,10 +79,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	chatData := _chatData.New(db)
 	chatService := _chatService.New(chatData, consultationData, doctorData, userData, adminData)
 	chatHandlerAPI := _chatHandler.New(chatService, consultationData, userData, doctorData)
-
-	order_ProductData := _order_ProductData.New(db)
-	order_ProductService := _order_ProductService.New(order_ProductData)
-	order_productHandlerAPI := _order_ProductHandler.New(order_ProductService)
 
 	transactionData := _transactionData.New(db)
 	transactionService := _transactionService.New(transactionData)
@@ -140,10 +132,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.GET("/consultations/user", consultationHandlerAPI.GetConsultationsByUserID, middlewares.JWTMiddleware())
 	e.GET("/consultations/doctor/:doctor_id", consultationHandlerAPI.GetConsultationsByDoctorID, middlewares.JWTMiddleware())
 	e.PUT("/consultations/:consultation_id", consultationHandlerAPI.UpdateConsultationResponse, middlewares.JWTMiddleware())
-
-	//order_products
-	e.POST("/order_products", order_productHandlerAPI.CreateOrderProduct, middlewares.JWTMiddleware())
-	e.GET("/order-products/:order_id", order_productHandlerAPI.GetOrderProductsByOrderID, middlewares.JWTMiddleware())
 
 	//transactions
 	e.POST("/transactions", transactionHandlerAPI.CreateTransaction, middlewares.JWTMiddleware())
