@@ -19,8 +19,6 @@ func New(db *gorm.DB) order.OrderModel {
 func (om *OrderModel) CreateOrder(orderCore order.OrderCore) error {
 	orderGorm := Order{
 		UserID:    orderCore.UserID,
-		ProductID: orderCore.ProductID,
-		Quantity:  orderCore.Quantity,
 		Total:     orderCore.Total,
 		Status:    orderCore.Status,
 	}
