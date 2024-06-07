@@ -76,7 +76,6 @@ func ResponseLogin(userResponse *user.Core) UserResponse {
 	result := UserResponse{
 		ID:       userResponse.ID,
 		FullName: userResponse.FullName,
-		Role:     userResponse.Role,
 		Token:    userResponse.Token,
 	}
 	return result

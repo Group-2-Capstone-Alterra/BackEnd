@@ -29,7 +29,7 @@ type DataInterface interface {
 }
 
 type ServiceInterface interface {
-	Create(input Core) (string, error)
+	Create(input Core) error
 	Login(email string, password string) (data *Core, token string, err error)
 	GetProfile(id uint) (data *Core, err error)
 	UpdateById(id uint, input Core, file io.Reader, handlerFilename string) (string, error)

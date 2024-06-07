@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"time"
 )
 
@@ -26,26 +25,16 @@ func New(ud user.DataInterface, hash encrypts.HashInterface, helper helper.Helpe
 	}
 }
 
-func (u *userService) Create(input user.Core) (string, error) {
+func (u *userService) Create(input user.Core) error {
 
-	if input.FullName == "" || input.Email == "" || input.Password == "" {
-		return "", errors.New("[validation] nama/email/password tidak boleh kosong")
-	}
+	result, _ := u.hashService.HashPassword(input.Password)
+	input.Password = result
 
-	if input.Password != "" {
-		result, errHash := u.hashService.HashPassword(input.Password)
-		if errHash != nil {
-			return "", errHash
-		}
-		input.Password = result
-	}
-	defaultPhoto := "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg"
-	input.ProfilePicture = defaultPhoto
 	err := u.userData.Insert(input)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return input.ProfilePicture, nil
+	return nil
 }
 
 func (u *userService) Login(email string, password string) (data *user.Core, token string, err error) {
@@ -55,7 +44,7 @@ func (u *userService) Login(email string, password string) (data *user.Core, tok
 	}
 	isLoginValid := u.hashService.CheckPasswordHash(data.Password, password)
 	if !isLoginValid {
-		return nil, "", errors.New("[validation] password tidak sesuai")
+		return nil, "", errors.New("Invalid email or password. Please try again.")
 	}
 	token, errJWT := middlewares.CreateToken(int(data.ID), data.Role)
 	if errJWT != nil {
@@ -66,14 +55,14 @@ func (u *userService) Login(email string, password string) (data *user.Core, tok
 
 func (u *userService) GetProfile(id uint) (data *user.Core, err error) {
 	if id <= 0 {
-		return nil, errors.New("[validation] id not valid")
+		return nil, errors.New("Invalid user ID. Please try again.")
 	}
 	return u.userData.SelectById(id)
 }
 
 func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
-		return "", errors.New("id not valid")
+		return "", errors.New("Invalid user ID. Please try again.")
 	}
 
 	if input.Password != "" {
@@ -83,20 +72,14 @@ func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handl
 		}
 		input.Password = result
 	}
-	log.Println("[Service - UpdateById]")
-
-	log.Println("[Service - UpdateById] file ", file)
-	log.Println("[Service - UpdateById] handlerFilename ", handlerFilename)
 	if file != nil && handlerFilename != "" {
 		timestamp := time.Now().Unix()
 		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
-		log.Println("[Service - UpdateById] fileName ", fileName)
 		photoFileName, errPhoto := u.helperService.UploadProfilePicture(file, fileName)
 		if errPhoto != nil {
 			return "", errPhoto
 		}
 		input.ProfilePicture = photoFileName
-		log.Println("[Service - UpdateById] input.ProfilePicture ", input.ProfilePicture)
 	}
 
 	err := u.userData.PutById(id, input)
@@ -108,7 +91,7 @@ func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handl
 
 func (u *userService) Delete(id uint) error {
 	if id <= 0 {
-		return errors.New("id not valid")
+		return errors.New("Invalid user ID. Please try again.")
 	}
 	return u.userData.Delete(id)
 }

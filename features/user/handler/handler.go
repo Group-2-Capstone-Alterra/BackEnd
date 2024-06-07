@@ -5,8 +5,6 @@ import (
 	"PetPalApp/features/user"
 	"PetPalApp/utils/encrypts"
 	"PetPalApp/utils/responses"
-	"fmt"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -38,16 +36,14 @@ func (uh *UserHandler) Register(c echo.Context) error {
 	}
 
 	inputCore := RequestToCore(newUser)
-	fmt.Println("inputCore", inputCore)
-	_, errInsert := uh.userService.Create(inputCore)
+	errInsert := uh.userService.Create(inputCore)
 	if errInsert != nil {
 		if strings.Contains(errInsert.Error(), "validation") {
-			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error add data", errInsert))
+			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Please fill in all required fields. Full Name, Email, and Password cannot be blank.", nil))
 		}
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error add data", errInsert))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Email already exists. Please try another email address.", nil))
 	}
-
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("success add data", nil))
+	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Registration successful! You can now log in to your account.", nil))
 }
 
 func (uh *UserHandler) Login(c echo.Context) error {
@@ -58,22 +54,21 @@ func (uh *UserHandler) Login(c echo.Context) error {
 	}
 	result, token, err := uh.userService.Login(reqLoginData.Email, reqLoginData.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error login", result))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Invalid email or password. Please try again.", nil))
 	}
 	result.Token = token
 	var resultResponse = ResponseLogin(result)
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success login", resultResponse))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Login successful! You are now logged in.", resultResponse))
 }
 
 func (uh *UserHandler) Profile(c echo.Context) error {
 	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
-	log.Println("idtoken:", idToken)
-	userData, err := uh.userService.GetProfile(uint(idToken)) // Ambil data pengguna dari Redis
+	userData, err := uh.userService.GetProfile(uint(idToken))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error get user data", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to access profile information. Please contact our support team.", nil))
 	}
 	userResponse := ResponseProfile(*userData)
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get profile", userResponse))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Profile information loaded successfully.", userResponse))
 }
 
 func (uh *UserHandler) UpdateUserById(c echo.Context) error {
@@ -111,16 +106,16 @@ func (uh *UserHandler) UpdateUserById(c echo.Context) error {
 
 	_, errUpdate := uh.userService.UpdateById(uint(idToken), inputCore, file, filename)
 	if errUpdate != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", errUpdate))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to save changes. Please try again or contact our support team.", errUpdate))
 	}
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", nil))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Profile information updated successfully.", nil))
 }
 
 func (uh *UserHandler) Delete(c echo.Context) error {
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
 	err := uh.userService.Delete(uint(idToken))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to delete account. Please contact our support team.", nil))
 	}
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", err))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Your account has been deleted. Thank you for using our service.", nil))
 }
