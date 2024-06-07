@@ -46,7 +46,6 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 			req.AvailableDays[day] = value[0] == "true"
 		}
 	}
-
 	// Manually populate the AvailableDays field
 	req.ServiceDoctors = make(map[string]bool)
 	for key, value := range c.Request().Form {
@@ -58,26 +57,16 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 	}
 
 	file, handler, _ := c.Request().FormFile("profile_picture")
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
-	// 		"message": "Unable to upload photo: " + err.Error(),
-	// 	})
-	// }
-	defer file.Close()
 
 	inputCore := AddRequestToCore(req)
 	inputCore.AdminID = uint(adminID)
 
-	log.Println("[Handler]inputCore.ServiceDoctor", inputCore.ServiceDoctor)
 	_, errAdd := dh.doctorService.AddDoctor(inputCore, file, handler.Filename)
 	if errAdd != nil {
-		if strings.Contains(errAdd.Error(), "validation") {
-			return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Tambah dokter gagal: "+errAdd.Error(), nil))
-		}
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Tambah dokter gagal: "+errAdd.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to add doctor. Please contact our support team.", nil))
 	}
 
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Tambah dokter berhasil. ", nil))
+	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Doctor added successfully. Thank you.", nil))
 }
 
 func (dh *DoctorHandler) ProfileDoctor(c echo.Context) error {
@@ -86,23 +75,24 @@ func (dh *DoctorHandler) ProfileDoctor(c echo.Context) error {
 	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
-	doctorDetails, errDoctorDetails := dh.doctorService.GetDoctorByIdAdmin(uint(idToken))
-	if errDoctorDetails != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+	doctorDetails, _ := dh.doctorService.GetDoctorByIdAdmin(uint(idToken))
+	if doctorDetails.ID == 0 {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("You don't have a doctor associated with your account. Please add a doctor to continue.", nil))
 	}
 
+	log.Println("doctorDetails.ID", doctorDetails.ID)
 	availDaysDoct, errAvailDaysDoct := dh.doctorService.GetAvailDoctorByIdDoctor(doctorDetails.ID)
 	if errAvailDaysDoct != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error read data", nil))
 	}
-	log.Println("[Handler Doctor - ProfileDoctor] availDaysDoct ", availDaysDoct)
 
 	serviceDoctor, errServiceDoctor := dh.doctorData.SelectServiceById(doctorDetails.ID)
 	if errServiceDoctor != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error read data", nil))
 	}
 
 	doctorResponse := GormToCore(*doctorDetails, *availDaysDoct, *serviceDoctor)
+
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success get detail doctor profile", doctorResponse))
 }
 
@@ -120,6 +110,7 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 	}
 
 	// Manually populate the AvailableDays field
+	log.Println("AvailableDays 1", req.AvailableDay)
 	req.AvailableDays = make(map[string]bool)
 	for key, value := range c.Request().Form {
 		if strings.HasPrefix(key, "available_days[") {
@@ -128,6 +119,7 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 			req.AvailableDays[day] = value[0] == "true"
 		}
 	}
+	log.Println("AvailableDays 2", req.AvailableDay)
 
 	// Manually populate the AvailableDays field
 	req.ServiceDoctors = make(map[string]bool)
@@ -139,19 +131,7 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 		}
 	}
 
-	file, handler, err := c.Request().FormFile("profile_picture")
-	if err != nil {
-		if err != http.ErrMissingFile {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"message": "Unable to upload photo: " + err.Error(),
-			})
-		}
-		// Handle the case where no file was uploaded
-		file = nil
-		handler = nil
-	} else {
-		defer file.Close()
-	}
+	file, handler, _ := c.Request().FormFile("profile_picture")
 
 	log.Println("[Handler Doctor - AddDoctor] req ", req)
 	inputCore := AddRequestToCore(req)
@@ -162,10 +142,10 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 	_, errUpdate := dh.doctorService.UpdateByIdAdmin(uint(adminID), inputCore, file, handler.Filename)
 	if errUpdate != nil {
 		// Handle error from userService.UpdateById
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error updating doctor's information. Please contact our support team.", nil))
 	}
 	// Return success response
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", err))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Update successful. Doctor's data has been updated.", nil))
 }
 
 func (dh *DoctorHandler) UploadDoctorPicture(c echo.Context) error {
@@ -181,19 +161,8 @@ func (dh *DoctorHandler) UploadDoctorPicture(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding doctor data: "+errBind.Error(), nil))
 	}
 
-	file, handler, err := c.Request().FormFile("profile_picture")
-	if err != nil {
-		if err != http.ErrMissingFile {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"message": "Unable to upload photo: " + err.Error(),
-			})
-		}
-		// Handle the case where no file was uploaded
-		file = nil
-		handler = nil
-	} else {
-		defer file.Close()
-	}
+	file, handler, _ := c.Request().FormFile("profile_picture")
+	defer file.Close()
 
 	log.Println("[Handler Doctor - AddDoctor] req ", req)
 	inputCore := AddRequestToCore(req)
@@ -204,8 +173,22 @@ func (dh *DoctorHandler) UploadDoctorPicture(c echo.Context) error {
 	_, errUpdate := dh.doctorService.UpdateByIdAdmin(uint(adminID), inputCore, file, handler.Filename)
 	if errUpdate != nil {
 		// Handle error from userService.UpdateById
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", err))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error update data", errUpdate))
 	}
 	// Return success response
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", err))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success update data", nil))
+}
+
+func (dh *DoctorHandler) Delete(c echo.Context) error {
+	adminID, role, _ := middlewares.ExtractTokenUserId(c)
+	if role == "user" {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
+
+	err := dh.doctorService.Delete(uint(adminID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to delete doctor. Please contact our support team.", nil))
+	}
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Dcotor has been deleted. Thank you for using our service.", nil))
 }

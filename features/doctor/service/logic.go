@@ -73,10 +73,7 @@ func (ds *DoctorService) UpdateByIdAdmin(AdminId uint, input doctor.Core, file i
 	if file != nil && handlerFilename != "" {
 		timestamp := time.Now().Unix()
 		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
-		photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
-		if errPhoto != nil {
-			return "", errPhoto
-		}
+		photoFileName, _ := ds.helper.UploadDoctorPicture(file, fileName)
 		input.ProfilePicture = photoFileName
 	}
 
@@ -85,4 +82,11 @@ func (ds *DoctorService) UpdateByIdAdmin(AdminId uint, input doctor.Core, file i
 		return "", err
 	}
 	return input.ProfilePicture, nil
+}
+
+func (ds *DoctorService) Delete(adminID uint) error {
+	if adminID <= 0 {
+		return errors.New("id not valid")
+	}
+	return ds.DoctorModel.Delete(adminID)
 }

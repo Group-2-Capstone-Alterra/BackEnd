@@ -56,9 +56,10 @@ func (d *DoctorRequest) UnmarshalForm(form url.Values) error {
 	}
 
 	d.ServiceDoctor = _serviceHandler.ServiceRequest{
-		Vaccinations: servicesDoctors["vaccinations"],
-		Operations:   servicesDoctors["operations"],
-		MCU:          servicesDoctors["mcu"],
+		Vaccinations:        servicesDoctors["vaccinations"],
+		Operations:          servicesDoctors["operations"],
+		MCU:                 servicesDoctors["mcu"],
+		OnlineConsultations: servicesDoctors["online_consultations"],
 	}
 	return nil
 }
@@ -75,9 +76,10 @@ func handlerToCoreAvailableDay(req _availHandler.AvailableDayRequest) availdaydo
 
 func handlerToCoreService(req _serviceHandler.ServiceRequest) servicedoctor.Core {
 	return servicedoctor.Core{
-		Vaccinations: req.Vaccinations,
-		Operations:   req.Operations,
-		MCU:          req.MCU,
+		Vaccinations:        req.Vaccinations,
+		Operations:          req.Operations,
+		MCU:                 req.MCU,
+		OnlineConsultations: req.OnlineConsultations,
 	}
 }
 
@@ -96,9 +98,10 @@ func AddRequestToCore(req AddDoctorRequest) doctor.Core {
 			Friday:    req.AvailableDays["friday"],
 		}),
 		ServiceDoctor: handlerToCoreService(_serviceHandler.ServiceRequest{
-			Vaccinations: req.ServiceDoctors["vaccinations"],
-			Operations:   req.ServiceDoctors["operations"],
-			MCU:          req.ServiceDoctors["mcu"],
+			Vaccinations:        req.ServiceDoctors["vaccinations"],
+			Operations:          req.ServiceDoctors["operations"],
+			MCU:                 req.ServiceDoctors["mcu"],
+			OnlineConsultations: req.ServiceDoctors["online_consultations"],
 		}),
 	}
 	return inputCore

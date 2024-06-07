@@ -4,11 +4,11 @@ import "PetPalApp/features/availdaydoctor"
 
 type AvailableDayResponse struct {
 	DoctorID  uint `json:"doctor_id,omitempty"`
-	Monday    bool `json:"monday"`
-	Tuesday   bool `json:"tuesday"`
-	Wednesday bool `json:"wednesday"`
-	Thursday  bool `json:"thursday"`
-	Friday    bool `json:"friday"`
+	Monday    bool `json:"monday,omitempty"`
+	Tuesday   bool `json:"tuesday,omitempty"`
+	Wednesday bool `json:"wednesday,omitempty"`
+	Thursday  bool `json:"thursday,omitempty"`
+	Friday    bool `json:"friday,omitempty"`
 }
 
 func GormToCore(gorm availdaydoctor.Core) AvailableDayResponse {

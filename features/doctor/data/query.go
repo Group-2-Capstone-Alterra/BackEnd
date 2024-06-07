@@ -73,9 +73,7 @@ func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
 }
 
 func (dm *DoctorModel) SelectByAdminId(id uint) (*doctor.Core, error) {
-	log.Println("[Query Doctor - SelectById]")
 	var doctorData Doctor
-	log.Println("[Query Doctor - SelectById] AdminID", id)
 	tx := dm.db.Where("admin_id = ?", id).Find(&doctorData)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -102,15 +100,12 @@ func (dm *DoctorModel) SelectDoctorById(id uint) (*doctor.Core, error) {
 
 func (dm *DoctorModel) SelectAvailDayById(id uint) (*availdaydoctor.Core, error) {
 	var availDay data.AvailableDay
-	log.Println("[Query Doctor - SelectAvailDayById] iD Param", id)
 
 	tx := dm.db.Where("doctor_id = ?", id).Find(&availDay)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	var availDayCore = data.AvailGormToCore(availDay)
-	log.Println("[Query Doctor - SelectAvailDayById] availDayCore", availDayCore)
-
 	return &availDayCore, nil
 }
 
@@ -173,28 +168,45 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 
 	var doctorCore = GormToCore(doctorData)
 
+	dm.db.Where("doctor_id = ?", doctorCore.ID).Delete(&data.AvailableDay{})
+
 	availdayGorm := data.AvailableDay{
+		DoctorID:  doctorCore.ID,
 		Monday:    input.AvailableDay.Monday,
 		Tuesday:   input.AvailableDay.Tuesday,
 		Wednesday: input.AvailableDay.Wednesday,
 		Thursday:  input.AvailableDay.Thursday,
 		Friday:    input.AvailableDay.Friday,
 	}
-	txAvail := dm.db.Model(&data.AvailableDay{}).Where("doctor_id = ?", doctorCore.ID).Updates(&availdayGorm)
+	log.Println("availdayGorm", availdayGorm)
+	log.Println("doctorCore.ID", doctorCore.ID)
+	txAvail := dm.db.Create(&availdayGorm)
 	if txAvail.Error != nil {
-		return tx.Error
+		return txAvail.Error
 	}
 
+	dm.db.Where("doctor_id = ?", doctorCore.ID).Delete(&_dataService.ServiceDoctor{})
+
 	serviceGorm := _dataService.ServiceDoctor{
-		Vaccinations: input.ServiceDoctor.Vaccinations,
-		Operations:   input.ServiceDoctor.Operations,
-		MCU:          input.ServiceDoctor.MCU,
+		DoctorID:            doctorCore.ID,
+		Vaccinations:        input.ServiceDoctor.Vaccinations,
+		Operations:          input.ServiceDoctor.Operations,
+		MCU:                 input.ServiceDoctor.MCU,
+		OnlineConsultations: input.ServiceDoctor.OnlineConsultations,
 	}
 	log.Println("[QUERY]serviceGorm", serviceGorm)
-	txService := dm.db.Model(&_dataService.ServiceDoctor{}).Where("doctor_id = ?", doctorCore.ID).Updates(&serviceGorm)
+	txService := dm.db.Create(&serviceGorm)
 	if txService.Error != nil {
 		return txService.Error
 	}
 
+	return nil
+}
+
+func (dm *DoctorModel) Delete(adminID uint) error {
+	tx := dm.db.Where("admin_id = ?", adminID).Delete(&Doctor{})
+	if tx.Error != nil {
+		return tx.Error
+	}
 	return nil
 }
