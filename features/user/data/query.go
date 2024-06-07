@@ -20,7 +20,6 @@ func New(db *gorm.DB, helperuser helperuser.HelperuserInterface) user.DataInterf
 }
 
 func (u *userQuery) Insert(input user.Core) error {
-
 	userGorm := UserCoreToUserGorm(input, u.helperuser)
 	tx := u.db.Create(&userGorm)
 	if tx.Error != nil {

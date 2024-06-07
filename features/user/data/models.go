@@ -12,15 +12,15 @@ import (
 type User struct {
 	gorm.Model
 	FullName       *string
-	Email          *string 						`gorm:"unique"`
-	NumberPhone    *string 						`gorm:"unique"`
+	Email          *string `gorm:"unique"`
+	NumberPhone    *string `gorm:"unique"`
 	Address        *string
 	Password       *string
-	ProfilePicture *string
+	ProfilePicture *string `gorm:"default:'https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg'"`
 	Coordinate     *string
-	Role           string 						`gorm:"default:'user'"`
-	Orders		   []order.Order 				`gorm:"foreign_key:UserID"`
-	Transactions   []transaction.Transaction 	`gorm:"foreign_key:UserID"`
+	Role           string                    `gorm:"default:'user'"`
+	Orders         []order.Order             `gorm:"foreign_key:UserID"`
+	Transactions   []transaction.Transaction `gorm:"foreign_key:UserID"`
 }
 
 func UserCoreToUserGorm(userCore user.Core, helper helperuser.HelperuserInterface) User {
