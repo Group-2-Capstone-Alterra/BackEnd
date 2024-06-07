@@ -2,6 +2,7 @@ package handler
 
 import (
 	"PetPalApp/app/middlewares"
+	"PetPalApp/features/admin"
 	"PetPalApp/features/chat"
 	"PetPalApp/features/consultation"
 	"PetPalApp/features/doctor"
@@ -19,14 +20,16 @@ type ChatHandler struct {
 	consultationData consultation.ConsultationModel
 	userData         user.DataInterface
 	doctorData       doctor.DoctorModel
+	adminData        admin.AdminModel
 }
 
-func New(cs chat.ServiceInterface, consultationData consultation.ConsultationModel, userData user.DataInterface, doctorData doctor.DoctorModel) *ChatHandler {
+func New(cs chat.ServiceInterface, consultationData consultation.ConsultationModel, userData user.DataInterface, doctorData doctor.DoctorModel, adminData admin.AdminModel) *ChatHandler {
 	return &ChatHandler{
 		chatService:      cs,
 		consultationData: consultationData,
 		userData:         userData,
 		doctorData:       doctorData,
+		adminData:        adminData,
 	}
 }
 
@@ -92,7 +95,7 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 			log.Println("[Handler] if sender doctor")
 			doctorData, _ := ch.doctorData.SelectDoctorById(v.SenderID)
 			userData, _ := ch.userData.SelectById(v.ReceiverID)
-			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData))
+			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData, uint(currentID)))
 		} else {
 			log.Println("[Handler] if sender user")
 			userData, _ := ch.userData.SelectById(v.SenderID)
