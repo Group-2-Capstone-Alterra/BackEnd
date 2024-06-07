@@ -33,7 +33,8 @@ func (cs *ConsultationService) GetConsultations(currentID uint, role string) ([]
 		return cs.consultationModel.GetConsultationsByUserID(currentID)
 	} else {
 		log.Println("[Service - GetConsultations] Role Admin")
-		return cs.consultationModel.GetConsultationsByDoctorID(currentID)
+		doctorID, _ := cs.dataDoctor.SelectByAdminId(currentID)
+		return cs.consultationModel.GetConsultationsByDoctorID(doctorID.ID)
 	}
 }
 
