@@ -8,12 +8,12 @@ import (
 )
 
 type AllClinicResponse struct {
-	ID         uint                `json:"admin_id"`
-	ClinicName string              `json:"clinic_name"`
-	Open       availdaydoctor.Core `json:"open"`
-	Service    servicedoctor.Core  `json:"service"`
-	Veterinary string              `json:"veterinary"`
-	Location   string              `json:"location"`
+	ID         uint                `json:"admin_id,omitempty"`
+	ClinicName string              `json:"clinic_name,omitempty"`
+	Open       availdaydoctor.Core `json:"open,omitempty"`
+	Service    servicedoctor.Core  `json:"service,omitempty"`
+	Veterinary string              `json:"veterinary,omitempty"`
+	Location   string              `json:"location,omitempty"`
 }
 
 func ResponseAllClinic(admin admin.Core, doctor doctor.Core) AllClinicResponse {

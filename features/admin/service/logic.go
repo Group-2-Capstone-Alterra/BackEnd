@@ -83,8 +83,8 @@ func (as *AdminService) Delete(adminid uint) error {
 }
 
 func (as *AdminService) Update(adminid uint, updateData admin.Core, file io.Reader, handlerFilename string) error {
-	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" && 
-	   updateData.Address == "" && updateData.Coordinate == "" && updateData.Password == "" && file == nil {
+	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" &&
+		updateData.Address == "" && updateData.Coordinate == "" && updateData.Password == "" && file == nil {
 		return errors.New("[validation] Tidak ada data yang diupdate")
 	}
 
@@ -121,42 +121,47 @@ func (as *AdminService) Update(adminid uint, updateData admin.Core, file io.Read
 func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error) {
 	log.Println("[Service]")
 	// log.Println("[Service] sortStr", sortStr)
-	// log.Println("[Service] userid", userid)
-	allDoctor, errAllDoctor := as.DoctorModel.SelectAllDoctor()
-	if errAllDoctor != nil {
-		return nil, errAllDoctor
+	var allAdmin []admin.Core
+	var errAllAdmin error
+	if userid == 0 {
+		allAdmin, errAllAdmin = as.AdminModel.SelectAllAdmin()
+	} else {
+		allAdmin, errAllAdmin = as.AdminModel.SelectAllAdminWithCoor()
 	}
-	// log.Println("[Service - Admin] allDoctor", allDoctor)
+	if errAllAdmin != nil {
+		return nil, errAllAdmin
+	}
 
 	var allClinic []clinic.Core
-	for _, v := range allDoctor {
-		// log.Println("[Service] value", v)
-		// log.Println("[Service] value", v.AdminID)
-		adminDetail, errAdminDetail := as.AdminModel.AdminById(v.AdminID)
-		if errAdminDetail != nil {
-			return nil, errAdminDetail
+	for _, v := range allAdmin {
+		doctorDetail, errDoctorDetail := as.DoctorModel.SelectByAdminId(v.ID)
+		if errDoctorDetail != nil {
+			return nil, errDoctorDetail
 		}
-		doctorAvailDay, errDoctorAvailDay := as.DoctorModel.SelectAvailDayById(v.ID)
+		doctorAvailDay, errDoctorAvailDay := as.DoctorModel.SelectAvailDayById(doctorDetail.ID)
 		if errDoctorAvailDay != nil {
 			return nil, errDoctorAvailDay
 		}
 
-		serviceDoctor, errServiceDoctor := as.DoctorModel.SelectServiceById(v.ID)
+		serviceDoctor, errServiceDoctor := as.DoctorModel.SelectServiceById(doctorDetail.ID)
 		if errServiceDoctor != nil {
 			return nil, errServiceDoctor
 		}
 		allClinic = append(allClinic, clinic.Core{
-			ID:         adminDetail.ID,
-			ClinicName: adminDetail.FullName,
+			ID:         v.ID,
+			ClinicName: v.FullName,
 			Open:       *doctorAvailDay,
 			Service:    *serviceDoctor,
-			Veterinary: v.FullName,
-			Location:   adminDetail.Address,
-			Coordinate: adminDetail.Coordinate,
+			Veterinary: doctorDetail.FullName,
+			Location:   v.Address,
+			Coordinate: v.Coordinate,
 		})
 	}
-	clinicSort := as.helper.SortClinicsByDistance(userid, allClinic)
-	// log.Println("[Service - Admin] clinicSort", clinicSort)
-	// log.Println("[Service - Admin] allClinic", allClinic)
-	return clinicSort, nil
+	if userid == 0 {
+		return allClinic, nil
+	} else {
+		clinicSort := as.helper.SortClinicsByDistance(userid, allClinic)
+		// log.Println("[Service - Admin] allClinic", allClinic)
+		return clinicSort, nil
+	}
 }
