@@ -95,7 +95,7 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 			log.Println("[Handler] if sender doctor")
 			doctorData, _ := ch.doctorData.SelectDoctorById(v.SenderID)
 			userData, _ := ch.userData.SelectById(v.ReceiverID)
-			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData, uint(currentID)))
+			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData))
 		} else {
 			log.Println("[Handler] if sender user")
 			userData, _ := ch.userData.SelectById(v.SenderID)

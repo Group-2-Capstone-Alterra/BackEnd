@@ -27,7 +27,7 @@ func AllResponseChatFromUser(gorm chat.ChatCore, user user.Core, doctor doctor.C
 		SenderID:            gorm.SenderID,
 		SenderName:          user.FullName,
 		SenderProfilePict:   user.ProfilePicture,
-		ReceiverID:          gorm.ReceiverID,
+		ReceiverID:          doctor.AdminID,
 		ReceiverName:        doctor.FullName,
 		ReceiverProfilePict: doctor.ProfilePicture,
 		Message:             gorm.Message,
@@ -36,11 +36,11 @@ func AllResponseChatFromUser(gorm chat.ChatCore, user user.Core, doctor doctor.C
 	return result
 }
 
-func AllResponseChatFromDoctor(gorm chat.ChatCore, user user.Core, doctor doctor.Core, currentID uint) ChatResponse {
+func AllResponseChatFromDoctor(gorm chat.ChatCore, user user.Core, doctor doctor.Core) ChatResponse {
 	result := ChatResponse{
 		ID:                  gorm.ID,
 		ConsultationID:      gorm.ConsultationID,
-		SenderID:            currentID,
+		SenderID:            doctor.AdminID,
 		SenderName:          doctor.FullName,
 		SenderProfilePict:   doctor.ProfilePicture,
 		ReceiverID:          gorm.ReceiverID,
