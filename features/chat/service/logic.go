@@ -31,8 +31,6 @@ func New(cm chat.DataInterface, consultationData consultation.ConsultationModel,
 }
 
 func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
-	log.Println("[Query - CreateChat]")
-	//Verif admin or not
 	if role == "user" { //Pengirim user
 		consulData, errconsulData := cs.consultationData.GetCuntationsById(chat.ConsultationID) //get data from consultation
 		if errconsulData != nil {
@@ -49,7 +47,8 @@ func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
 			return fmt.Errorf("roomchat not found")
 		}
 		chat.ReceiverID = consulData.UserID //penerima adalah user
-		valConcul, _ := cs.consultationData.VerAdmin(chat.SenderID, chat.ReceiverID, chat.ConsultationID)
+		getDoctorByAdmin, _ := cs.doctorData.SelectByAdminId(chat.SenderID)
+		valConcul, _ := cs.consultationData.VerAdmin(getDoctorByAdmin.ID, chat.ReceiverID, chat.ConsultationID)
 		if valConcul.ID == 0 {
 			return fmt.Errorf("[Sender Admin] UserID and DoctorID not match at Roomchat")
 		}
@@ -59,8 +58,6 @@ func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
 }
 
 func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([]chat.ChatCore, error) {
-
-	log.Println("[Service - GetChats]")
 	//ver role
 	if role == "admin" { //role is admin
 		doctorData, _ := cs.doctorData.SelectByAdminId(currentID)
@@ -96,16 +93,12 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 
 func (cs *ChatService) Delete(roomChatID, bubbleChatID, senderID uint) error {
 	if roomChatID <= 0 {
-		return errors.New("id not valid")
+		return errors.New("ID must be a positive integer")
 	}
-	log.Println("[Query]")
-	//Verif admin or not
 	valConcul, _ := cs.chatModel.VerAvailChat(roomChatID, bubbleChatID, senderID)
 	if valConcul == nil { // CurrentID and RoomChat not match (Roomchat not found)
-		log.Println("[Query - Delete] valConcul NotFound")
-		return errors.New("[Query - Delete] valConcul NotFound")
+		return errors.New("Chat not found")
 	} else { // CurrentID and RoomChat is match (Roomchat has found)
-		log.Println("[Query - Delete] valConcul is found")
 		return cs.chatModel.Delete(roomChatID, bubbleChatID, senderID)
 	}
 }
