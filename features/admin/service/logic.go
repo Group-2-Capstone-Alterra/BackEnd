@@ -83,8 +83,8 @@ func (as *AdminService) Delete(adminid uint) error {
 }
 
 func (as *AdminService) Update(adminid uint, updateData admin.Core, file io.Reader, handlerFilename string) error {
-	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" &&
-		updateData.Address == "" && updateData.Coordinate == "" && updateData.Password == "" && file == nil {
+	if updateData.FullName == "" && updateData.Email == "" && updateData.NumberPhone == "" && 
+	   updateData.Address == "" && updateData.Coordinate == "" && updateData.Password == "" && file == nil {
 		return errors.New("[validation] Tidak ada data yang diupdate")
 	}
 
@@ -104,8 +104,15 @@ func (as *AdminService) Update(adminid uint, updateData admin.Core, file io.Read
 			return errPhoto
 		}
 		updateData.ProfilePicture = photoFileName
-	} else if updateData.ProfilePicture == "" {
-		updateData.ProfilePicture = "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg"
+	}
+
+	existingAdmin, err := as.AdminModel.AdminById(adminid)
+	if err != nil {
+		return err
+	}
+
+	if file == nil && updateData.ProfilePicture == "" {
+		updateData.ProfilePicture = existingAdmin.ProfilePicture
 	}
 
 	return as.AdminModel.Update(adminid, updateData)
