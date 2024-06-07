@@ -52,7 +52,6 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 		address = *adminData.Address
 	}
 
-
 	var admins = admin.Core{
 		ID:             adminData.ID,
 		Role:           adminData.Role,
@@ -68,7 +67,7 @@ func (am *AdminModel) AdminByEmail(email string) (*admin.Core, error) {
 
 func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 	var adminData Admin
-	tx := am.db.First(&adminData, adminid)
+	tx := am.db.Find(&adminData, adminid)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -83,14 +82,13 @@ func (am *AdminModel) AdminById(adminid uint) (*admin.Core, error) {
 		address = *adminData.Address
 	}
 
-
 	if adminData.Coordinate != nil {
 		coordinate = *adminData.Coordinate
 	}
 
 	var admin = admin.Core{
 		ID:             adminData.ID,
-		Role: 			adminData.Role,
+		Role:           adminData.Role,
 		FullName:       adminData.FullName,
 		Email:          adminData.Email,
 		NumberPhone:    numberPhone,
@@ -146,8 +144,6 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 	return nil
 }
 
-
-
 // func (am *AdminModel) SelectAll(offset uint, sortStr string) ([]admin.AllClinicResponseCore, error) {
 // 	var allClinic []AllClinicResponse
 
@@ -157,6 +153,36 @@ func (am *AdminModel) SelectAllAdmin() ([]admin.Core, error) {
 	var allAdmin []Admin
 
 	tx := am.db.Find(&allAdmin)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	var allAdminCore []admin.Core
+	for _, v := range allAdmin {
+		var address, coordinate, profilePicture string
+
+		if v.Address != nil {
+			address = *v.Address
+		}
+		if v.Coordinate != nil {
+			coordinate = *v.Coordinate
+		}
+
+		allAdminCore = append(allAdminCore, admin.Core{
+			ID:             v.ID,
+			FullName:       v.FullName,
+			Address:        address,
+			Coordinate:     coordinate,
+			ProfilePicture: profilePicture,
+		})
+	}
+	return allAdminCore, nil
+}
+
+func (am *AdminModel) SelectAllAdminWithCoor() ([]admin.Core, error) {
+	var allAdmin []Admin
+
+	tx := am.db.Where("coordinate IS NOT NULL").Find(&allAdmin)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

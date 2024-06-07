@@ -28,6 +28,7 @@ type AdminModel interface {
 	Delete(adminid uint) error
 	Update(adminid uint, updateData Core) error
 	SelectAllAdmin() ([]Core, error)
+	SelectAllAdminWithCoor() ([]Core, error)
 }
 
 type AdminService interface {

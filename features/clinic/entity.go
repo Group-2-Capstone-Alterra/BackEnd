@@ -6,12 +6,12 @@ import (
 )
 
 type Core struct {
-	ID         uint                `json:"admin_id"`
-	ClinicName string              `json:"clinic_name"`
-	Open       availdaydoctor.Core `json:"open"`
-	Service    servicedoctor.Core  `json:"service"`
-	Veterinary string              `json:"veterinary"`
-	Location   string              `json:"location"`
-	Coordinate string              `json:"coordinate"`
-	Distance   float64             `json:"distance"`
+	ID         uint                `json:"admin_id,omitempty"`
+	ClinicName string              `json:"clinic_name,omitempty"`
+	Open       availdaydoctor.Core `json:"open,omitempty"`
+	Service    servicedoctor.Core  `json:"service,omitempty"`
+	Veterinary string              `json:"veterinary,omitempty"`
+	Location   string              `json:"location,omitempty"`
+	Coordinate string              `json:"coordinate,omitempty"`
+	Distance   float64             `json:"distance,omitempty"`
 }

@@ -183,7 +183,7 @@ func (u *helper) SortProductsByDistance(userid uint, products []product.Core) []
 		//get coordinate admin
 		adminID := products[i].IdUser
 		dataAdmin, _ := u.admin.AdminById(adminID)
-		log.Println("[Helper - SortClinicsByDistance] dataAdmin", dataAdmin)
+		log.Println("[Helper - SortProductsByDistance] dataAdmin", dataAdmin)
 
 		adminCoor := strings.Split(dataAdmin.Coordinate, ",")
 		adminLat, errAdminLat := strconv.ParseFloat(adminCoor[0], 64)
@@ -208,6 +208,8 @@ func (u *helper) SortProductsByDistance(userid uint, products []product.Core) []
 }
 
 func (u *helper) SortClinicsByDistance(userid uint, clinics []clinic.Core) []clinic.Core {
+	log.Println("[helper] short clinics 2", clinics)
+	log.Println("[helper] short userid", userid)
 
 	user, _ := u.user.SelectById(userid)
 	userCoorConv := strings.Split(user.Coordinate, ",")
@@ -238,13 +240,19 @@ func (u *helper) SortClinicsByDistance(userid uint, clinics []clinic.Core) []cli
 
 		//get distance
 		distance := Distance(userLat, userLong, adminLat, adminLong)
+		log.Printf("\n[helper] short clinics %v, %v\n", i, clinics[i])
+		log.Printf("\n[helper] short distance %v, %v\n", i, distance)
 
 		clinics[i].Distance = distance
+		log.Printf("\n[helper] short clinics3 %v, %v\n", i, clinics[i])
+
 	}
 	sort.Slice(clinics, func(i, j int) bool {
 		return clinics[i].Distance < clinics[j].Distance
 	})
+	log.Println("[helper] short clinics 4", clinics)
 	return clinics
+
 }
 
 func Distance(userLat, userLon, adminLat, adminLon float64) float64 {

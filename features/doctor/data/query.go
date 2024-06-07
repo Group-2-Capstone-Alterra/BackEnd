@@ -178,8 +178,6 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 		Thursday:  input.AvailableDay.Thursday,
 		Friday:    input.AvailableDay.Friday,
 	}
-	log.Println("availdayGorm", availdayGorm)
-	log.Println("doctorCore.ID", doctorCore.ID)
 	txAvail := dm.db.Create(&availdayGorm)
 	if txAvail.Error != nil {
 		return txAvail.Error
@@ -194,7 +192,6 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 		MCU:                 input.ServiceDoctor.MCU,
 		OnlineConsultations: input.ServiceDoctor.OnlineConsultations,
 	}
-	log.Println("[QUERY]serviceGorm", serviceGorm)
 	txService := dm.db.Create(&serviceGorm)
 	if txService.Error != nil {
 		return txService.Error
