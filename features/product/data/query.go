@@ -29,14 +29,17 @@ func (p *productrQuery) Insert(input product.Core) error {
 	return nil
 }
 
-func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, error) {
+func (p *productrQuery) SelectAll(limit, offset uint, sortStr string) ([]product.Core, error) {
 	var allProduct []Product
 
+	log.Println("[Query] limit", limit)
+	log.Println("[Query] offset", offset)
 	log.Println("[Query] sortStr", sortStr)
+
 	if sortStr == "lowest distance" || sortStr == "lowest" {
 		log.Println("[query] lowest+distance")
 
-		tx := p.db.Order("price asc").Limit(10).Offset(int(offset)).Find(&allProduct)
+		tx := p.db.Order("price asc").Limit(int(limit)).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
 		}
@@ -44,7 +47,7 @@ func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, 
 	} else if sortStr == "highest distance" || sortStr == "highest" {
 		log.Println("[query] highest+distance")
 
-		tx := p.db.Order("price desc").Limit(10).Offset(int(offset)).Find(&allProduct)
+		tx := p.db.Order("price desc").Limit(int(limit)).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
 		}
@@ -64,7 +67,7 @@ func (p *productrQuery) SelectAll(offset uint, sortStr string) ([]product.Core, 
 	return allProductCore, nil
 }
 
-func (p *productrQuery) SelectAllAdmin(userid uint, offset uint) ([]product.Core, error) {
+func (p *productrQuery) SelectAllAdmin(limit, userid uint, offset uint) ([]product.Core, error) {
 	var allProduct []Product
 	log.Println("[Query - admin] SelectAllAdmin, userid: ", userid)
 

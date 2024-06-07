@@ -47,14 +47,14 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 	return input.ProductPicture, nil
 }
 
-func (p *productService) GetAll(userid uint, role string, offset uint, sortStr string) ([]product.Core, error) {
+func (p *productService) GetAll(userid uint, limit uint, role string, offset uint, sortStr string) ([]product.Core, error) {
 
 	log.Println("[Service]")
 	log.Println("[Service] role", role)
 
 	if role == "user" { // is user
 		log.Println("[Service - is user]")
-		product, err := p.productData.SelectAll(offset, sortStr)
+		product, err := p.productData.SelectAll(limit, offset, sortStr)
 		if err != nil {
 			return nil, err
 		}
@@ -67,14 +67,14 @@ func (p *productService) GetAll(userid uint, role string, offset uint, sortStr s
 		}
 	} else if userid == 0 { // guest
 		log.Println("[service - guest]")
-		product, err := p.productData.SelectAll(offset, sortStr)
+		product, err := p.productData.SelectAll(limit, offset, sortStr)
 		if err != nil {
 			return nil, err
 		}
 		return product, nil
 	} else { //is admin
 		log.Println("[Service - admin]")
-		product, err := p.productData.SelectAllAdmin(userid, offset)
+		product, err := p.productData.SelectAllAdmin(limit, userid, offset)
 		if err != nil {
 			return nil, err
 		}

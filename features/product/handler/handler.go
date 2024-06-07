@@ -63,14 +63,21 @@ func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
 	if err != nil || pageInt < 1 {
 		pageInt = 1
 	}
-	offset := (pageInt - 1) * 10
+	offset := (pageInt - 1) * 1
 
 	sortStr := c.QueryParam("sort")
+
+	limitProduct := c.QueryParam("limit")
+	limit, errlimit := strconv.Atoi(limitProduct)
+	if errlimit != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	log.Println("[Limit = ]", limit)
 
 	idToken, role, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
 	log.Println("idtoken:", idToken)
 
-	result, errResult := ph.productService.GetAll(uint(idToken), role, uint(offset), sortStr)
+	result, errResult := ph.productService.GetAll(uint(idToken), uint(limit), role, uint(offset), sortStr)
 	if errResult != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
 	}
