@@ -38,9 +38,6 @@ func (oh *OrderHandler) CreateOrder(c echo.Context) error {
 
 	orderData := order.OrderCore{
 		UserID:    uint(userID),
-		ProductID: newOrder.ProductID,
-		Quantity:  newOrder.Quantity,
-		Total:     newOrder.Total,
 		Status:    "Pending", // default status
 	}
 
@@ -57,20 +54,13 @@ func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
 
-	orders, err := oh.orderService.GetOrdersByUserID(uint(userID))
+	_, err := oh.orderService.GetOrdersByUserID(uint(userID))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
 	}
 
 	var resultResponse []OrderResponse
-	for _, v := range orders {
 
-		userData, _ := oh.userData.SelectById(v.UserID)
-		productData, _ := oh.productData.SelectById(v.ProductID)
-
-		resultResponse = append(resultResponse, CoreToResponse(v, *userData, *productData))
-
-	}
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", resultResponse))
 }
