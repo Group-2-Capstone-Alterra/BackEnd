@@ -3,6 +3,7 @@ package data
 import (
 	"PetPalApp/features/order"
 	orderProduct "PetPalApp/features/order_product/data"
+	transaction "PetPalApp/features/transaction/data"
 
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ type Order struct {
     Total           float64 
     Status          string  
     OrderProducts   []orderProduct.OrderProduct `gorm:"foreign_key:OrderID"`
+    Transactions    []transaction.Transaction   `gorm:"foreign_key:OrderID"`
 }
 
 func (o *Order) ToCore() order.OrderCore {
