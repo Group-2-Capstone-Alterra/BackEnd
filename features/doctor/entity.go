@@ -26,6 +26,7 @@ type DoctorModel interface {
 	SelectServiceById(id uint) (*servicedoctor.Core, error)
 	SelectAllDoctor() ([]Core, error)
 	PutByIdAdmin(AdminID uint, input Core) error
+	Delete(adminID uint) error
 }
 
 type DoctorService interface {
@@ -33,4 +34,5 @@ type DoctorService interface {
 	GetDoctorByIdAdmin(adminID uint) (*Core, error)
 	GetAvailDoctorByIdDoctor(doctorID uint) (*_avail.Core, error)
 	UpdateByIdAdmin(AdminId uint, input Core, file io.Reader, handlerFilename string) (string, error)
+	Delete(adminID uint) error
 }

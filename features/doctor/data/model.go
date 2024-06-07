@@ -12,7 +12,7 @@ type Doctor struct {
 	FullName       string
 	About          string
 	Price          float32
-	ProfilePicture string
+	ProfilePicture string `gorm:"default:'https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/default.jpg'"`
 }
 
 func GormToCore(doctorGorm Doctor) doctor.Core {
