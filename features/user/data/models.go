@@ -1,6 +1,7 @@
 package data
 
 import (
+	order "PetPalApp/features/order/data"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/helperuser"
 
@@ -17,6 +18,7 @@ type User struct {
 	ProfilePicture *string
 	Coordinate     *string
 	Role           string `gorm:"default:'user'"`
+	Orders		   []order.Order `gorm:"foreign_key:UserID"`
 }
 
 func UserCoreToUserGorm(userCore user.Core, helper helperuser.HelperuserInterface) User {
