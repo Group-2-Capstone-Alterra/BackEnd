@@ -2,7 +2,6 @@ package data
 
 import (
 	"PetPalApp/features/availdaydoctor"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -10,14 +9,29 @@ import (
 type AvailableDay struct {
 	gorm.Model
 	DoctorID  uint
-	Monday    bool `gorm:"default:null"`
-	Tuesday   bool `gorm:"default:null"`
-	Wednesday bool `gorm:"default:null"`
-	Thursday  bool `gorm:"default:null"`
-	Friday    bool `gorm:"default:null"`
+	Monday    string `gorm:"default:false"`
+	Tuesday   string `gorm:"default:false"`
+	Wednesday string `gorm:"default:false"`
+	Thursday  string `gorm:"default:false"`
+	Friday    string `gorm:"default:false"`
 }
 
 func AvailGormToCore(availGorm AvailableDay) availdaydoctor.Core {
+	if availGorm.Monday == "false" {
+		availGorm.Monday = ""
+	}
+	if availGorm.Tuesday == "false" {
+		availGorm.Tuesday = ""
+	}
+	if availGorm.Wednesday == "false" {
+		availGorm.Wednesday = ""
+	}
+	if availGorm.Thursday == "false" {
+		availGorm.Thursday = ""
+	}
+	if availGorm.Friday == "false" {
+		availGorm.Friday = ""
+	}
 	result := availdaydoctor.Core{
 		Monday:    availGorm.Monday,
 		Tuesday:   availGorm.Tuesday,
@@ -25,6 +39,5 @@ func AvailGormToCore(availGorm AvailableDay) availdaydoctor.Core {
 		Thursday:  availGorm.Thursday,
 		Friday:    availGorm.Friday,
 	}
-	log.Println("[Data - Availdoc] availGorm", availGorm)
 	return result
 }

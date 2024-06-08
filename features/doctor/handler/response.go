@@ -15,8 +15,8 @@ type DoctorResponse struct {
 	Price          float32                         `json:"price"`
 	About          string                          `json:"about"`
 	ProfilePicture string                          `json:"profile_picture"`
-	AvailableDay   handler.AvailableDayResponse    `json:"available_days"`
-	Service        _serviceHandler.ServiceResponse `json:"service"`
+	AvailableDay   handler.AvailableDayResponse    `json:"available_days,omitempty"`
+	Service        _serviceHandler.ServiceResponse `json:"service,omitempty"`
 }
 
 type ConsulDoctorReponse struct {

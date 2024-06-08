@@ -6,12 +6,12 @@ import (
 )
 
 type AvailableDayRequest struct {
-	DoctorID  uint `json:"doctor_id" form:"doctor_id" query:"doctor_id"`
-	Monday    bool `json:"monday" form:"monday" query:"monday"`
-	Tuesday   bool `json:"tuesday" form:"tuesday" query:"tuesday"`
-	Wednesday bool `json:"wednesday" form:"wednesday" query:"wednesday"`
-	Thursday  bool `json:"thursday" form:"thursday" query:"thursday"`
-	Friday    bool `json:"friday" form:"friday" query:"friday"`
+	DoctorID  uint   `json:"doctor_id" form:"doctor_id" query:"doctor_id"`
+	Monday    string `json:"monday" form:"monday" query:"monday"`
+	Tuesday   string `json:"tuesday" form:"tuesday" query:"tuesday"`
+	Wednesday string `json:"wednesday" form:"wednesday" query:"wednesday"`
+	Thursday  string `json:"thursday" form:"thursday" query:"thursday"`
+	Friday    string `json:"friday" form:"friday" query:"friday"`
 }
 
 func RequestToCore(doctorID uint, input AvailableDayRequest) availdaydoctor.Core {
