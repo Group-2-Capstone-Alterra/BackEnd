@@ -127,11 +127,11 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.GET("/orders", orderHandlerAPI.GetOrdersByUserID, middlewares.JWTMiddleware())
 
 	//consultation
-	e.POST("/consultations", consultationHandlerAPI.CreateConsultation, middlewares.JWTMiddleware())
+	e.POST("/consultations/:id", consultationHandlerAPI.CreateConsultation, middlewares.JWTMiddleware())
 	e.GET("/consultations", consultationHandlerAPI.GetConsultations, middlewares.JWTMiddleware())
 	e.GET("/consultations/user", consultationHandlerAPI.GetConsultationsByUserID, middlewares.JWTMiddleware())
 	e.GET("/consultations/doctor/:doctor_id", consultationHandlerAPI.GetConsultationsByDoctorID, middlewares.JWTMiddleware())
-	e.PUT("/consultations/:consultation_id", consultationHandlerAPI.UpdateConsultationResponse, middlewares.JWTMiddleware())
+	e.PATCH("/consultations/:consultation_id", consultationHandlerAPI.UpdateConsultationResponse, middlewares.JWTMiddleware())
 
 	//transactions
 	e.POST("/transactions", transactionHandlerAPI.CreateTransaction, middlewares.JWTMiddleware())

@@ -6,7 +6,7 @@ type ConsultationCore struct {
 	ID                 uint
 	UserID             uint
 	DoctorID           uint
-	Consultation       string
+	Service            string
 	TransactionStatus  string
 	StatusConsultation string
 	CreatedAt          time.Time
@@ -22,7 +22,7 @@ type ConsultationModel interface {
 	GetConsultations(currentID uint) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
-	UpdateConsultationResponse(consultationID uint, response string) error
+	UpdateConsultation(consultationID uint, core ConsultationCore) error
 }
 
 type ConsultationService interface {
@@ -30,5 +30,5 @@ type ConsultationService interface {
 	GetConsultations(currentID uint, role string) ([]ConsultationCore, error)
 	GetConsultationsByUserID(userID uint) ([]ConsultationCore, error)
 	GetConsultationsByDoctorID(doctorID uint) ([]ConsultationCore, error)
-	UpdateConsultationResponse(consultationID uint, response string) error
+	UpdateConsultation(consulID uint, Core ConsultationCore) error
 }

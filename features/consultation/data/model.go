@@ -10,29 +10,17 @@ type Consultation struct {
 	gorm.Model
 	UserID             uint
 	DoctorID           uint
-	Consultation       string
+	Service            string
 	TransactionStatus  string `gorm:"default:'Pending'"`
 	StatusConsultation string `gorm:"default:'New Consultation'"`
 }
-
-const (
-	Pending = "Pending"
-	Paid    = "Paid"
-	Failed  = "Failed"
-)
-
-const (
-	NewConsultation = "New Consultation"
-	InProgress      = "In Progress"
-	Finished        = "Finished"
-)
 
 func ToCore(c Consultation) consultation.ConsultationCore {
 	return consultation.ConsultationCore{
 		ID:                 c.ID,
 		UserID:             c.UserID,
 		DoctorID:           c.DoctorID,
-		Consultation:       c.Consultation,
+		Service:            c.Service,
 		TransactionStatus:  c.TransactionStatus,
 		StatusConsultation: c.StatusConsultation,
 		CreatedAt:          c.CreatedAt,

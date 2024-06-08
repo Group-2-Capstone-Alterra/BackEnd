@@ -19,9 +19,9 @@ func New(db *gorm.DB) consultation.ConsultationModel {
 
 func (cm *ConsultationModel) CreateConsultation(consultationCore consultation.ConsultationCore) error {
 	consultationGorm := Consultation{
-		UserID:       consultationCore.UserID,
-		DoctorID:     consultationCore.DoctorID,
-		Consultation: consultationCore.Consultation,
+		UserID:   consultationCore.UserID,
+		DoctorID: consultationCore.DoctorID,
+		Service:  consultationCore.Service,
 		// Status:       "Pending", // default status
 
 	}
@@ -156,8 +156,8 @@ func (cm *ConsultationModel) GetConsultationsByDoctorID(doctorID uint) ([]consul
 	return result, nil
 }
 
-func (cm *ConsultationModel) UpdateConsultationResponse(consultationID uint, response string) error {
-	tx := cm.db.Model(&Consultation{}).Where("id = ?", consultationID).Update("response", response)
+func (cm *ConsultationModel) UpdateConsultation(consultationID uint, Core consultation.ConsultationCore) error {
+	tx := cm.db.Model(&Consultation{}).Where("id = ?", consultationID).Update("status_consultation", Core.StatusConsultation)
 	if tx.Error != nil {
 		return tx.Error
 	}
