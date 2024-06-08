@@ -49,6 +49,7 @@ func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
 		chat.ReceiverID = consulData.UserID //penerima adalah user
 		getDoctorByAdmin, _ := cs.doctorData.SelectByAdminId(chat.SenderID)
 		valConcul, _ := cs.consultationData.VerAdmin(getDoctorByAdmin.ID, chat.ReceiverID, chat.ConsultationID)
+		chat.SenderID = getDoctorByAdmin.ID
 		if valConcul.ID == 0 {
 			return fmt.Errorf("[Sender Admin] UserID and DoctorID not match at Roomchat")
 		}
@@ -91,13 +92,17 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 	}
 }
 
-func (cs *ChatService) Delete(roomChatID, bubbleChatID, senderID uint) error {
+func (cs *ChatService) Delete(roomChatID, bubbleChatID, senderID uint, role string) error {
 	if roomChatID <= 0 {
 		return errors.New("ID must be a positive integer")
 	}
+	if role == "admin" {
+		adminData, _ := cs.doctorData.SelectByAdminId(senderID)
+		senderID = adminData.ID
+	}
 	valConcul, _ := cs.chatModel.VerAvailChat(roomChatID, bubbleChatID, senderID)
 	if valConcul == nil { // CurrentID and RoomChat not match (Roomchat not found)
-		return errors.New("Chat not found")
+		return errors.New("Roomchat not found")
 	} else { // CurrentID and RoomChat is match (Roomchat has found)
 		return cs.chatModel.Delete(roomChatID, bubbleChatID, senderID)
 	}

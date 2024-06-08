@@ -28,5 +28,5 @@ type DataInterface interface {
 type ServiceInterface interface {
 	CreateChat(ChatCore ChatCore, role string) error
 	GetChats(currentID uint, role string, roomchatID uint) ([]ChatCore, error)
-	Delete(roomChatID, bubbleChatID, senderID uint) error
+	Delete(roomChatID, bubbleChatID, senderID uint, role string) error
 }
