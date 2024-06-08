@@ -117,11 +117,11 @@ func (ch *ChatHandler) Delete(c echo.Context) error {
 	if errBubleChatInt != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", errBubleChatInt))
 	}
-	senderID, _, _ := middlewares.ExtractTokenUserId(c)
+	currentID, role, _ := middlewares.ExtractTokenUserId(c)
 
-	err := ch.chatService.Delete(uint(roomChatIDConv), uint(bubbleChatInt), uint(senderID))
+	err := ch.chatService.Delete(uint(roomChatIDConv), uint(bubbleChatInt), uint(currentID), role)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", err))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", nil))
 	}
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", err))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", nil))
 }
