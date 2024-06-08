@@ -38,7 +38,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 	roomchatID := c.Param("id")
 	roomchatIDConv, errConv := strconv.Atoi(roomchatID)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", errConv))
 	}
 
 	senderID, role, _ := middlewares.ExtractTokenUserId(c)
@@ -69,7 +69,7 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 	roomchatID := c.Param("id")
 	roomchatIDConv, errConv := strconv.Atoi(roomchatID)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get project id", errConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", errConv))
 	}
 	log.Println("[Handler] Roomchat ID", roomchatIDConv)
 
@@ -110,18 +110,18 @@ func (ch *ChatHandler) Delete(c echo.Context) error {
 	roomChatID := c.Param("id")
 	roomChatIDConv, errRoomChatIDConv := strconv.Atoi(roomChatID)
 	if errRoomChatIDConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", roomChatIDConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", roomChatIDConv))
 	}
 	bubbleChat := c.QueryParam("bubble")
 	bubbleChatInt, errBubleChatInt := strconv.Atoi(bubbleChat)
 	if errBubleChatInt != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("error get user id", errBubleChatInt))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID bubble chat must be a positive integer", errBubleChatInt))
 	}
 	currentID, role, _ := middlewares.ExtractTokenUserId(c)
 
 	err := ch.chatService.Delete(uint(roomChatIDConv), uint(bubbleChatInt), uint(currentID), role)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error delete data", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to delete chat, please ensure the room chat ID and bubble chat are correct.", nil))
 	}
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("success delete data", nil))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Chat deleted successfully", nil))
 }
