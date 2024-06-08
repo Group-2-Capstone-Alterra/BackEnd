@@ -2,7 +2,6 @@ package data
 
 import (
 	"PetPalApp/features/consultation"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -17,13 +16,16 @@ func New(db *gorm.DB) consultation.ConsultationModel {
 	}
 }
 
+const (
+	qdoctorID = "doctor_id = ?"
+	quserID   = "user_id = ?"
+)
+
 func (cm *ConsultationModel) CreateConsultation(consultationCore consultation.ConsultationCore) error {
 	consultationGorm := Consultation{
 		UserID:   consultationCore.UserID,
 		DoctorID: consultationCore.DoctorID,
 		Service:  consultationCore.Service,
-		// Status:       "Pending", // default status
-
 	}
 	tx := cm.db.Create(&consultationGorm)
 	if tx.Error != nil {
@@ -45,17 +47,12 @@ func (cm *ConsultationModel) GetCuntationsById(id uint) (*consultation.Consultat
 
 func (p *ConsultationModel) VerIsDoctor(userid uint, id uint) (*consultation.ConsultationCore, error) {
 	var conculData Consultation
-	tx := p.db.Where("doctor_id = ?", userid).Find(&conculData)
+	tx := p.db.Where(qdoctorID, userid).Find(&conculData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	conculDataCore := ToCore(conculData)
-	if conculDataCore.ID == 0 {
-		log.Println("[Query VerIsAdmin] Not Admin")
-	} else {
-		log.Println("[Query VerIsAdmin] Is Admin")
-	}
 	return &conculDataCore, nil
 }
 
@@ -67,47 +64,30 @@ func (p *ConsultationModel) VerAvailConcul(currentUserId uint, id uint) (*consul
 	}
 
 	conculDataCore := ToCore(conculData)
-	if conculDataCore.ID == 0 {
-		log.Println("[Query VerAvailConcul] Roomchat Not Found")
-	} else {
-		log.Println("[Query VerAvailConcul] Roomchat Has Found")
-	}
 	return &conculDataCore, nil
 }
 
 func (p *ConsultationModel) VerUser(userID uint, doctorID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
 	var conculData Consultation
-	tx := p.db.Where("user_id = ?", userID).Where("doctor_id = ?", doctorID).Find(&conculData, roomchatID)
+	tx := p.db.Where(quserID, userID).Where(qdoctorID, doctorID).Find(&conculData, roomchatID)
 
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	conculDataCore := ToCore(conculData)
-	if conculDataCore.ID == 0 {
-		log.Printf("\n[Query VerUser] User not found at RoomchatID\n")
-	} else {
-		log.Printf("\n[Query VerUser] User has found at RoomchatID\n")
-
-	}
 	return &conculDataCore, nil
 }
 
 func (p *ConsultationModel) VerAdmin(doctorID uint, userID uint, roomchatID uint) (*consultation.ConsultationCore, error) {
 	var conculData Consultation
-	tx := p.db.Where("doctor_id = ?", doctorID).Where("user_id = ?", userID).Find(&conculData, roomchatID)
+	tx := p.db.Where(qdoctorID, doctorID).Where(quserID, userID).Find(&conculData, roomchatID)
 
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	conculDataCore := ToCore(conculData)
-	if conculDataCore.ID == 0 {
-		log.Printf("\n[Query VerAdmin] Doctor not found at RoomchatID\n")
-	} else {
-		log.Printf("\n[Query VerAdmin] Doctor has found at RoomchatID\n")
-
-	}
 	return &conculDataCore, nil
 }
 
@@ -128,7 +108,7 @@ func (cm *ConsultationModel) GetConsultations(currentID uint) ([]consultation.Co
 
 func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {
 	var consultations []Consultation
-	tx := cm.db.Where("user_id = ?", userID).Find(&consultations)
+	tx := cm.db.Where(quserID, userID).Find(&consultations)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -143,7 +123,7 @@ func (cm *ConsultationModel) GetConsultationsByUserID(userID uint) ([]consultati
 
 func (cm *ConsultationModel) GetConsultationsByDoctorID(doctorID uint) ([]consultation.ConsultationCore, error) {
 	var consultations []Consultation
-	tx := cm.db.Where("doctor_id = ?", doctorID).Find(&consultations)
+	tx := cm.db.Where(qdoctorID, doctorID).Find(&consultations)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

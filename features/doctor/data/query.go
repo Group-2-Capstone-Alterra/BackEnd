@@ -23,21 +23,20 @@ func New(db *gorm.DB) doctor.DoctorModel {
 	}
 }
 
+const (
+	qadminID  = "admin_id = ?"
+	qdoctorID = "doctor_id = ?"
+)
+
 func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
-	doctorGorm := Doctor{
-		AdminID:        doctor.AdminID,
-		FullName:       doctor.FullName,
-		ProfilePicture: doctor.ProfilePicture,
-		About:          doctor.About,
-		Price:          doctor.Price,
-	}
+	doctorGorm := CoreToGorm(doctor)
 	tx := dm.db.Create(&doctorGorm)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
 	var doctorData Doctor
-	txDoctor := dm.db.Where("admin_id = ?", doctor.AdminID).Find(&doctorData)
+	txDoctor := dm.db.Where(qadminID, doctor.AdminID).Find(&doctorData)
 	if txDoctor.Error != nil {
 		return txDoctor.Error
 	}
@@ -63,7 +62,6 @@ func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
 		Operations:   doctor.ServiceDoctor.Operations,
 		MCU:          doctor.ServiceDoctor.MCU,
 	}
-	log.Println("[QUERY]serviceGorm", serviceGorm)
 	txService := dm.db.Create(&serviceGorm)
 	if txService.Error != nil {
 		return txService.Error
@@ -74,7 +72,7 @@ func (dm *DoctorModel) AddDoctor(doctor doctor.Core) error {
 
 func (dm *DoctorModel) SelectByAdminId(id uint) (*doctor.Core, error) {
 	var doctorData Doctor
-	tx := dm.db.Where("admin_id = ?", id).Find(&doctorData)
+	tx := dm.db.Where(qadminID, id).Find(&doctorData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -84,9 +82,7 @@ func (dm *DoctorModel) SelectByAdminId(id uint) (*doctor.Core, error) {
 }
 
 func (dm *DoctorModel) SelectDoctorById(id uint) (*doctor.Core, error) {
-	log.Println("[Query Doctor - SelectById]")
 	var doctorData Doctor
-	log.Println("[Query Doctor - SelectById] AdminID", id)
 	tx := dm.db.Find(&doctorData, id)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -101,7 +97,7 @@ func (dm *DoctorModel) SelectDoctorById(id uint) (*doctor.Core, error) {
 func (dm *DoctorModel) SelectAvailDayById(id uint) (*availdaydoctor.Core, error) {
 	var availDay data.AvailableDay
 
-	tx := dm.db.Where("doctor_id = ?", id).Find(&availDay)
+	tx := dm.db.Where(qdoctorID, id).Find(&availDay)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -111,16 +107,12 @@ func (dm *DoctorModel) SelectAvailDayById(id uint) (*availdaydoctor.Core, error)
 
 func (dm *DoctorModel) SelectServiceById(id uint) (*servicedoctor.Core, error) {
 	var serviceDoctor _serviceData.ServiceDoctor
-	log.Println("[Query Doctor - SelectServiceById] iD Param", id)
-
-	tx := dm.db.Where("doctor_id = ?", id).Find(&serviceDoctor)
+	tx := dm.db.Where(qdoctorID, id).Find(&serviceDoctor)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-
 	var serviceDoctorCore = _serviceData.ServiceGormToCore(serviceDoctor)
 	return &serviceDoctorCore, nil
-
 }
 
 func (dm *DoctorModel) SelectAllDoctor() ([]doctor.Core, error) {
@@ -155,13 +147,13 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 		Price:          input.Price,
 	}
 
-	tx := dm.db.Model(&Doctor{}).Where("admin_id = ?", AdminID).Updates(&doctorGorm)
+	tx := dm.db.Model(&Doctor{}).Where(qadminID, AdminID).Updates(&doctorGorm)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
 	var doctorData Doctor
-	txDoctor := dm.db.Where("admin_id = ?", AdminID).Find(&doctorData)
+	txDoctor := dm.db.Where(qadminID, AdminID).Find(&doctorData)
 	if txDoctor.Error != nil {
 		return txDoctor.Error
 	}
@@ -175,7 +167,7 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 		Thursday:  input.AvailableDay.Thursday,
 		Friday:    input.AvailableDay.Friday,
 	}
-	txAvail := dm.db.Model(&data.AvailableDay{}).Where("doctor_id = ?", doctorCore.ID).Updates(&availdayGorm)
+	txAvail := dm.db.Model(&data.AvailableDay{}).Where(qdoctorID, doctorCore.ID).Updates(&availdayGorm)
 	if txAvail.Error != nil {
 		return txAvail.Error
 	}
@@ -186,7 +178,7 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 		MCU:                 input.ServiceDoctor.MCU,
 		OnlineConsultations: input.ServiceDoctor.OnlineConsultations,
 	}
-	txService := dm.db.Model(&_dataService.ServiceDoctor{}).Where("doctor_id = ?", doctorCore.ID).Updates(&serviceGorm)
+	txService := dm.db.Model(&_dataService.ServiceDoctor{}).Where(qdoctorID, doctorCore.ID).Updates(&serviceGorm)
 	if txService.Error != nil {
 		return txService.Error
 	}
@@ -196,17 +188,17 @@ func (dm *DoctorModel) PutByIdAdmin(AdminID uint, input doctor.Core) error {
 
 func (dm *DoctorModel) Delete(adminID uint) error {
 	var doctorData Doctor
-	txDoctor := dm.db.Where("admin_id = ?", adminID).Find(&doctorData)
+	txDoctor := dm.db.Where(qadminID, adminID).Find(&doctorData)
 	if txDoctor.Error != nil {
 		return txDoctor.Error
 	}
 
 	var doctorCore = GormToCore(doctorData)
 
-	dm.db.Where("doctor_id = ?", doctorCore.ID).Delete(&data.AvailableDay{})
-	dm.db.Where("doctor_id = ?", doctorCore.ID).Delete(&_dataService.ServiceDoctor{})
+	dm.db.Where(qdoctorID, doctorCore.ID).Delete(&data.AvailableDay{})
+	dm.db.Where(qdoctorID, doctorCore.ID).Delete(&_dataService.ServiceDoctor{})
 
-	tx := dm.db.Where("admin_id = ?", adminID).Delete(&Doctor{})
+	tx := dm.db.Where(qadminID, adminID).Delete(&Doctor{})
 	if tx.Error != nil {
 		return tx.Error
 	}

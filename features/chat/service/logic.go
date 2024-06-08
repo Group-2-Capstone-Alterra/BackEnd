@@ -8,7 +8,6 @@ import (
 	"PetPalApp/features/user"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -71,7 +70,6 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 			if valRoomchat.ID == 0 {
 				return nil, fmt.Errorf("[Sender Admin] UserID and DoctorID not match at current Roomchat")
 			} else {
-				log.Println("[Service - GetChats] Data has been found")
 				return cs.chatModel.GetChatsDoctor(roomchatID)
 			}
 		}
@@ -85,7 +83,6 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 			if valRoomchat.ID == 0 {
 				return nil, fmt.Errorf("[Sender User] UserID and DoctorID not match at current Roomchat")
 			} else {
-				log.Println("[Service - GetChats] Data has been found")
 				return cs.chatModel.GetChatsUser(currentID, roomchatID)
 			}
 		}

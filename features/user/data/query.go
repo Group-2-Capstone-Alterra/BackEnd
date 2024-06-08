@@ -45,14 +45,6 @@ func (u *userQuery) SelectById(id uint) (*user.Core, error) {
 		return nil, tx.Error
 	}
 	var usercore = UserGormToUserCore(userData, u.helperuser)
-	// errAddRedis := UserGormToRedis(u.rdb, userData, ttl)
-	// for key, v := range errAddRedis {
-	// 	keyWithPrefix := fmt.Sprint(key)
-	// 	errIns := u.rdb.Set(u.ctx, keyWithPrefix, v, ttl).Err()
-	// 	if errIns != nil {
-	// 		log.Print(errIns)
-	// 	}
-	// }
 	return &usercore, nil
 }
 

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"PetPalApp/features/availdaydoctor"
-	"log"
 )
 
 type AvailableDayRequest struct {
@@ -15,7 +14,7 @@ type AvailableDayRequest struct {
 }
 
 func RequestToCore(doctorID uint, input AvailableDayRequest) availdaydoctor.Core {
-	inputCore := availdaydoctor.Core{
+	return availdaydoctor.Core{
 		DoctorID:  doctorID,
 		Monday:    input.Monday,
 		Tuesday:   input.Tuesday,
@@ -23,7 +22,4 @@ func RequestToCore(doctorID uint, input AvailableDayRequest) availdaydoctor.Core
 		Thursday:  input.Thursday,
 		Friday:    input.Friday,
 	}
-	log.Println("[Handler Req - Availdoc] input", input)
-	log.Println("[Handler Req - Availdoc] availGorm", inputCore)
-	return inputCore
 }

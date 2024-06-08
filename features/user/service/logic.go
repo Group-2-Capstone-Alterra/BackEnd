@@ -25,6 +25,10 @@ func New(ud user.DataInterface, hash encrypts.HashInterface, helper helper.Helpe
 	}
 }
 
+const (
+	errid = "ID must be a positive integer"
+)
+
 func (u *userService) Create(input user.Core) error {
 
 	result, _ := u.hashService.HashPassword(input.Password)
@@ -55,14 +59,14 @@ func (u *userService) Login(email string, password string) (data *user.Core, tok
 
 func (u *userService) GetProfile(id uint) (data *user.Core, err error) {
 	if id <= 0 {
-		return nil, errors.New("Invalid user ID. Please try again.")
+		return nil, errors.New(errid)
 	}
 	return u.userData.SelectById(id)
 }
 
 func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
-		return "", errors.New("Invalid user ID. Please try again.")
+		return "", errors.New(errid)
 	}
 
 	if input.Password != "" {
@@ -91,7 +95,7 @@ func (u *userService) UpdateById(id uint, input user.Core, file io.Reader, handl
 
 func (u *userService) Delete(id uint) error {
 	if id <= 0 {
-		return errors.New("Invalid user ID. Please try again.")
+		return errors.New(errid)
 	}
 	return u.userData.Delete(id)
 }

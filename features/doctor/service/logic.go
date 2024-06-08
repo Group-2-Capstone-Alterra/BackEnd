@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"time"
 )
 
@@ -60,14 +59,13 @@ func (ds *DoctorService) GetDoctorByIdAdmin(adminID uint) (*doctor.Core, error) 
 
 func (ds *DoctorService) GetAvailDoctorByIdDoctor(doctorID uint) (*availdaydoctor.Core, error) {
 	availDayCore, _ := ds.DoctorModel.SelectAvailDayById(doctorID)
-	log.Println("[Serive - GetAvailDoctorByIdDoctor] availDayCore", availDayCore)
 
 	return availDayCore, nil
 }
 
 func (ds *DoctorService) UpdateByIdAdmin(AdminId uint, input doctor.Core, file io.Reader, handlerFilename string) (string, error) {
 	if AdminId <= 0 {
-		return "", errors.New("id admin not valid")
+		return "", errors.New("ID must be a positive integer")
 	}
 
 	if file != nil && handlerFilename != "" {
@@ -89,7 +87,7 @@ func (ds *DoctorService) UpdateByIdAdmin(AdminId uint, input doctor.Core, file i
 
 func (ds *DoctorService) Delete(adminID uint) error {
 	if adminID <= 0 {
-		return errors.New("id not valid")
+		return errors.New("ID must be a positive integer")
 	}
 	return ds.DoctorModel.Delete(adminID)
 }

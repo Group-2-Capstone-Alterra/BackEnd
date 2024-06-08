@@ -4,6 +4,7 @@ import (
 	"PetPalApp/features/admin"
 	"PetPalApp/features/consultation"
 	"PetPalApp/features/doctor"
+	"fmt"
 	"log"
 )
 
@@ -22,11 +23,15 @@ func New(cm consultation.ConsultationModel, dataDoctor doctor.DoctorModel, dataA
 }
 
 func (cs *ConsultationService) CreateConsultation(consultation consultation.ConsultationCore) error {
-	return cs.consultationModel.CreateConsultation(consultation)
+	doctorAvailCheck, _ := cs.dataDoctor.SelectDoctorById(consultation.DoctorID)
+	if doctorAvailCheck.ID == 0 {
+		return fmt.Errorf("Doctor with that ID was not found in any clinic.")
+	} else {
+		return cs.consultationModel.CreateConsultation(consultation)
+	}
 }
 
 func (cs *ConsultationService) GetConsultations(currentID uint, role string) ([]consultation.ConsultationCore, error) {
-	log.Println("[Service - GetConsultations] Role : ", role)
 	//check doctor or not
 	if role == "user" {
 		log.Println("[Service - GetConsultations] Role User")

@@ -24,6 +24,10 @@ func New(ps product.ServiceInterface, helper helper.HelperInterface) *ProductHan
 	}
 }
 
+const (
+	errid = "ID must be a positive integer"
+)
+
 func (ph *ProductHandler) AddProduct(c echo.Context) error {
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
@@ -81,7 +85,7 @@ func (ph *ProductHandler) GetProductById(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(errid, idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
@@ -99,7 +103,7 @@ func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(errid, idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
@@ -136,7 +140,7 @@ func (ph *ProductHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(errid, idConv))
 	}
 
 	idToken, _, _ := middlewares.ExtractTokenUserId(c)
