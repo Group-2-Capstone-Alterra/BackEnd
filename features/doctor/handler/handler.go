@@ -5,8 +5,8 @@ import (
 	"PetPalApp/features/doctor"
 	"PetPalApp/utils/responses"
 	"log"
+	"mime/multipart"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -37,31 +37,27 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding doctor data: "+errBind.Error(), nil))
 	}
 
-	// Manually populate the AvailableDays field
-	req.AvailableDays = make(map[string]bool)
-	for key, value := range c.Request().Form {
-		if strings.HasPrefix(key, "available_days[") {
-			day := strings.TrimPrefix(key, "available_days[")
-			day = strings.TrimSuffix(day, "]")
-			req.AvailableDays[day] = value[0] == "true"
-		}
-	}
-	// Manually populate the AvailableDays field
-	req.ServiceDoctors = make(map[string]bool)
-	for key, value := range c.Request().Form {
-		if strings.HasPrefix(key, "services[") {
-			service := strings.TrimPrefix(key, "services[")
-			service = strings.TrimSuffix(service, "]")
-			req.ServiceDoctors[service] = value[0] == "true"
-		}
-	}
+	var file multipart.File
+	var handler *multipart.FileHeader
 
-	file, handler, _ := c.Request().FormFile("profile_picture")
-
+	file, handler, _ = c.Request().FormFile("profile_picture")
+	if file == nil && handler == nil {
+		file = nil
+		handler = nil
+	}
 	inputCore := AddRequestToCore(req)
-	inputCore.AdminID = uint(adminID)
 
-	_, errAdd := dh.doctorService.AddDoctor(inputCore, file, handler.Filename)
+	var filename string
+	if handler != nil {
+		filename = handler.Filename
+	}
+
+	inputCore.AdminID = uint(adminID)
+	log.Println("[inputCore]", inputCore)
+
+	log.Println("[inputCore.AvailableDay]", inputCore.AvailableDay)
+
+	_, errAdd := dh.doctorService.AddDoctor(inputCore, file, filename)
 	if errAdd != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to add doctor. Please contact our support team.", nil))
 	}
@@ -109,37 +105,25 @@ func (dh *DoctorHandler) UpdateProfile(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding doctor data: "+errBind.Error(), nil))
 	}
 
-	// Manually populate the AvailableDays field
-	log.Println("AvailableDays 1", req.AvailableDay)
-	req.AvailableDays = make(map[string]bool)
-	for key, value := range c.Request().Form {
-		if strings.HasPrefix(key, "available_days[") {
-			day := strings.TrimPrefix(key, "available_days[")
-			day = strings.TrimSuffix(day, "]")
-			req.AvailableDays[day] = value[0] == "true"
-		}
-	}
-	log.Println("AvailableDays 2", req.AvailableDay)
+	var file multipart.File
+	var handler *multipart.FileHeader
 
-	// Manually populate the AvailableDays field
-	req.ServiceDoctors = make(map[string]bool)
-	for key, value := range c.Request().Form {
-		if strings.HasPrefix(key, "services[") {
-			service := strings.TrimPrefix(key, "services[")
-			service = strings.TrimSuffix(service, "]")
-			req.ServiceDoctors[service] = value[0] == "true"
-		}
+	file, handler, _ = c.Request().FormFile("profile_picture")
+	if file == nil && handler == nil {
+		file = nil
+		handler = nil
 	}
 
-	file, handler, _ := c.Request().FormFile("profile_picture")
-
-	log.Println("[Handler Doctor - AddDoctor] req ", req)
 	inputCore := AddRequestToCore(req)
 
+	var filename string
+	if handler != nil {
+		filename = handler.Filename
+	}
 	// inputCore.AdminID = uint(adminID)
 	log.Println("[Handler Doctor - AddDoctor] inputCore ", inputCore)
 
-	_, errUpdate := dh.doctorService.UpdateByIdAdmin(uint(adminID), inputCore, file, handler.Filename)
+	_, errUpdate := dh.doctorService.UpdateByIdAdmin(uint(adminID), inputCore, file, filename)
 	if errUpdate != nil {
 		// Handle error from userService.UpdateById
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error updating doctor's information. Please contact our support team.", nil))

@@ -2,7 +2,6 @@ package data
 
 import (
 	"PetPalApp/features/servicedoctor"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -10,19 +9,31 @@ import (
 type ServiceDoctor struct {
 	gorm.Model
 	DoctorID            uint
-	Vaccinations        bool `gorm:"default:null"`
-	Operations          bool `gorm:"default:null"`
-	MCU                 bool `gorm:"default:null"`
-	OnlineConsultations bool `gorm:"default:null"`
+	Vaccinations        string `gorm:"default:false"`
+	Operations          string `gorm:"default:false"`
+	MCU                 string `gorm:"default:false"`
+	OnlineConsultations string `gorm:"default:false"`
 }
 
 func ServiceGormToCore(serviceGorm ServiceDoctor) servicedoctor.Core {
+	if serviceGorm.Vaccinations == "false" {
+		serviceGorm.Vaccinations = ""
+	}
+	if serviceGorm.Operations == "false" {
+		serviceGorm.Operations = ""
+	}
+	if serviceGorm.MCU == "false" {
+		serviceGorm.MCU = ""
+	}
+	if serviceGorm.OnlineConsultations == "false" {
+		serviceGorm.OnlineConsultations = ""
+	}
+
 	result := servicedoctor.Core{
 		Vaccinations:        serviceGorm.Vaccinations,
 		Operations:          serviceGorm.Operations,
 		MCU:                 serviceGorm.MCU,
 		OnlineConsultations: serviceGorm.OnlineConsultations,
 	}
-	log.Println("[Data - ServiceGormToCore] serviceGorm", serviceGorm)
 	return result
 }

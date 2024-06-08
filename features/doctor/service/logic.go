@@ -73,7 +73,10 @@ func (ds *DoctorService) UpdateByIdAdmin(AdminId uint, input doctor.Core, file i
 	if file != nil && handlerFilename != "" {
 		timestamp := time.Now().Unix()
 		fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
-		photoFileName, _ := ds.helper.UploadDoctorPicture(file, fileName)
+		photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
+		if errPhoto != nil {
+			return "", errPhoto
+		}
 		input.ProfilePicture = photoFileName
 	}
 
