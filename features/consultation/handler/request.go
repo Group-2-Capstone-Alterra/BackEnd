@@ -11,9 +11,17 @@ type UpdateConsultationRequest struct {
 	StatusConsultation string `json:"consultation_status" form:"consultation_status"`
 }
 
-func ReqToCore(request UpdateConsultationRequest) consultation.ConsultationCore {
+func UpdateReqToCore(request UpdateConsultationRequest) consultation.ConsultationCore {
 	return consultation.ConsultationCore{
 		TransactionStatus:  request.TransactionStatus,
 		StatusConsultation: request.StatusConsultation,
+	}
+}
+
+func ReqToCore(userID, doctorID uint, c ConsultationRequest) consultation.ConsultationCore {
+	return consultation.ConsultationCore{
+		UserID:   uint(userID),
+		DoctorID: uint(doctorID),
+		Service:  c.Service,
 	}
 }

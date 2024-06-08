@@ -2,7 +2,6 @@ package handler
 
 import (
 	"PetPalApp/features/servicedoctor"
-	"log"
 )
 
 type ServiceRequest struct {
@@ -21,7 +20,5 @@ func RequestToCore(doctorID uint, input ServiceRequest) servicedoctor.Core {
 		MCU:                 input.MCU,
 		OnlineConsultations: input.OnlineConsultations,
 	}
-	log.Println("[Handler Req - ServiceDoc] input", input)
-	log.Println("[Handler Req - ServiceDoc] serviceCore", inputCore)
 	return inputCore
 }

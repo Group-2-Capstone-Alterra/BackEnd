@@ -18,15 +18,13 @@ func New(db *gorm.DB) chat.DataInterface {
 	}
 }
 
+const (
+	consulID = "consultation_id = ?"
+	senderID = "sender_id = ?"
+)
+
 func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
-	log.Println("[Query - Create Chat] Chat Created")
-	chatGorm := Chat{
-		ConsultationID: chat.ConsultationID,
-		SenderID:       chat.SenderID,
-		ReceiverID:     chat.ReceiverID,
-		Message:        chat.Message,
-		TimeStamp:      chat.TimeStamp,
-	}
+	chatGorm := ToGorm(chat)
 	tx := cm.db.Create(&chatGorm)
 	if tx.Error != nil {
 		return tx.Error
@@ -36,7 +34,7 @@ func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
 
 func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
-	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
+	tx := cm.db.Where(consulID, roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -53,7 +51,7 @@ func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, 
 func (cm *ChatModel) GetChatsDoctor(roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
 
-	tx := cm.db.Where("consultation_id = ?", roomchatID).Find(&chats)
+	tx := cm.db.Where(consulID, roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -68,21 +66,21 @@ func (cm *ChatModel) GetChatsDoctor(roomchatID uint) ([]chat.ChatCore, error) {
 
 func (cm *ChatModel) VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*chat.ChatCore, error) {
 	var chatData Chat
-	tx := cm.db.Where("consultation_id = ?", roomChatID).Where("sender_id = ?", senderID).Find(&chatData, bubbleChatID)
+	tx := cm.db.Where(consulID, roomChatID).Where(senderID, senderID).Find(&chatData, bubbleChatID)
 	if tx.Error != nil {
-		return nil, fmt.Errorf("[Query VerAvailConcul] BubbleChat not match with consultation and sender id")
+		return nil, fmt.Errorf("BubbleChat not match with consultation and sender id")
 	}
 	conculDataCore := ToCore(chatData)
 	if conculDataCore.ID == 0 {
-		return nil, fmt.Errorf("[Query VerAvailConcul] BubbleChat not match with consultation and sender id")
+		return nil, fmt.Errorf("BubbleChat not match with consultation and sender id")
 	} else {
-		log.Println("[Query VerAvailConcul] BubbleChat found and match with consultation and sender id")
+		log.Println("BubbleChat found and match with consultation and sender id")
 	}
 	return &conculDataCore, nil
 }
 
 func (cm *ChatModel) Delete(roomChatID, bubbleChatID, senderID uint) error {
-	tx := cm.db.Where("consultation_id = ?", roomChatID).Where("sender_id = ?", senderID).Delete(&Chat{}, bubbleChatID)
+	tx := cm.db.Where(consulID, roomChatID).Where(senderID, senderID).Delete(&Chat{}, bubbleChatID)
 	if tx.Error != nil {
 		return tx.Error
 	}

@@ -32,12 +32,11 @@ func AvailGormToCore(availGorm AvailableDay) availdaydoctor.Core {
 	if availGorm.Friday == "false" {
 		availGorm.Friday = ""
 	}
-	result := availdaydoctor.Core{
+	return availdaydoctor.Core{
 		Monday:    availGorm.Monday,
 		Tuesday:   availGorm.Tuesday,
 		Wednesday: availGorm.Wednesday,
 		Thursday:  availGorm.Thursday,
 		Friday:    availGorm.Friday,
 	}
-	return result
 }

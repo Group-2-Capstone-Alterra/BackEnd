@@ -26,3 +26,13 @@ func ToCore(c Chat) chat.ChatCore {
 		TimeStamp:      c.TimeStamp,
 	}
 }
+
+func ToGorm(c chat.ChatCore) Chat {
+	return Chat{
+		ConsultationID: c.ConsultationID,
+		SenderID:       c.SenderID,
+		ReceiverID:     c.ReceiverID,
+		Message:        c.Message,
+		TimeStamp:      c.TimeStamp,
+	}
+}

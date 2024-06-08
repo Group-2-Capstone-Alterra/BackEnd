@@ -26,3 +26,13 @@ func GormToCore(doctorGorm Doctor) doctor.Core {
 	}
 	return result
 }
+
+func CoreToGorm(input doctor.Core) Doctor {
+	return Doctor{
+		AdminID:        input.AdminID,
+		FullName:       input.FullName,
+		ProfilePicture: input.ProfilePicture,
+		About:          input.About,
+		Price:          input.Price,
+	}
+}

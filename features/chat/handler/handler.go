@@ -8,7 +8,6 @@ import (
 	"PetPalApp/features/doctor"
 	"PetPalApp/features/user"
 	"PetPalApp/utils/responses"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -33,12 +32,15 @@ func New(cs chat.ServiceInterface, consultationData consultation.ConsultationMod
 	}
 }
 
+const (
+	valID = "ID must be a positive integer"
+)
+
 func (ch *ChatHandler) CreateChat(c echo.Context) error {
-	log.Println("[Handler]")
 	roomchatID := c.Param("id")
 	roomchatIDConv, errConv := strconv.Atoi(roomchatID)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", errConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(valID, errConv))
 	}
 
 	senderID, role, _ := middlewares.ExtractTokenUserId(c)
@@ -51,11 +53,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
 	}
 
-	chatData := chat.ChatCore{
-		ConsultationID: uint(roomchatIDConv),
-		SenderID:       uint(senderID),
-		Message:        newChat.Message,
-	}
+	chatData := ReqToCore(uint(senderID), uint(roomchatIDConv), newChat)
 
 	if err := ch.chatService.CreateChat(chatData, role); err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error creating chat: "+err.Error(), nil))
@@ -65,19 +63,16 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 }
 
 func (ch *ChatHandler) GetChats(c echo.Context) error {
-	log.Println("[Handler]")
 	roomchatID := c.Param("id")
 	roomchatIDConv, errConv := strconv.Atoi(roomchatID)
 	if errConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", errConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(valID, errConv))
 	}
-	log.Println("[Handler] Roomchat ID", roomchatIDConv)
 
 	currentID, role, _ := middlewares.ExtractTokenUserId(c)
 	if currentID == 0 {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
-	log.Println("[Handler] Current User ID", currentID)
 
 	chats, err := ch.chatService.GetChats(uint(currentID), role, uint(roomchatIDConv))
 	if err != nil {
@@ -86,18 +81,12 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 
 	var allChat []ChatResponse
 	for _, v := range chats {
-		log.Println("[Handler] for _, v")
 		consulData, _ := ch.consultationData.GetCuntationsById(uint(roomchatIDConv))
-		// log.Println("[Handler - Chats] consulData", consulData)
-
-		// log.Println("[Handler - Chats] doctorData", doctorData)
 		if v.SenderID == consulData.DoctorID { //if sender doctor
-			log.Println("[Handler] if sender doctor")
 			doctorData, _ := ch.doctorData.SelectDoctorById(v.SenderID)
 			userData, _ := ch.userData.SelectById(v.ReceiverID)
 			allChat = append(allChat, AllResponseChatFromDoctor(v, *userData, *doctorData))
 		} else {
-			log.Println("[Handler] if sender user")
 			userData, _ := ch.userData.SelectById(v.SenderID)
 			doctorData, _ := ch.doctorData.SelectDoctorById(v.ReceiverID)
 			allChat = append(allChat, AllResponseChatFromUser(v, *userData, *doctorData))
@@ -110,7 +99,7 @@ func (ch *ChatHandler) Delete(c echo.Context) error {
 	roomChatID := c.Param("id")
 	roomChatIDConv, errRoomChatIDConv := strconv.Atoi(roomChatID)
 	if errRoomChatIDConv != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", roomChatIDConv))
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse(valID, roomChatIDConv))
 	}
 	bubbleChat := c.QueryParam("bubble")
 	bubbleChatInt, errBubleChatInt := strconv.Atoi(bubbleChat)

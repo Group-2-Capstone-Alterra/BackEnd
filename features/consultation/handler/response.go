@@ -11,13 +11,13 @@ import (
 )
 
 type ConsultationResponse struct {
-	ID                 uint                               `json:"id"`
-	UserDetails        _userHandler.ConsulUserReponse     `json:"user_details"`
-	DoctorDetails      _doctorHandler.ConsulDoctorReponse `json:"doctor_details"`
-	Service            string                             `json:"service"`
-	TransactionStatus  string                             `json:"transaction_status"`
-	StatusConsultation string                             `json:"consultation_status"`
-	CreatedAt          time.Time                          `json:"created_at"`
+	ID                 uint                               `json:"id,omitempty"`
+	UserDetails        _userHandler.ConsulUserReponse     `json:"user_details,omitempty"`
+	DoctorDetails      _doctorHandler.ConsulDoctorReponse `json:"doctor_details,omitempty"`
+	Service            string                             `json:"service,omitempty"`
+	TransactionStatus  string                             `json:"transaction_status,omitempty"`
+	StatusConsultation string                             `json:"consultation_status,omitempty"`
+	CreatedAt          time.Time                          `json:"created_at,omitempty"`
 }
 
 func GormToCore(gormConsul consultation.ConsultationCore, gormUser user.Core, gormDoctor doctor.Core) ConsultationResponse {

@@ -27,9 +27,13 @@ func New(pd product.DataInterface, helper helper.HelperInterface, adminData admi
 	}
 }
 
+const (
+	errid = "ID must be a positive integer"
+)
+
 func (p *productService) Create(id uint, input product.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
-		return "", echo.NewHTTPError(http.StatusBadRequest, "ID must be a positive integer")
+		return "", echo.NewHTTPError(http.StatusBadRequest, errid)
 	}
 	if input.ProductName == "" || input.Price <= 0 || file == nil || input.Stock == 0 || input.Description == "" {
 		return "", echo.NewHTTPError(http.StatusBadRequest, "Failed to add product. Please ensure all fields are filled in correctly.")
@@ -80,7 +84,7 @@ func (p *productService) GetAll(userid uint, limit uint, role string, offset uin
 
 func (p *productService) GetProductById(id uint, userid uint) (data *product.Core, err error) {
 	if id <= 0 {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "ID must be a positive integer")
+		return nil, echo.NewHTTPError(http.StatusBadRequest, errid)
 	}
 
 	if userid != 0 {
@@ -92,7 +96,7 @@ func (p *productService) GetProductById(id uint, userid uint) (data *product.Cor
 
 func (p *productService) UpdateById(id uint, userid uint, input product.Core, file io.Reader, handlerFilename string) (string, error) {
 	if id <= 0 {
-		return "", errors.New("ID must be a positive integer")
+		return "", errors.New(errid)
 	}
 
 	if file != nil && handlerFilename != "" {
@@ -114,7 +118,7 @@ func (p *productService) UpdateById(id uint, userid uint, input product.Core, fi
 
 func (p *productService) Delete(id uint, userid uint) error {
 	if id <= 0 {
-		return errors.New("ID must be a positive integer")
+		return errors.New(errid)
 	}
 	return p.productData.Delete(id, userid)
 }
