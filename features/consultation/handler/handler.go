@@ -32,14 +32,20 @@ func (ch *ConsultationHandler) CreateConsultation(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
 	}
 
+	id := c.Param("id")
+	idConv, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
+	}
+
 	newConsultation := ConsultationRequest{}
 	if err := c.Bind(&newConsultation); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
 	}
 	consultationData := consultation.ConsultationCore{
-		UserID:       uint(userID),
-		DoctorID:     newConsultation.DoctorID,
-		Consultation: newConsultation.Consultation,
+		UserID:   uint(userID),
+		DoctorID: uint(idConv),
+		Service:  newConsultation.Service,
 	}
 
 	if err := ch.consultationService.CreateConsultation(consultationData); err != nil {
@@ -107,13 +113,20 @@ func (ch *ConsultationHandler) UpdateConsultationResponse(c echo.Context) error 
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Invalid consultation ID", nil))
 	}
 
-	responseRequest := ConsultationResponse{}
-	if err := c.Bind(&responseRequest); err != nil {
+	currentID, role, _ := middlewares.ExtractTokenUserId(c)
+	if currentID == 0 && role != "admin" {
+		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+	}
+
+	updateRequest := UpdateConsultationRequest{}
+	if err := c.Bind(&updateRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("Error binding data: "+err.Error(), nil))
 	}
-	if err := ch.consultationService.UpdateConsultationResponse(uint(consultationID), responseRequest.StatusConsultation); err != nil {
+
+	inputCore := ReqToCore(updateRequest)
+	if err := ch.consultationService.UpdateConsultation(uint(consultationID), inputCore); err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error updating consultation response: "+err.Error(), nil))
 	}
 
-	return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", responseRequest))
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Consultations retrieved successfully", nil))
 }

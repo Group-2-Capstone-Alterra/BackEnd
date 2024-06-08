@@ -46,6 +46,6 @@ func (cs *ConsultationService) GetConsultationsByDoctorID(doctorID uint) ([]cons
 	return cs.consultationModel.GetConsultationsByDoctorID(doctorID)
 }
 
-func (cs *ConsultationService) UpdateConsultationResponse(consultationID uint, response string) error {
-	return cs.consultationModel.UpdateConsultationResponse(consultationID, response)
+func (cs *ConsultationService) UpdateConsultation(consulID uint, Core consultation.ConsultationCore) error {
+	return cs.consultationModel.UpdateConsultation(consulID, Core)
 }
