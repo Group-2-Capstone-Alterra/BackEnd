@@ -26,52 +26,52 @@ func New(ps payment.PaymentService, midtrans midtrans.Client) *PaymentHandler {
 }
 
 func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
-	var newPayment PaymentRequest
-	if err := c.Bind(&newPayment); err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("invalid input", nil))
-	}
+    var newPayment PaymentRequest
+    if err := c.Bind(&newPayment); err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("invalid input", nil))
+    }
 
-	validate := validator.New()
-	if err := validate.Struct(newPayment); err != nil {
-		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("validation failed: "+err.Error(), nil))
-	}
+    validate := validator.New()
+    if err := validate.Struct(newPayment); err != nil {
+        return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("validation failed: "+err.Error(), nil))
+    }
 
-	order, err := ph.paymentService.GetOrderById(newPayment.OrderID)
+    order, err := ph.paymentService.GetOrderByID(newPayment.OrderID)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to get product", nil))
     }
 
-	user, err := ph.paymentService.GetUserById(order.UserID)
+    user, err := ph.paymentService.GetUserByID(order.UserID)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to get product", nil))
     }
 
-	client := ph.midtrans
+    client := ph.midtrans
     req := &midtrans.ChargeReq{
         PaymentType: midtrans.SourceBankTransfer,
         BankTransfer: &midtrans.BankTransferDetail{
             Bank: midtrans.BankBca,
         },
-		TransactionDetails: midtrans.TransactionDetails{
+        TransactionDetails: midtrans.TransactionDetails{
             OrderID:  order.InvoiceID,
             GrossAmt: int64(order.Price), // Jumlah transaksi
         },
-		CustomerDetail: &midtrans.CustDetail{
-			Email: user.Email,
-			FName: user.FullName,
-			LName: "",
-			Phone: user.NumberPhone,
-		},
+        CustomerDetail: &midtrans.CustDetail{
+            Email: user.Email,
+            FName: user.FullName,
+            LName: "",
+            Phone: user.NumberPhone,
+        },
         Items: &[]midtrans.ItemDetail{
             {
-                ID: strconv.FormatUint(uint64(order.ProductID), 10),
+                ID:    strconv.FormatUint(uint64(order.ProductID), 10),
                 Price: int64(order.Price) / int64(order.Quantity),
-                Qty: int32(order.Quantity),
-                Name: order.ProductName,
+                Qty:   int32(order.Quantity),
+                Name:  order.ProductName,
             },
         },
     }
-	coreGateway := midtrans.CoreGateway{
+    coreGateway := midtrans.CoreGateway{
         Client: client,
     }
     // Lakukan transaksi
@@ -79,41 +79,46 @@ func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
     if err != nil {
         log.Fatalf("Transaction failed with error: %v", err)
     }
-	log.Printf("Charge Request: %+v\n", req)
+    log.Printf("Charge Request: %+v\n", req)
 
-	var SignatureID string
-	var BillingNumber string;
+    var SignatureID string
+    var VANumber string
     // Cek hasil transaksi
     if resp.StatusCode == "201" {
-		SignatureID = resp.TransactionID
-		BillingNumber = resp.VANumbers[len(resp.VANumbers)-1].VANumber
+        SignatureID = resp.TransactionID
+        VANumber = resp.VANumbers[len(resp.VANumbers)-1].VANumber
         fmt.Printf("Transaction successful: %+v\n", resp)
     } else {
         fmt.Printf("Transaction failed with status: %s\n", resp.StatusMessage)
     }
 
-	payments := payment.PaymentCore{
-		PaymentMethod: newPayment.PaymentMethod,
-		OrderID: newPayment.OrderID,
-		InvoiceID: order.InvoiceID,
-		SignatureID: SignatureID,
-		BillingNumber: BillingNumber,
-	}
+    payments := payment.Payment{
+        PaymentMethod: resp.PaymentType,
+        PaymentStatus: newPayment.PaymentMethod,
+        OrderID:       newPayment.OrderID,
+        InvoiceID:     order.InvoiceID,
+        SignatureID:   SignatureID,
+        VANumber:      VANumber,
+    }
 
-	if SignatureID == "" {
+    if SignatureID == "" {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to charge payment", nil))
-	}
+    }
 
-    err = ph.paymentService.CreatePayment(payments)
+    createdPayment, err := ph.paymentService.CreatePayment(payments)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create payment", nil))
     }
 
-	// Update order status
-	// err = ph.paymentService.UpdateOrderStatus(newPayment.OrderID, "Paid")
-	// if err != nil {
-	// 	return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to update order status", nil))
-	// }
+    paymentresponse := PaymentResponse{
+        ID:            createdPayment.ID,
+        PaymentMethod: createdPayment.PaymentMethod,
+        PaymentStatus: createdPayment.PaymentStatus,
+        OrderID:       createdPayment.OrderID,
+        SignatureID:   createdPayment.SignatureID,
+        VANumber:      createdPayment.VANumber,
+		InvoiceID: 	   createdPayment.InvoiceID,
+    }
 
-	return c.JSON(http.StatusCreated, responses.JSONWebResponse("payment created successfully", payments))
+    return c.JSON(http.StatusCreated, responses.JSONWebResponse("payment created successfully", paymentresponse))
 }

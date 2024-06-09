@@ -1,6 +1,6 @@
 package order
 
-type OrderCore struct {
+type Order struct {
 	ID             uint
 	UserID         uint
 	ProductID      uint
@@ -24,17 +24,23 @@ type Payment struct {
 	OrderID       uint
 	PaymentMethod string
 	PaymentStatus string
-	PaymentAmount float64
+	SignatureID   string
+	VANumber      string
+	InvoiceID     string
 }
 
 type OrderModel interface {
-	CreateOrder(opCore OrderCore) error
-	GetOrdersByUserID(userID uint) ([]OrderCore, error)
-	GetProductById(productID uint) (*Product, error)
+	CreateOrder(opCore Order) (Order, error)
+	GetOrdersByUserID(userID uint) ([]Order, error)
+	GetProductByID(productID uint) (*Product, error)
+	GetOrderByID(orderID uint) (*Order, error)
+	// GetPaymentByID(paymentID uint) (*Payment, error)
 }
 
 type OrderService interface {
-	CreateOrder(opCore OrderCore) error
-	GetOrdersByUserID(userID uint) ([]OrderCore, error)
-	GetProductById(id uint) (data *Product, err error)
+	CreateOrder(opCore Order) (Order, error)
+	GetOrdersByUserID(userID uint) ([]Order, error)
+	GetProductByID(id uint) (data *Product, err error)
+	GetOrderByID(orderID uint) (*Order, error)
+	// GetPaymentByID(id uint) (data *Payment, err error)
 }

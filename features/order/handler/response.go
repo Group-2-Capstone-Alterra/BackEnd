@@ -2,7 +2,7 @@ package handler
 
 import "PetPalApp/features/order"
 
-func CoreToResponse(order order.OrderCore) OrderResponse {
+func CoreToResponse(order order.Order) OrderResponse {
     var payment PaymentResponse
     if order.Payment.ID != 0 {
         payment = PaymentResponse{
@@ -10,7 +10,9 @@ func CoreToResponse(order order.OrderCore) OrderResponse {
             OrderID:        order.Payment.OrderID,
             PaymentMethod:  order.Payment.PaymentMethod,
             PaymentStatus:  order.Payment.PaymentStatus,
-            PaymentAmount:  order.Payment.PaymentAmount,
+			SignatureID:    order.Payment.SignatureID,
+			VANumber:       order.Payment.VANumber,
+			InvoiceID: 		order.Payment.InvoiceID,
         }
     }
 
@@ -29,11 +31,13 @@ func CoreToResponse(order order.OrderCore) OrderResponse {
 
 
 type PaymentResponse struct {
-	ID              uint		`json:"id"`
-	OrderID         uint		`json:"order_id"`
-	PaymentMethod   string		`json:"payment_method"`
-	PaymentStatus   string		`json:"payment_status"`
-	PaymentAmount   float64		`json:"payment_amount"`
+	ID            uint		`json:"id"`
+	OrderID       uint		`json:"order_id"`
+	PaymentMethod string	`json:"payment_method"`
+	PaymentStatus string	`json:"payment_status"`
+	SignatureID   string	`json:"signature_id"`
+	VANumber      string	`json:"va_number"`
+	InvoiceID     string	`json:"invoice_id"`
 }
 
 type OrderResponse struct {
@@ -46,4 +50,8 @@ type OrderResponse struct {
 	Price          float64					`json:"price"`
 	Status         string					`json:"status"`
 	Payment   	   PaymentResponse			`json:"payment"`
+}
+
+type CreatedResponse struct {
+	ID             uint						`json:"id"`
 }

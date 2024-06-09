@@ -1,11 +1,12 @@
 package payment
 
-type PaymentCore struct {
+type Payment struct {
 	ID            uint
 	OrderID       uint
 	PaymentMethod string
+	PaymentStatus string
 	SignatureID   string
-	BillingNumber string
+	VANumber      string
 	InvoiceID     string
 }
 
@@ -35,13 +36,15 @@ type User struct {
 }
 
 type PaymentModel interface {
-	Create(payment PaymentCore) error
+	Create(payment Payment) (Payment, error)
+	GetPaymentByID(paymentID uint) (*Payment, error)
 	GetOrderByID(orderID uint) (*Order, error)
 	GetUserByID(orderID uint) (*User, error)
 }
 
 type PaymentService interface {
-	CreatePayment(payment PaymentCore) error
-	GetOrderById(id uint) (data *Order, err error)
-	GetUserById(id uint) (*User, error)
+	CreatePayment(payment Payment) (Payment, error)
+	GetPaymentByID(id uint) (data *Payment, err error)
+	GetOrderByID(id uint) (data *Order, err error)
+	GetUserByID(id uint) (*User, error)
 }
