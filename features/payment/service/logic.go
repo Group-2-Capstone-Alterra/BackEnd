@@ -19,14 +19,19 @@ func New(pm payment.PaymentModel) payment.PaymentService {
 	}
 }
 
-func (ps *PaymentService) CreatePayment(payment payment.PaymentCore) error {
+func (ps *PaymentService) CreatePayment(payment payment.Payment) (payment.Payment, error) {
 	return ps.paymentModel.Create(payment)
 }
 
-func (ps *PaymentService) GetOrderById(id uint) (data *payment.Order, err error) {	
+func (ps *PaymentService) GetPaymentByID(id uint) (data *payment.Payment, err error) {	
+	return ps.paymentModel.GetPaymentByID(id)	
+}
+
+func (ps *PaymentService) GetOrderByID(id uint) (data *payment.Order, err error) {	
 	return ps.paymentModel.GetOrderByID(id)	
 }
 
-func (ps *PaymentService) GetUserById(id uint) (data *payment.User, err error) {	
+func (ps *PaymentService) GetUserByID(id uint) (data *payment.User, err error) {	
 	return ps.paymentModel.GetUserByID(id)	
 }
+

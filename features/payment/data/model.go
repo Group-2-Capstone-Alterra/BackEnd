@@ -6,9 +6,11 @@ import (
 
 type Payment struct {
 	gorm.Model
-	OrderID   		uint
-	PaymentMethod   string
-	SignatureID	    string
-	BillingNumber   string
+	OrderID   				uint
+	PaymentMethod   		string
+	PaymentStatus 			string
+	SignatureID	    		string
+	VANumber    			string
+	InvoiceID     			string
 }
 

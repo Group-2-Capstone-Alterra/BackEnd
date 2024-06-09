@@ -20,17 +20,21 @@ type Order struct {
 	Payment         payment.Payment   `gorm:"foreign_key:OrderID"`
 }
 
-func ToCore(o Order) order.OrderCore {
+func ToCore(o Order) order.Order {
     var paymentCore order.Payment
     if o.Payment.ID != 0 {
         paymentCore = order.Payment{
             ID:             o.Payment.ID,
             OrderID:        o.Payment.OrderID,
             PaymentMethod:  o.Payment.PaymentMethod,
+			PaymentStatus:  o.Payment.PaymentStatus,
+			SignatureID:    o.Payment.SignatureID,
+			VANumber:       o.Payment.VANumber,
+			InvoiceID: 		o.Payment.InvoiceID,	
         }
     }
 
-    return order.OrderCore{
+    return order.Order{
         ID:             o.ID,
         UserID:         o.UserID,
         ProductID:      o.ProductID,

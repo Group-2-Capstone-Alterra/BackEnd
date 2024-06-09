@@ -14,33 +14,22 @@ func New(db *gorm.DB) payment.PaymentModel {
 	return &PaymentModel{db: db}
 }
 
-func (pm *PaymentModel) Create(payment payment.PaymentCore) error {
-	paymentGorm := Payment{
-		OrderID:         payment.OrderID,
-		PaymentMethod:   payment.PaymentMethod,
-		SignatureID: 	 payment.SignatureID,
-		BillingNumber:   payment.BillingNumber,
-	}
-	tx := pm.db.Create(&paymentGorm)
-	if tx.Error != nil {
-		return tx.Error
-	}
-	return nil
+func (pm *PaymentModel) Create(payment payment.Payment) (payment.Payment, error) {
+    tx := pm.db.Create(&payment)
+    if tx.Error != nil {
+        return payment, tx.Error
+    }
+    return payment, nil
 }
 
-func (pm *PaymentModel) GetPaymentByID(id uint) (payment.PaymentCore, error) {
-	var paymentGorm Payment
-	tx := pm.db.First(&paymentGorm, id)
-	if tx.Error != nil {
-		return payment.PaymentCore{}, tx.Error
+
+func (pm *PaymentModel) GetPaymentByID(paymentID uint) (*payment.Payment, error) {
+	var result payment.Payment
+	if err := pm.db.Where("id = ?", paymentID).First(&result).Error; err != nil {
+		return nil, err
 	}
 
-	return payment.PaymentCore{
-		ID:              paymentGorm.ID,
-		PaymentMethod:   paymentGorm.PaymentMethod,
-		SignatureID: 	 paymentGorm.SignatureID,
-		BillingNumber:   paymentGorm.BillingNumber,
-	}, nil
+	return &result, nil 
 }
 
 func (pm *PaymentModel) GetOrderByID(orderID uint) (*payment.Order, error) {
