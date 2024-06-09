@@ -38,4 +38,5 @@ type AdminService interface {
 	Delete(adminid uint) error
 	Update(adminid uint, updateData Core, file io.Reader, handlerFilename string) error
 	GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error)
+	GetClinic(id uint) (clinic.Core, error)
 }
