@@ -6,8 +6,6 @@ import (
 	_doctorHandler "PetPalApp/features/doctor/handler"
 	"PetPalApp/features/user"
 	_userHandler "PetPalApp/features/user/handler"
-
-	"time"
 )
 
 type ConsultationResponse struct {
@@ -17,7 +15,7 @@ type ConsultationResponse struct {
 	Service            string                             `json:"service,omitempty"`
 	TransactionStatus  string                             `json:"transaction_status,omitempty"`
 	StatusConsultation string                             `json:"consultation_status,omitempty"`
-	CreatedAt          time.Time                          `json:"created_at,omitempty"`
+	ScheduledDate      string                             `json:"scheduled_date,omitempty"`
 }
 
 func GormToCore(gormConsul consultation.ConsultationCore, gormUser user.Core, gormDoctor doctor.Core) ConsultationResponse {
@@ -28,7 +26,7 @@ func GormToCore(gormConsul consultation.ConsultationCore, gormUser user.Core, go
 		Service:            gormConsul.Service,
 		TransactionStatus:  gormConsul.TransactionStatus,
 		StatusConsultation: gormConsul.StatusConsultation,
-		CreatedAt:          gormConsul.CreatedAt,
+		ScheduledDate:      gormConsul.ScheduledDate,
 	}
 	return result
 }

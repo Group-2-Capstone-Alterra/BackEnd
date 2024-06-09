@@ -1,9 +1,12 @@
 package handler
 
-import "PetPalApp/features/consultation"
+import (
+	"PetPalApp/features/consultation"
+)
 
 type ConsultationRequest struct {
-	Service string `json:"service" form:"service" validate:"required"`
+	Service       string `json:"service" form:"service" validate:"required"`
+	ScheduledDate string `json:"scheduled_date" form:"scheduled_date" validate:"scheduled_date"`
 }
 
 type UpdateConsultationRequest struct {
@@ -20,8 +23,9 @@ func UpdateReqToCore(request UpdateConsultationRequest) consultation.Consultatio
 
 func ReqToCore(userID, doctorID uint, c ConsultationRequest) consultation.ConsultationCore {
 	return consultation.ConsultationCore{
-		UserID:   uint(userID),
-		DoctorID: uint(doctorID),
-		Service:  c.Service,
+		UserID:        uint(userID),
+		DoctorID:      uint(doctorID),
+		Service:       c.Service,
+		ScheduledDate: c.ScheduledDate,
 	}
 }
