@@ -1,7 +1,5 @@
 package consultation
 
-import "time"
-
 type ConsultationCore struct {
 	ID                 uint
 	UserID             uint
@@ -9,7 +7,7 @@ type ConsultationCore struct {
 	Service            string
 	TransactionStatus  string
 	StatusConsultation string
-	CreatedAt          time.Time
+	ScheduledDate      string
 }
 
 type ConsultationModel interface {

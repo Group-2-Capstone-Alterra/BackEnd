@@ -23,9 +23,10 @@ const (
 
 func (cm *ConsultationModel) CreateConsultation(consultationCore consultation.ConsultationCore) error {
 	consultationGorm := Consultation{
-		UserID:   consultationCore.UserID,
-		DoctorID: consultationCore.DoctorID,
-		Service:  consultationCore.Service,
+		UserID:        consultationCore.UserID,
+		DoctorID:      consultationCore.DoctorID,
+		Service:       consultationCore.Service,
+		ScheduledDate: consultationCore.ScheduledDate,
 	}
 	tx := cm.db.Create(&consultationGorm)
 	if tx.Error != nil {
