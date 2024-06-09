@@ -134,6 +134,7 @@ func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) (
 
 	var allClinic []clinic.Core
 	for _, v := range allAdmin {
+		dataAdmin, _ := as.AdminModel.AdminById(v.ID)
 		doctorDetail, errDoctorDetail := as.DoctorModel.SelectByAdminId(v.ID)
 		if errDoctorDetail != nil {
 			return nil, errDoctorDetail
@@ -148,13 +149,15 @@ func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) (
 			return nil, errServiceDoctor
 		}
 		allClinic = append(allClinic, clinic.Core{
-			ID:         v.ID,
-			ClinicName: v.FullName,
-			Open:       *doctorAvailDay,
-			Service:    *serviceDoctor,
-			Veterinary: doctorDetail.FullName,
-			Location:   v.Address,
-			Coordinate: v.Coordinate,
+			ID:                v.ID,
+			ClinicName:        v.FullName,
+			ClinicPicture:     dataAdmin.ProfilePicture,
+			Open:              *doctorAvailDay,
+			Service:           *serviceDoctor,
+			Veterinary:        doctorDetail.FullName,
+			VeterinaryPicture: doctorDetail.ProfilePicture,
+			Location:          v.Address,
+			Coordinate:        v.Coordinate,
 		})
 	}
 	if userid == 0 {
@@ -164,4 +167,31 @@ func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) (
 		// log.Println("[Service - Admin] allClinic", allClinic)
 		return clinicSort, nil
 	}
+}
+
+func (as *AdminService) GetClinic(id uint) (clinic.Core, error) {
+	log.Println("[Service]")
+	// log.Println("[Service] sortStr", sortStr)
+
+	dataAdmin, _ := as.AdminModel.AdminById(id)
+
+	doctorDetail, _ := as.DoctorModel.SelectByAdminId(dataAdmin.ID)
+
+	doctorAvailDay, _ := as.DoctorModel.SelectAvailDayById(doctorDetail.ID)
+
+	serviceDoctor, _ := as.DoctorModel.SelectServiceById(doctorDetail.ID)
+
+	result := clinic.Core{
+		ID:                dataAdmin.ID,
+		ClinicName:        dataAdmin.FullName,
+		ClinicPicture:     dataAdmin.ProfilePicture,
+		Open:              *doctorAvailDay,
+		Service:           *serviceDoctor,
+		Veterinary:        doctorDetail.FullName,
+		VeterinaryPicture: doctorDetail.ProfilePicture,
+		Location:          dataAdmin.Address,
+		Coordinate:        dataAdmin.Coordinate,
+	}
+
+	return result, nil
 }

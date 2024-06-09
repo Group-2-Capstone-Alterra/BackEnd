@@ -176,3 +176,21 @@ func (ah *AdminHandler) GetAllClinic(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", result))
 }
+
+func (ah *AdminHandler) GetClinicByID(c echo.Context) error {
+	id := c.Param("id")
+	idConv, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		return c.JSON(http.StatusBadRequest, responses.JSONWebResponse("ID must be a positive integer", idConv))
+	}
+
+	result, errResult := ah.adminService.GetClinic(uint(idConv))
+	if errResult != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("error read data", nil))
+	}
+
+	// clinicSort := ah.helper.SortClinicsByDistance(uint(idToken), result)
+	log.Println("[HANDLER - result]", result)
+
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("success read data", result))
+}
