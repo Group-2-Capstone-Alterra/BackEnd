@@ -3,6 +3,7 @@ package main
 import (
 	"PetPalApp/app/configs"
 	"PetPalApp/app/databases"
+	"PetPalApp/app/midtrans"
 	"PetPalApp/app/migrations"
 	"PetPalApp/app/routers"
 
@@ -15,6 +16,7 @@ func main() {
 	dbMysql := databases.InitDBMysql(cfg)
 	migrations.InitMigrations(dbMysql)
 	s3Client, s3Bucket := databases.InitS3(cfg)
+	MidtransClient := midtrans.GetMidtransClient(cfg)
 
 	e := echo.New()
 
@@ -22,6 +24,6 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
 
-	routers.InitRouter(e, dbMysql, s3Client, s3Bucket)
+	routers.InitRouter(e, dbMysql, s3Client, s3Bucket, MidtransClient)
 	e.Logger.Fatal(e.Start(":8080"))
 }

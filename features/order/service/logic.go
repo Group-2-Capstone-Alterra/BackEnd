@@ -23,5 +23,5 @@ func (os *OrderService) GetOrdersByUserID(userID uint) ([]order.OrderCore, error
 }
 
 func (os *OrderService) GetProductById(id uint) (data *order.Product, err error) {	
-	return os.OrderModel.GetPriceByProductID(id)	
+	return os.OrderModel.GetProductById(id)	
 }

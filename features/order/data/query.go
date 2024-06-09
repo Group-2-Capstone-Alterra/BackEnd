@@ -3,6 +3,8 @@ package data
 import (
 	order "PetPalApp/features/order"
 	"fmt"
+	"math/rand"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -32,7 +34,8 @@ func (om *OrderModel) CreateOrder(opCore order.OrderCore) error {
 		ProductPicture: product.ProductPicture,
         Quantity:  		opCore.Quantity,
         Price:     		totalPrice,
-		Status:         "Pending", 
+		Status:         "Created",
+        InvoiceID:      generateInvoiceID(),
     }
 
     tx := om.db.Create(&op)
@@ -41,7 +44,7 @@ func (om *OrderModel) CreateOrder(opCore order.OrderCore) error {
 
 func (om *OrderModel) GetOrdersByUserID(userID uint) ([]order.OrderCore, error) {
     var orders []Order
-    tx := om.db.Preload("Transactions").Where("user_id = ?", userID).Find(&orders)
+    tx := om.db.Where("user_id = ?", userID).Find(&orders)
     if tx.Error != nil {
         return nil, tx.Error
     }
@@ -54,11 +57,19 @@ func (om *OrderModel) GetOrdersByUserID(userID uint) ([]order.OrderCore, error) 
     return result, nil
 }
 
-func (om *OrderModel) GetPriceByProductID(productID uint) (*order.Product, error) {
+func (om *OrderModel) GetProductById(productID uint) (*order.Product, error) {
 	var result order.Product
 	if err := om.db.Where("id = ?", productID).First(&result).Error; err != nil {
 		return nil, err
 	}
 
 	return &result, nil 
+}
+
+func generateInvoiceID() string {
+	randomNumber := rand.Intn(9000) + 1000
+	currentDate := time.Now().Format("02012006")
+	invoiceID := fmt.Sprintf("ORDER-%s-%d", currentDate, randomNumber)
+
+	return invoiceID
 }

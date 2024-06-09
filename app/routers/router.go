@@ -34,20 +34,17 @@ import (
 	_consultationHandler "PetPalApp/features/consultation/handler"
 	_consultationService "PetPalApp/features/consultation/service"
 
-	_transactionData "PetPalApp/features/transaction/data"
-	_transactionHandler "PetPalApp/features/transaction/handler"
-	_transactionService "PetPalApp/features/transaction/service"
-
 	_paymentData "PetPalApp/features/payment/data"
 	_paymentHandler "PetPalApp/features/payment/handler"
 	_paymentService "PetPalApp/features/payment/service"
 
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/labstack/echo/v4"
+	"github.com/veritrans/go-midtrans"
 	"gorm.io/gorm"
 )
 
-func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
+func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans midtrans.Client) {
 	hashService := encrypts.NewHashService()
 	helperUserService := helperuser.NewHelperService()
 	helperService := helper.NewHelperService(s3, s3Bucket, _adminData.New(db), _userData.New(db, helperUserService))
@@ -80,13 +77,9 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	chatService := _chatService.New(chatData, consultationData, doctorData, userData, adminData)
 	chatHandlerAPI := _chatHandler.New(chatService, consultationData, userData, doctorData, adminData)
 
-	transactionData := _transactionData.New(db)
-	transactionService := _transactionService.New(transactionData)
-	transactionHandlerAPI := _transactionHandler.New(transactionService)
-
 	paymentData := _paymentData.New(db)
 	paymentService := _paymentService.New(paymentData)
-	paymentHandlerAPI := _paymentHandler.New(paymentService)
+	paymentHandlerAPI := _paymentHandler.New(paymentService, midtrans)
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
@@ -132,10 +125,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string) {
 	e.GET("/consultations/user", consultationHandlerAPI.GetConsultationsByUserID, middlewares.JWTMiddleware())
 	e.GET("/consultations/doctor/:doctor_id", consultationHandlerAPI.GetConsultationsByDoctorID, middlewares.JWTMiddleware())
 	e.PATCH("/consultations/:consultation_id", consultationHandlerAPI.UpdateConsultationResponse, middlewares.JWTMiddleware())
-
-	//transactions
-	e.POST("/transactions", transactionHandlerAPI.CreateTransaction, middlewares.JWTMiddleware())
-	e.GET("/transactions/:user_id", transactionHandlerAPI.GetTransactionsByUserID, middlewares.JWTMiddleware())
 
 	//payments
 	e.POST("/payments", paymentHandlerAPI.CreatePayment, middlewares.JWTMiddleware())

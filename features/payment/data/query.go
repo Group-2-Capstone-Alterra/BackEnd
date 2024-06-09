@@ -16,9 +16,10 @@ func New(db *gorm.DB) payment.PaymentModel {
 
 func (pm *PaymentModel) Create(payment payment.PaymentCore) error {
 	paymentGorm := Payment{
+		OrderID:         payment.OrderID,
 		PaymentMethod:   payment.PaymentMethod,
-		PaymentStatus:   payment.PaymentStatus,
-		PaymentAmount:   payment.PaymentAmount,
+		SignatureID: 	 payment.SignatureID,
+		BillingNumber:   payment.BillingNumber,
 	}
 	tx := pm.db.Create(&paymentGorm)
 	if tx.Error != nil {
@@ -37,7 +38,25 @@ func (pm *PaymentModel) GetPaymentByID(id uint) (payment.PaymentCore, error) {
 	return payment.PaymentCore{
 		ID:              paymentGorm.ID,
 		PaymentMethod:   paymentGorm.PaymentMethod,
-		PaymentStatus:   paymentGorm.PaymentStatus,
-		PaymentAmount:   paymentGorm.PaymentAmount,
+		SignatureID: 	 paymentGorm.SignatureID,
+		BillingNumber:   paymentGorm.BillingNumber,
 	}, nil
+}
+
+func (pm *PaymentModel) GetOrderByID(orderID uint) (*payment.Order, error) {
+	var result payment.Order
+	if err := pm.db.Where("id = ?", orderID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
+}
+
+func (pm *PaymentModel) GetUserByID(userID uint) (*payment.User, error) {
+	var result payment.User
+	if err := pm.db.Where("id = ?", userID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
 }
