@@ -19,8 +19,8 @@ func New(db *gorm.DB) chat.DataInterface {
 }
 
 const (
-	consulID = "consultation_id = ?"
-	senderID = "sender_id = ?"
+	qconsulID = "consultation_id = ?"
+	qsenderID = "sender_id = ?"
 )
 
 func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
@@ -34,7 +34,7 @@ func (cm *ChatModel) CreateChat(chat chat.ChatCore) error {
 
 func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
-	tx := cm.db.Where(consulID, roomchatID).Find(&chats)
+	tx := cm.db.Where(qconsulID, roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -51,7 +51,7 @@ func (cm *ChatModel) GetChatsUser(currentID, roomchatID uint) ([]chat.ChatCore, 
 func (cm *ChatModel) GetChatsDoctor(roomchatID uint) ([]chat.ChatCore, error) {
 	var chats []Chat
 
-	tx := cm.db.Where(consulID, roomchatID).Find(&chats)
+	tx := cm.db.Where(qconsulID, roomchatID).Find(&chats)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -66,7 +66,7 @@ func (cm *ChatModel) GetChatsDoctor(roomchatID uint) ([]chat.ChatCore, error) {
 
 func (cm *ChatModel) VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*chat.ChatCore, error) {
 	var chatData Chat
-	tx := cm.db.Where(consulID, roomChatID).Where(senderID, senderID).Find(&chatData, bubbleChatID)
+	tx := cm.db.Where(qconsulID, roomChatID).Where(qsenderID, senderID).Find(&chatData, bubbleChatID)
 	if tx.Error != nil {
 		return nil, fmt.Errorf("BubbleChat not match with consultation and sender id")
 	}
@@ -80,7 +80,7 @@ func (cm *ChatModel) VerAvailChat(roomChatID, bubbleChatID, senderID uint) (*cha
 }
 
 func (cm *ChatModel) Delete(roomChatID, bubbleChatID, senderID uint) error {
-	tx := cm.db.Where(consulID, roomChatID).Where(senderID, senderID).Delete(&Chat{}, bubbleChatID)
+	tx := cm.db.Where(qconsulID, roomChatID).Where(qsenderID, senderID).Delete(&Chat{}, bubbleChatID)
 	if tx.Error != nil {
 		return tx.Error
 	}
