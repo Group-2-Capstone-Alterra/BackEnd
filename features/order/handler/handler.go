@@ -43,7 +43,6 @@ func (oh *OrderHandler) CreateOrder(c echo.Context) error {
         ProductPicture: product.ProductPicture,
         Quantity:       uint(newOrderReq.Quantity),
         Price:          product.Price * float64(newOrderReq.Quantity), 
-        Status:         "Pending",
     }
 
     err = oh.OrderService.CreateOrder(newOrder)

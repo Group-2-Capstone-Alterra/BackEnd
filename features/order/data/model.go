@@ -2,7 +2,7 @@ package data
 
 import (
 	order "PetPalApp/features/order"
-	transaction "PetPalApp/features/transaction/data"
+	payment "PetPalApp/features/payment/data"
 
 	"gorm.io/gorm"
 )
@@ -16,20 +16,18 @@ type Order struct {
 	Quantity   		uint
 	Price      		float64
 	Status			string
-	Transactions    []transaction.Transaction   `gorm:"foreign_key:OrderID"`
+    InvoiceID       string
+	Payment         payment.Payment   `gorm:"foreign_key:OrderID"`
 }
 
-
 func ToCore(o Order) order.OrderCore {
-    var transactionCore []order.Transaction
-    for _, op := range o.Transactions {
-        transaction := order.Transaction{
-            ID:        op.ID,
-            UserID:    op.UserID,
-            Amount:    op.Amount,
-            Status:    op.Status,
+    var paymentCore order.Payment
+    if o.Payment.ID != 0 {
+        paymentCore = order.Payment{
+            ID:             o.Payment.ID,
+            OrderID:        o.Payment.OrderID,
+            PaymentMethod:  o.Payment.PaymentMethod,
         }
-        transactionCore = append(transactionCore, transaction)
     }
 
     return order.OrderCore{
@@ -41,7 +39,7 @@ func ToCore(o Order) order.OrderCore {
 		Quantity:       o.Quantity,
 		Price:          o.Price,
         Status:         o.Status,
-        Transactions:   transactionCore,
+        Payment:       paymentCore,
     }
 }
 

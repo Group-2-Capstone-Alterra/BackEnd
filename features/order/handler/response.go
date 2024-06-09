@@ -3,35 +3,37 @@ package handler
 import "PetPalApp/features/order"
 
 func CoreToResponse(order order.OrderCore) OrderResponse {
-	var transactions []TransactionResponse
-	for _, op := range order.Transactions { 
-		transactions = append(transactions, TransactionResponse{
-			ID:   		 op.ID,
-			UserID: 	 op.UserID,
-			Amount:      op.Amount,
-			Status:      op.Status,
-		})
-	}
+    var payment PaymentResponse
+    if order.Payment.ID != 0 {
+        payment = PaymentResponse{
+            ID:             order.Payment.ID,
+            OrderID:        order.Payment.OrderID,
+            PaymentMethod:  order.Payment.PaymentMethod,
+            PaymentStatus:  order.Payment.PaymentStatus,
+            PaymentAmount:  order.Payment.PaymentAmount,
+        }
+    }
 
-	return OrderResponse{
-		ID:             order.ID,
-		UserID:         order.UserID,
-		ProductID:      order.ProductID,
+    return OrderResponse{
+        ID:             order.ID,
+        UserID:         order.UserID,
+        ProductID:      order.ProductID,
 		ProductName:    order.ProductName,
 		ProductPicture: order.ProductPicture,
 		Quantity:       order.Quantity,
-		Price: 			order.Price,
-		Status:         order.Status,
-		Transactions:   transactions,
-	}
+		Price:          order.Price,
+        Status:         order.Status,
+        Payment:        payment,
+    }
 }
 
 
-type TransactionResponse struct {
-	ID     uint		`json:"id"`
-	UserID uint		`json:"user_id"`
-	Amount float64  `json:"amount"`
-	Status string   `json:"status"`
+type PaymentResponse struct {
+	ID              uint		`json:"id"`
+	OrderID         uint		`json:"order_id"`
+	PaymentMethod   string		`json:"payment_method"`
+	PaymentStatus   string		`json:"payment_status"`
+	PaymentAmount   float64		`json:"payment_amount"`
 }
 
 type OrderResponse struct {
@@ -43,5 +45,5 @@ type OrderResponse struct {
 	Quantity       uint						`json:"quantity"`
 	Price          float64					`json:"price"`
 	Status         string					`json:"status"`
-	Transactions   []TransactionResponse	`json:"transactions"`
+	Payment   	   PaymentResponse			`json:"payment"`
 }

@@ -35,6 +35,9 @@ type AppConfig struct {
 	S3_SECRETACCESKEY string
 
 	VALIDATLOCALORSERVER string
+
+	MIDTRANS_SERVER_KEY string
+	MIDTRANS_CLIENT_KEY string
 }
 
 func ReadEnv() *AppConfig {
@@ -67,6 +70,9 @@ func ReadEnv() *AppConfig {
 	app.S3_REGION = os.Getenv("S3REGION")
 	app.S3_ACCESKEY = os.Getenv("S3ACCESKEY")
 	app.S3_SECRETACCESKEY = os.Getenv("S3SECRETACCESKEY")
+
+	app.MIDTRANS_SERVER_KEY = os.Getenv("MIDTRANS_SERVER_KEY")
+	app.MIDTRANS_CLIENT_KEY = os.Getenv("MIDTRANS_CLIENT_KEY")
 
 	return &app
 }

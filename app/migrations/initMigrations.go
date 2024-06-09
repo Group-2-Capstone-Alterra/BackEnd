@@ -10,7 +10,6 @@ import (
 	_dataPayment "PetPalApp/features/payment/data"
 	_dataProduct "PetPalApp/features/product/data"
 	_dataServiceDoctor "PetPalApp/features/servicedoctor/data"
-	_dataTransaction "PetPalApp/features/transaction/data"
 	_dataUser "PetPalApp/features/user/data"
 
 	"gorm.io/gorm"
@@ -25,7 +24,6 @@ func InitMigrations(db *gorm.DB) {
 	db.AutoMigrate(&_dataChat.Chat{})
 	db.AutoMigrate(&_dataOrder.Order{})
 	db.AutoMigrate(&_dataConsultation.Consultation{})
-	db.AutoMigrate(&_dataTransaction.Transaction{})
 	db.AutoMigrate(&_dataPayment.Payment{})
 	db.AutoMigrate(&_dataServiceDoctor.ServiceDoctor{})
 }

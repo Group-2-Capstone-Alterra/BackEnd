@@ -6,9 +6,9 @@ import (
 
 type Payment struct {
 	gorm.Model
-	TransactionID   uint
+	OrderID   		uint
 	PaymentMethod   string
-	PaymentStatus   string
-	PaymentAmount   float64
+	SignatureID	    string
+	BillingNumber   string
 }
 

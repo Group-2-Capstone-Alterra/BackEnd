@@ -9,7 +9,7 @@ type OrderCore struct {
 	Quantity       uint
 	Price          float64
 	Status         string
-	Transactions   []Transaction
+	Payment        Payment
 }
 
 type Product struct {
@@ -19,17 +19,18 @@ type Product struct {
 	Price          float64
 }
 
-type Transaction struct {
-	ID     uint
-	UserID uint
-	Amount float64
-	Status string
+type Payment struct {
+	ID            uint
+	OrderID       uint
+	PaymentMethod string
+	PaymentStatus string
+	PaymentAmount float64
 }
 
 type OrderModel interface {
 	CreateOrder(opCore OrderCore) error
 	GetOrdersByUserID(userID uint) ([]OrderCore, error)
-	GetPriceByProductID(productID uint) (*Product, error)
+	GetProductById(productID uint) (*Product, error)
 }
 
 type OrderService interface {
