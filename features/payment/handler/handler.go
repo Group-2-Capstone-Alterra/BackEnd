@@ -93,8 +93,8 @@ func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
     }
 
     payments := payment.Payment{
-        PaymentMethod: resp.PaymentType,
-        PaymentStatus: newPayment.PaymentMethod,
+        PaymentMethod: newPayment.PaymentMethod,
+        PaymentStatus: resp.TransactionStatus,
         OrderID:       newPayment.OrderID,
         InvoiceID:     order.InvoiceID,
         SignatureID:   SignatureID,

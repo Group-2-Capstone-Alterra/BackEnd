@@ -5,8 +5,11 @@ import (
 	"PetPalApp/app/middlewares"
 	order "PetPalApp/features/order"
 	"PetPalApp/utils/responses"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -44,6 +47,8 @@ func (oh *OrderHandler) CreateOrder(c echo.Context) error {
         ProductPicture: product.ProductPicture,
         Quantity:       uint(newOrderReq.Quantity),
         Price:          product.Price * float64(newOrderReq.Quantity), 
+        Status:         "Created",
+        InvoiceID:      generateInvoiceID(),
     }
 
     createdOrder, err := oh.OrderService.CreateOrder(newOrder)
@@ -61,24 +66,41 @@ func (oh *OrderHandler) CreateOrder(c echo.Context) error {
 
 
 
-func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
-    userID, _, _ := middlewares.ExtractTokenUserId(c)
-    if userID == 0 {
-        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
-    }
+// func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
+//     userID, _, _ := middlewares.ExtractTokenUserId(c)
+//     if userID == 0 {
+//         return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+//     }
 
-    orders, err := oh.OrderService.GetOrdersByUserID(uint(userID))
-    if err != nil {
-        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
-    }
+//     orders, err := oh.OrderService.GetOrdersByUserID(uint(userID))
+//     if err != nil {
+//         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
+//     }
 
-    var resultResponse []OrderResponse
-    for _, order := range orders {
-        resultResponse = append(resultResponse, CoreToResponse(order))
-    }
-
-    return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", resultResponse))
-}
+//     var response []OrderResponse
+//     for _, order := range orders {
+//     response := append (response, OrderResponse{
+//         ID: order[len(order)-1].ID,
+//         UserID: order[len(order)-1].UserID,
+//         ProductID: order[len(order)-1].ProductID,
+//         ProductName: order[len(order)-1].ProductName,
+//         ProductPicture: order[len(order)-1].ProductPicture,
+//         Quantity: order[len(order)-1].Quantity,
+//         Price: order[len(order)-1].Price,
+//         Status: order[len(order)-1].Status,
+//         Payment: PaymentResponse{
+//             ID: order[len(order)-1].Payment.ID,
+//             OrderID: order[len(order)-1].Payment.OrderID,
+//             PaymentMethod: order[len(order)-1].Payment.PaymentMethod,
+//             PaymentStatus: order[len(order)-1].Payment.PaymentStatus,
+//             SignatureID:   order[len(order)-1].Payment.SignatureID,
+//             VANumber:      order[len(order)-1].Payment.VANumber,
+//             InvoiceID:     order[len(order)-1].InvoiceID,
+//         },
+//     })
+//     }
+//     return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", response))
+// }
 
 func (oh *OrderHandler) GetOrderByID(c echo.Context) error {
     userID, _, _ := middlewares.ExtractTokenUserId(c)
@@ -125,4 +147,49 @@ func (oh *OrderHandler) GetOrderByID(c echo.Context) error {
     }
 
     return c.JSON(http.StatusOK, responses.JSONWebResponse("Order retrieved successfully", newResponse))
+}
+
+func generateInvoiceID() string {
+	randomNumber := rand.Intn(9000) + 1000
+	currentDate := time.Now().Format("02012006")
+	invoiceID := fmt.Sprintf("ORDER-%s-%d", currentDate, randomNumber)
+
+	return invoiceID
+}
+
+func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {
+    userID, _, _ := middlewares.ExtractTokenUserId(c)
+    if userID == 0 {
+        return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("Unauthorized", nil))
+    }
+
+    orders, err := oh.OrderService.GetOrdersByUserID(uint(userID))
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving orders: "+err.Error(), nil))
+    }
+
+    var response []OrderResponse
+    for _, order := range orders {
+        response = append(response, OrderResponse{
+            ID: order.ID,
+            UserID: order.UserID,
+            ProductID: order.ProductID,
+            ProductName: order.ProductName,
+            ProductPicture: order.ProductPicture,
+            Quantity: order.Quantity,
+            Price: order.Price,
+            Status: order.Status,
+            Payment: PaymentResponse{
+                ID: order.Payment.ID,
+                OrderID: order.Payment.OrderID,
+                PaymentMethod: order.Payment.PaymentMethod,
+                PaymentStatus: order.Payment.PaymentStatus,
+                SignatureID:   order.Payment.SignatureID,
+                VANumber:      order.Payment.VANumber,
+                InvoiceID:     order.InvoiceID,
+            },
+        })
+    }
+
+    return c.JSON(http.StatusOK, responses.JSONWebResponse("Orders retrieved successfully", response))
 }
