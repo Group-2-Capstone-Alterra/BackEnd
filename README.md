@@ -1,29 +1,73 @@
-# PETPAL API
+**PetPal API**
+================
 
-<div align="center">
-<img src="petpal.png">
-</div>
+![PetPal Logo](petpal.png)
 
-# 📑 About the Project
+**About the Project**
+--------------------
 
-PetPal App adalah platform e-commerce khusus untuk kebutuhan hewan peliharaan. Aplikasi ini menyediakan berbagai fitur yang memudahkan pemilik hewan peliharaan untuk membeli barang dan berkonsultasi dengan dokter hewan, bisa dengan konsultasi online maupun kunjungan. Dengan UI yang user-friendly, PetPal App memungkinkan user untuk menemukan produk hewan yang berkualitas dan mendapatkan saran kesehatan dari dokter hewan profesional.
+PetPal App is an e-commerce platform specifically designed for pet owners. The application provides various features that make it easy for pet owners to buy products and consult with veterinarians, either online or offline. With a user-friendly UI, PetPal App allows users to find high-quality pet products and receive health advice from professional veterinarians.
 
-# 🎨 Prototype
+**Getting Started**
+-------------------
 
-[Figma](https://www.figma.com/design/hVqvSWqgOSIv9V0oWxO9NL/Untitled?node-id=0-1)
+### Installation
 
-# 📄 Documentation (SwaggerHub)
+```bash
+$ git clone https://github.com/Group-2-Capstone-Alterra/BackEnd.git
+```
 
-[PetpalAPI](https://app.swaggerhub.com/apis-docs/WFHADIT/PETPAL/1.0.0)
+### Running the Server
 
-# ERD
+```bash
+$ go run main.go
+```
 
-<div align="center">
-<img src="ERD_petpal.png">
-</div>
+### Base URL
 
-# Contributor
+`http://localhost:5000/api`
 
-[Aditya Ramadhan](https://www.linkedin.com/in/adit6/)
+**API Endpoints**
+----------------
 
-[Bagas Alfaristo Putra](https://www.linkedin.com/in/bagas-alfaristo-putra/)
+### GET /rolls
+
+* Retrieve a list of all sushi rolls
+* Response: JSON array of Roll objects
+
+### GET /rolls/:id
+
+* Retrieve a single sushi roll by ID
+* Response: JSON object of Roll
+
+### POST /rolls
+
+* Create a new sushi roll
+* Request: JSON object of Roll
+* Response: JSON object of created Roll
+
+**Prototype**
+-------------
+
+[View Prototype on Figma](https://www.figma.com/design/hVqvSWqgOSIv9V0oWxO9NL/Untitled?node-id=0-1)
+
+**Documentation (SwaggerHub)**
+-----------------------------
+
+[View API Documentation on SwaggerHub](https://app.swaggerhub.com/apis-docs/WFHADIT/PETPAL/1.0.0)
+
+**ERD**
+-----
+
+![ERD Diagram](ERD_petpal.png)
+
+**Contributors**
+--------------
+
+* [Aditya Ramadhan](https://www.linkedin.com/in/adit6/)
+* [Bagas Alfaristo Putra](https://www.linkedin.com/in/bagas-alfaristo-putra/)
+
+**License**
+---------
+
+MIT License
