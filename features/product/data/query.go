@@ -12,7 +12,7 @@ type productrQuery struct {
 	helper helper.HelperInterface
 }
 
-func New(db *gorm.DB, helper helper.HelperInterface) product.DataInterface {
+func New(db *gorm.DB, helper helper.HelperInterface) product.ProductModel {
 	return &productrQuery{
 		db:     db,
 		helper: helper,
@@ -46,7 +46,7 @@ func (p *productrQuery) SelectAll(limit, offset uint, sortStr string) ([]product
 			return nil, tx.Error
 		}
 	} else {
-		tx := p.db.Limit(10).Offset(int(offset)).Find(&allProduct)
+		tx := p.db.Limit(int(limit)).Offset(int(offset)).Find(&allProduct)
 		if tx.Error != nil {
 			return nil, tx.Error
 		}
@@ -71,6 +71,19 @@ func (p *productrQuery) SelectAllAdmin(limit, userid uint, offset uint) ([]produ
 	return allProductCore, nil
 }
 
+func (p *productrQuery) SelectAllAdminByName(limit, userid uint, offset uint, name string) ([]product.Core, error) {
+	var allProduct []Product
+	tx := p.db.Where("product_name LIKE ?", "%"+name+"%").Where(quserid, userid).Find(&allProduct)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var allProductCore []product.Core
+	for _, v := range allProduct {
+		allProductCore = append(allProductCore, GormToCore(v))
+	}
+	return allProductCore, nil
+}
+
 func (p *productrQuery) SelectById(id uint) (*product.Core, error) {
 	var productData Product
 	tx := p.db.First(&productData, id)
@@ -79,6 +92,32 @@ func (p *productrQuery) SelectById(id uint) (*product.Core, error) {
 	}
 	projectcore := GormToCore(productData)
 	return &projectcore, nil
+}
+
+func (p *productrQuery) SelectByName(limit, offset uint, sortStr, name string) ([]product.Core, error) {
+	var allProduct []Product
+	if sortStr == "lowest distance" || sortStr == "lowest" {
+		tx := p.db.Order("price asc").Limit(int(limit)).Offset(int(offset)).Where("product_name LIKE ?", "%"+name+"%").Find(&allProduct)
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+
+	} else if sortStr == "highest distance" || sortStr == "highest" {
+		tx := p.db.Order("price desc").Limit(int(limit)).Offset(int(offset)).Where("product_name LIKE ?", "%"+name+"%").Find(&allProduct)
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+	} else {
+		tx := p.db.Limit(int(limit)).Offset(int(offset)).Where("product_name LIKE ?", "%"+name+"%").Find(&allProduct)
+		if tx.Error != nil {
+			return nil, tx.Error
+		}
+	}
+	var allProductCore []product.Core
+	for _, v := range allProduct {
+		allProductCore = append(allProductCore, GormToCore(v))
+	}
+	return allProductCore, nil
 }
 
 func (p *productrQuery) SelectByIdAdmin(id uint, userid uint) (*product.Core, error) {

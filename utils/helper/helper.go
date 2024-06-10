@@ -34,10 +34,10 @@ type helper struct {
 	s3       *s3.S3
 	s3Bucket string
 	admin    admin.AdminModel
-	user     user.DataInterface
+	user     user.UserModel
 }
 
-func NewHelperService(s3 *s3.S3, s3Bucket string, admin admin.AdminModel, user user.DataInterface) HelperInterface {
+func NewHelperService(s3 *s3.S3, s3Bucket string, admin admin.AdminModel, user user.UserModel) HelperInterface {
 	return &helper{
 		s3:       s3,
 		s3Bucket: s3Bucket,

@@ -14,12 +14,12 @@ import (
 )
 
 type productService struct {
-	productData product.DataInterface
+	productData product.ProductModel
 	helper      helper.HelperInterface
 	adminData   admin.AdminModel
 }
 
-func New(pd product.DataInterface, helper helper.HelperInterface, adminData admin.AdminModel) product.ServiceInterface {
+func New(pd product.ProductModel, helper helper.HelperInterface, adminData admin.AdminModel) product.ProductService {
 	return &productService{
 		productData: pd,
 		helper:      helper,
@@ -91,6 +91,34 @@ func (p *productService) GetProductById(id uint, userid uint) (data *product.Cor
 		return p.productData.SelectByIdAdmin(id, userid)
 	} else {
 		return p.productData.SelectById(id)
+	}
+}
+
+func (p *productService) GetProductByName(userid uint, limit uint, role string, offset uint, sortStr, name string) ([]product.Core, error) {
+	if role == "user" { // is user
+		product, err := p.productData.SelectByName(limit, offset, sortStr, name)
+		if err != nil {
+			return nil, err
+		}
+		if sortStr == "lowest distance" || sortStr == "higest distance" {
+			productSort := p.helper.SortProductsByDistance(userid, product)
+			return productSort, nil
+		} else {
+			return product, nil
+		}
+	} else if role == "admin" { // admin
+		product, err := p.productData.SelectAllAdminByName(limit, userid, offset, name)
+		if err != nil {
+			return nil, err
+		}
+		return product, nil
+
+	} else { //is guest
+		product, err := p.productData.SelectByName(limit, offset, sortStr, name)
+		if err != nil {
+			return nil, err
+		}
+		return product, nil
 	}
 }
 

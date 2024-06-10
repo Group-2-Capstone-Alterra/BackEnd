@@ -14,11 +14,11 @@ import (
 
 type ConsultationHandler struct {
 	consultationService consultation.ConsultationService
-	userData            user.DataInterface
+	userData            user.UserModel
 	doctorData          doctor.DoctorModel
 }
 
-func New(cs consultation.ConsultationService, userData user.DataInterface, doctorData doctor.DoctorModel) *ConsultationHandler {
+func New(cs consultation.ConsultationService, userData user.UserModel, doctorData doctor.DoctorModel) *ConsultationHandler {
 	return &ConsultationHandler{
 		consultationService: cs,
 		userData:            userData,

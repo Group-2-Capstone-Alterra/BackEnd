@@ -20,7 +20,7 @@ type Core struct {
 	UpdatedAt      time.Time
 }
 
-type DataInterface interface {
+type UserModel interface {
 	Insert(input Core) error
 	SelectByEmail(email string) (*Core, error)
 	SelectById(id uint) (*Core, error)
@@ -28,7 +28,7 @@ type DataInterface interface {
 	Delete(id uint) error
 }
 
-type ServiceInterface interface {
+type UserService interface {
 	Create(input Core) error
 	Login(email string, password string) (data *Core, token string, err error)
 	GetProfile(id uint) (data *Core, err error)

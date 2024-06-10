@@ -189,6 +189,8 @@ func (as *AdminService) GetClinic(id uint) (clinic.Core, error) {
 		Service:           *serviceDoctor,
 		Veterinary:        doctorDetail.FullName,
 		VeterinaryPicture: doctorDetail.ProfilePicture,
+		About:             doctorDetail.About,
+		Price:             doctorDetail.Price,
 		Location:          dataAdmin.Address,
 		Coordinate:        dataAdmin.Coordinate,
 	}

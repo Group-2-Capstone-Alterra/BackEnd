@@ -12,7 +12,7 @@ type ChatModel struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) chat.DataInterface {
+func New(db *gorm.DB) chat.ChatModel {
 	return &ChatModel{
 		db: db,
 	}

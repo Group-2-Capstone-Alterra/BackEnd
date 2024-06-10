@@ -17,7 +17,7 @@ type ChatCore struct {
 	UpdateAt            time.Time
 }
 
-type DataInterface interface {
+type ChatModel interface {
 	CreateChat(ChatCore) error
 	GetChatsUser(currentID, roomchatID uint) ([]ChatCore, error)
 	GetChatsDoctor(roomchatID uint) ([]ChatCore, error)
@@ -25,7 +25,7 @@ type DataInterface interface {
 	Delete(roomChatID, bubbleChatID, senderID uint) error
 }
 
-type ServiceInterface interface {
+type ChatService interface {
 	CreateChat(ChatCore ChatCore, role string) error
 	GetChats(currentID uint, role string, roomchatID uint) ([]ChatCore, error)
 	Delete(roomChatID, bubbleChatID, senderID uint, role string) error
