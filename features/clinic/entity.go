@@ -11,6 +11,7 @@ type Core struct {
 	ClinicPicture     string              `json:"clinic_picture,omitempty"`
 	Open              availdaydoctor.Core `json:"open,omitempty"`
 	Service           servicedoctor.Core  `json:"service,omitempty"`
+	IDDoctor          uint                `json:"id_veterinary,omitempty"`
 	Veterinary        string              `json:"veterinary,omitempty"`
 	VeterinaryPicture string              `json:"veterinary_picture,omitempty"`
 	About             string              `json:"about,omitempty"`
