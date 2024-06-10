@@ -5,6 +5,7 @@ import (
 	"PetPalApp/features/product"
 	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -13,11 +14,11 @@ import (
 )
 
 type ProductHandler struct {
-	productService product.ServiceInterface
+	productService product.ProductService
 	helper         helper.HelperInterface
 }
 
-func New(ps product.ServiceInterface, helper helper.HelperInterface) *ProductHandler {
+func New(ps product.ProductService, helper helper.HelperInterface) *ProductHandler {
 	return &ProductHandler{
 		productService: ps,
 		helper:         helper,
@@ -99,6 +100,36 @@ func (ph *ProductHandler) GetProductById(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("Products retrieved successfully", productResponse))
 }
 
+func (ph *ProductHandler) GetProductByName(c echo.Context) error {
+	page := c.QueryParam("page")
+	pageInt, err := strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	offset := (pageInt - 1) * 1
+	sortStr := c.QueryParam("sort")
+	limitProduct := c.QueryParam("limit")
+	limit, errlimit := strconv.Atoi(limitProduct)
+	if errlimit != nil || pageInt < 1 {
+		pageInt = 1
+	}
+
+	name := c.QueryParam("name")
+	log.Println("Name", name)
+
+	idToken, role, _ := middlewares.ExtractTokenUserId(c) // extract id user from jwt token
+
+	result, errResult := ph.productService.GetProductByName(uint(idToken), uint(limit), role, uint(offset), sortStr, name)
+	if errResult != nil {
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to retrieve products", nil))
+	}
+
+	var allProduct []AllProductResponse
+	for _, v := range result {
+		allProduct = append(allProduct, AllGormToCore(v))
+	}
+	return c.JSON(http.StatusOK, responses.JSONWebResponse("Products retrieved successfully", allProduct))
+}
 func (ph *ProductHandler) UpdateProductById(c echo.Context) error {
 	id := c.Param("id")
 	idConv, errConv := strconv.Atoi(id)

@@ -12,12 +12,12 @@ import (
 )
 
 type userService struct {
-	userData      user.DataInterface
+	userData      user.UserModel
 	hashService   encrypts.HashInterface
 	helperService helper.HelperInterface
 }
 
-func New(ud user.DataInterface, hash encrypts.HashInterface, helper helper.HelperInterface) user.ServiceInterface {
+func New(ud user.UserModel, hash encrypts.HashInterface, helper helper.HelperInterface) user.UserService {
 	return &userService{
 		userData:      ud,
 		hashService:   hash,

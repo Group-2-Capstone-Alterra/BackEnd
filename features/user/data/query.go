@@ -12,7 +12,7 @@ type userQuery struct {
 	helperuser helperuser.HelperuserInterface
 }
 
-func New(db *gorm.DB, helperuser helperuser.HelperuserInterface) user.DataInterface {
+func New(db *gorm.DB, helperuser helperuser.HelperuserInterface) user.UserModel {
 	return &userQuery{
 		db:         db,
 		helperuser: helperuser,

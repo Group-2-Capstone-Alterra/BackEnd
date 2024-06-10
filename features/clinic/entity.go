@@ -13,6 +13,8 @@ type Core struct {
 	Service           servicedoctor.Core  `json:"service,omitempty"`
 	Veterinary        string              `json:"veterinary,omitempty"`
 	VeterinaryPicture string              `json:"veterinary_picture,omitempty"`
+	About             string              `json:"about,omitempty"`
+	Price             float32             `json:"price,omitempty"`
 	Location          string              `json:"location,omitempty"`
 	Coordinate        string              `json:"coordinate,omitempty"`
 	Distance          float64             `json:"distance,omitempty"`

@@ -15,14 +15,14 @@ import (
 )
 
 type ChatHandler struct {
-	chatService      chat.ServiceInterface
+	chatService      chat.ChatService
 	consultationData consultation.ConsultationModel
-	userData         user.DataInterface
+	userData         user.UserModel
 	doctorData       doctor.DoctorModel
 	adminData        admin.AdminModel
 }
 
-func New(cs chat.ServiceInterface, consultationData consultation.ConsultationModel, userData user.DataInterface, doctorData doctor.DoctorModel, adminData admin.AdminModel) *ChatHandler {
+func New(cs chat.ChatService, consultationData consultation.ConsultationModel, userData user.UserModel, doctorData doctor.DoctorModel, adminData admin.AdminModel) *ChatHandler {
 	return &ChatHandler{
 		chatService:      cs,
 		consultationData: consultationData,

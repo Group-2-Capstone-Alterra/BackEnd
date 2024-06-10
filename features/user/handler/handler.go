@@ -17,11 +17,11 @@ const (
 )
 
 type UserHandler struct {
-	userService user.ServiceInterface
+	userService user.UserService
 	hashService encrypts.HashInterface
 }
 
-func New(us user.ServiceInterface, hash encrypts.HashInterface) *UserHandler {
+func New(us user.UserService, hash encrypts.HashInterface) *UserHandler {
 	return &UserHandler{
 		userService: us,
 		hashService: hash,

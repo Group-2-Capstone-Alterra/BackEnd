@@ -11,14 +11,14 @@ import (
 )
 
 type ChatService struct {
-	chatModel        chat.DataInterface
+	chatModel        chat.ChatModel
 	consultationData consultation.ConsultationModel
 	doctorData       doctor.DoctorModel
-	userData         user.DataInterface
+	userData         user.UserModel
 	adminData        admin.AdminModel
 }
 
-func New(cm chat.DataInterface, consultationData consultation.ConsultationModel, doctorData doctor.DoctorModel, userData user.DataInterface, adminData admin.AdminModel) chat.ServiceInterface {
+func New(cm chat.ChatModel, consultationData consultation.ConsultationModel, doctorData doctor.DoctorModel, userData user.UserModel, adminData admin.AdminModel) chat.ChatService {
 	return &ChatService{
 		chatModel:        cm,
 		consultationData: consultationData,
