@@ -10,6 +10,7 @@ type Order struct {
 	Price          float64
 	Status         string
 	Payment        Payment
+	InvoiceID      string
 }
 
 type Product struct {
@@ -30,7 +31,7 @@ type Payment struct {
 }
 
 type OrderModel interface {
-	CreateOrder(opCore Order) (Order, error)
+	CreateOrder(order Order) (Order, error)
 	GetOrdersByUserID(userID uint) ([]Order, error)
 	GetProductByID(productID uint) (*Product, error)
 	GetOrderByID(orderID uint) (*Order, error)
@@ -38,7 +39,7 @@ type OrderModel interface {
 }
 
 type OrderService interface {
-	CreateOrder(opCore Order) (Order, error)
+	CreateOrder(order Order) (Order, error)
 	GetOrdersByUserID(userID uint) ([]Order, error)
 	GetProductByID(id uint) (data *Product, err error)
 	GetOrderByID(orderID uint) (*Order, error)

@@ -1,35 +1,5 @@
 package handler
 
-import "PetPalApp/features/order"
-
-func CoreToResponse(order order.Order) OrderResponse {
-    var payment PaymentResponse
-    if order.Payment.ID != 0 {
-        payment = PaymentResponse{
-            ID:             order.Payment.ID,
-            OrderID:        order.Payment.OrderID,
-            PaymentMethod:  order.Payment.PaymentMethod,
-            PaymentStatus:  order.Payment.PaymentStatus,
-			SignatureID:    order.Payment.SignatureID,
-			VANumber:       order.Payment.VANumber,
-			InvoiceID: 		order.Payment.InvoiceID,
-        }
-    }
-
-    return OrderResponse{
-        ID:             order.ID,
-        UserID:         order.UserID,
-        ProductID:      order.ProductID,
-		ProductName:    order.ProductName,
-		ProductPicture: order.ProductPicture,
-		Quantity:       order.Quantity,
-		Price:          order.Price,
-        Status:         order.Status,
-        Payment:        payment,
-    }
-}
-
-
 type PaymentResponse struct {
 	ID            uint		`json:"id"`
 	OrderID       uint		`json:"order_id"`
