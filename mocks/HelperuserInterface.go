@@ -10,41 +10,14 @@ type HelperuserInterface struct {
 }
 
 // ConvertToNullableString provides a mock function with given fields: value
-func (_m *HelperuserInterface) ConvertToNullableString(value string) *string {
-	ret := _m.Called(value)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ConvertToNullableString")
-	}
-
-	var r0 *string
-	if rf, ok := ret.Get(0).(func(string) *string); ok {
-		r0 = rf(value)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*string)
-		}
-	}
-
-	return r0
+func (m *HelperuserInterface) ConvertToNullableString(input string) *string {
+	args := m.Called(input)
+	return args.Get(0).(*string)
 }
 
-// DereferenceString provides a mock function with given fields: s
-func (_m *HelperuserInterface) DereferenceString(s *string) string {
-	ret := _m.Called(s)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DereferenceString")
-	}
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func(*string) string); ok {
-		r0 = rf(s)
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
+func (m *HelperuserInterface) DereferenceString(input *string) string {
+	args := m.Called(input)
+	return args.String(0)
 }
 
 // NewHelperuserInterface creates a new instance of HelperuserInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"PetPalApp/app/middlewares"
 	"PetPalApp/features/user"
 	"PetPalApp/mocks"
 	"bytes"
@@ -32,11 +33,41 @@ func TestUserServiceCreate(t *testing.T) {
 	mockHashService.AssertExpectations(t)
 }
 
+func TestUserServiceLogin(t *testing.T) {
+	mockUserData := &mocks.UserModel{}
+	mockHashService := &mocks.HashInterface{}
+	mockHelperService := &mocks.HelperInterface{}
+	userService := New(mockUserData, mockHashService, mockHelperService)
+
+	email := "johndoe@example.com"
+	password := "plain_password"
+
+	mockUserData.On("SelectByEmail", email).Return(&user.Core{
+		ID:       1,
+		Email:    email,
+		Password: "hashed_password",
+	}, nil)
+
+	mockHashService.On("CheckPasswordHash", "hashed_password", password).Return(true)
+
+	token, err := middlewares.CreateToken(1, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	data, token, err := userService.Login(email, password)
+	assert.NotNil(t, data)
+	assert.NotEmpty(t, token)
+	assert.Nil(t, err)
+
+	mockUserData.AssertExpectations(t)
+	mockHashService.AssertExpectations(t)
+}
+
 func TestUserServiceGetProfile(t *testing.T) {
 	mockUserData := &mocks.UserModel{}
 	mockHashService := &mocks.HashInterface{}
 	mockHelperService := &mocks.HelperInterface{}
-	// mockJwt := &mocks.JwtInterface{}
 	userService := New(mockUserData, mockHashService, mockHelperService)
 
 	id := uint(1)
@@ -58,7 +89,6 @@ func TestUserServiceUpdateById(t *testing.T) {
 	mockUserData := &mocks.UserModel{}
 	mockHashService := &mocks.HashInterface{}
 	mockHelperService := &mocks.HelperInterface{}
-	// mockJwt := &mocks.JwtInterface{}
 	userService := New(mockUserData, mockHashService, mockHelperService)
 
 	id := uint(1)
@@ -87,7 +117,6 @@ func TestUserServiceDelete(t *testing.T) {
 	mockUserData := &mocks.UserModel{}
 	mockHashService := &mocks.HashInterface{}
 	mockHelperService := &mocks.HelperInterface{}
-	// mockJwt := &mocks.JwtInterface{}
 	userService := New(mockUserData, mockHashService, mockHelperService)
 
 	id := uint(1)

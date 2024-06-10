@@ -20,6 +20,7 @@ func TestCreateProduct(t *testing.T) {
 
 	id := uint(1)
 	input := product.Core{
+		IdUser:      id,
 		ProductName: "Test Product",
 		Price:       10.99,
 		Stock:       10,
@@ -31,7 +32,12 @@ func TestCreateProduct(t *testing.T) {
 	mockHelper.On("UploadProductPicture", file, mock.MatchedBy(func(filename string) bool {
 		return regexp.MustCompile(`^\d+_test_file\.jpg$`).MatchString(filename)
 	})).Return("test_file.jpg", nil)
-	mockProductData.On("Insert", input).Return(nil)
+
+	// Set the expected input to match the actual call
+	expectedInput := input
+	expectedInput.ProductPicture = "test_file.jpg"
+
+	mockProductData.On("Insert", expectedInput).Return(nil)
 
 	result, err := productService.Create(id, input, file, handlerFilename)
 
@@ -88,7 +94,7 @@ func TestGetProductById(t *testing.T) {
 	id := uint(1)
 	userid := uint(1)
 
-	mockProductData.On("SelectById", id, userid).Return(&product.Core{
+	mockProductData.On("SelectByIdAdmin", id, userid).Return(&product.Core{
 		ProductName: "Product 1",
 		Price:       10.99,
 		Stock:       10,
@@ -121,8 +127,13 @@ func TestUpdateProduct(t *testing.T) {
 	file := strings.NewReader("updated file content")
 	handlerFilename := "updated_file.jpg"
 
-	mockHelper.On("UploadProductPicture", file, handlerFilename).Return("updated_file.jpg", nil)
-	mockProductData.On("PutById", id, userid, input).Return(nil)
+	mockHelper.On("UploadProductPicture", file, mock.MatchedBy(func(filename string) bool {
+		return regexp.MustCompile(`^\d+_updated_file\.jpg$`).MatchString(filename)
+	})).Return("updated_file.jpg", nil)
+
+	mockProductData.On("PutById", id, userid, mock.MatchedBy(func(input product.Core) bool {
+		return input.ProductPicture == "updated_file.jpg"
+	})).Return(nil)
 
 	result, err := productService.UpdateById(id, userid, input, file, handlerFilename)
 

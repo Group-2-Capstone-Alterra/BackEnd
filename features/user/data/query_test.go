@@ -1,148 +1,143 @@
-package data
+package data_test
 
 import (
 	"PetPalApp/features/user"
+	"PetPalApp/features/user/data"
 	"PetPalApp/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-func TestUserQuery_Insert(t *testing.T) {
-	dsn := "root:password@tcp(localhost:3306)/test_db"
+func setupDatabase() (*gorm.DB, error) {
+	dsn := "avnadmin:AVNS_PLhXEJqSXBwMp2iyh2y@tcp(bagasdb-bagas-76bb.d.aivencloud.com:13407)/defaultdb?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	db.AutoMigrate(&data.User{})
+	return db, nil
+}
+
+func TestInsert(t *testing.T) {
+	db, err := setupDatabase()
 	assert.NoError(t, err)
 
-	helperuserMock := &mocks.HelperuserInterface{}
-	userQuery := New(db, helperuserMock)
+	mockHelper := new(mocks.HelperuserInterface)
+	userModel := data.New(db, mockHelper)
+
+	mockHelper.On("ConvertToNullableString", mock.Anything).Return(new(string))
 
 	input := user.Core{
 		FullName: "John Doe",
 		Email:    "johndoe@example.com",
 	}
 
-	helperuserMock.On("ConvertToNullableString", input.FullName).Return(&input.FullName)
-	helperuserMock.On("ConvertToNullableString", input.Email).Return(&input.Email)
-
-	err = userQuery.Insert(input)
+	err = userModel.Insert(input)
 	assert.NoError(t, err)
 
-	helperuserMock.AssertExpectations(t)
+	var userData data.User
+	err = db.First(&userData, "email = ?", input.Email).Error
+	assert.NoError(t, err)
+	assert.Equal(t, *userData.Email, input.Email)
 }
 
-func TestUserQuerySelectByEmail(t *testing.T) {
-	dsn := "root:password@tcp(localhost:3306)/test_db"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func TestSelectByEmail(t *testing.T) {
+	db, err := setupDatabase()
 	assert.NoError(t, err)
 
-	helperuserMock := &mocks.HelperuserInterface{}
-	userQuery := New(db, helperuserMock)
+	mockHelper := new(mocks.HelperuserInterface)
+	userModel := data.New(db, mockHelper)
 
-	email := "johndoe@example.com"
-	userData := User{
-		Email: &email,
+	mockHelper.On("DereferenceString", mock.Anything).Return("")
+
+	userData := data.User{
+		FullName: new(string),
+		Email:    new(string),
 	}
-
+	*userData.Email = "johndoe@example.com"
 	db.Create(&userData)
 
-	helperuserMock.On("DereferenceString", userData.Email).Return(*userData.Email)
-
-	result, err := userQuery.SelectByEmail(email)
+	coreUser, err := userModel.SelectByEmail("johndoe@example.com")
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.Equal(t, email, result.Email)
-
-	helperuserMock.AssertExpectations(t)
+	assert.NotNil(t, coreUser)
+	assert.Equal(t, coreUser.Email, "johndoe@example.com")
 }
 
-func TestUserQuerySelectById(t *testing.T) {
-	dsn := "root:password@tcp(localhost:3306)/test_db"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func TestSelectById(t *testing.T) {
+	db, err := setupDatabase()
 	assert.NoError(t, err)
 
-	helperuserMock := &mocks.HelperuserInterface{}
-	userQuery := New(db, helperuserMock)
+	mockHelper := new(mocks.HelperuserInterface)
+	userModel := data.New(db, mockHelper)
 
-	id := uint(1)
-	email := "johndoe@example.com"
-	userData := User{
-		Model: gorm.Model{ID: id},
-		Email: &email,
+	mockHelper.On("DereferenceString", mock.Anything).Return("")
+
+	userData := data.User{
+		FullName: new(string),
+		Email:    new(string),
 	}
-
+	*userData.Email = "johndoe@example.com"
 	db.Create(&userData)
 
-	helperuserMock.On("DereferenceString", userData.Email).Return(*userData.Email)
-
-	result, err := userQuery.SelectById(id)
+	coreUser, err := userModel.SelectById(userData.ID)
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.Equal(t, id, result.ID)
-
-	helperuserMock.AssertExpectations(t)
+	assert.NotNil(t, coreUser)
+	assert.Equal(t, coreUser.Email, "johndoe@example.com")
 }
 
-func TestUserQueryPutById(t *testing.T) {
-	dsn := "root:password@tcp(localhost:3306)/test_db"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func TestPutById(t *testing.T) {
+	db, err := setupDatabase()
 	assert.NoError(t, err)
 
-	helperuserMock := &mocks.HelperuserInterface{}
-	userQuery := New(db, helperuserMock)
+	mockHelper := new(mocks.HelperuserInterface)
+	userModel := data.New(db, mockHelper)
 
-	id := uint(1)
-	email := "johndoe@example.com"
-	userData := User{
-		Model: gorm.Model{ID: id},
-		Email: &email,
+	mockHelper.On("ConvertToNullableString", mock.Anything).Return(new(string))
+
+	userData := data.User{
+		FullName: new(string),
+		Email:    new(string),
 	}
-
+	*userData.Email = "johndoe@example.com"
 	db.Create(&userData)
 
-	input := user.Core{
+	updateData := user.Core{
 		FullName: "Jane Doe",
 		Email:    "janedoe@example.com",
 	}
 
-	helperuserMock.On("ConvertToNullableString", input.FullName).Return(&input.FullName)
-	helperuserMock.On("ConvertToNullableString", input.Email).Return(&input.Email)
-
-	err = userQuery.PutById(id, input)
+	err = userModel.PutById(userData.ID, updateData)
 	assert.NoError(t, err)
 
-	var updatedUserData User
-	db.First(&updatedUserData, id)
-	assert.Equal(t, input.FullName, *updatedUserData.FullName)
-	assert.Equal(t, input.Email, *updatedUserData.Email)
-
-	helperuserMock.AssertExpectations(t)
+	var updatedUser data.User
+	err = db.First(&updatedUser, userData.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, *updatedUser.Email, "janedoe@example.com")
 }
 
-func TestUserQueryDelete(t *testing.T) {
-	dsn := "root:password@tcp(localhost:3306)/test_db"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func TestDelete(t *testing.T) {
+	db, err := setupDatabase()
 	assert.NoError(t, err)
 
-	helperuserMock := &mocks.HelperuserInterface{}
-	userQuery := New(db, helperuserMock)
+	mockHelper := new(mocks.HelperuserInterface)
+	userModel := data.New(db, mockHelper)
 
-	id := uint(1)
-	email := "johndoe@example.com"
-	userData := User{
-		Model: gorm.Model{ID: id},
-		Email: &email,
+	userData := data.User{
+		FullName: new(string),
+		Email:    new(string),
 	}
-
+	*userData.Email = "johndoe@example.com"
 	db.Create(&userData)
 
-	err = userQuery.Delete(id)
+	err = userModel.Delete(userData.ID)
 	assert.NoError(t, err)
 
-	var deletedUserData User
-	db.First(&deletedUserData, id)
-	assert.Nil(t, deletedUserData)
-
-	helperuserMock.AssertExpectations(t)
+	var deletedUser data.User
+	err = db.First(&deletedUser, userData.ID).Error
+	assert.Error(t, err)
+	assert.Equal(t, gorm.ErrRecordNotFound, err)
 }
