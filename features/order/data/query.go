@@ -17,20 +17,38 @@ func New(db *gorm.DB) order.OrderModel {
 }
 
 func (om *OrderModel) CreateOrder(order order.Order) (order.Order, error) {
-    tx := om.db.Create(&order)
-    if tx.Error != nil {
-        return order, tx.Error
-    }
-    return order, nil
+	tx := om.db.Create(&order)
+	if tx.Error != nil {
+		return order, tx.Error
+	}
+	return order, nil
 }
 
 func (om *OrderModel) GetOrdersByUserID(userID uint) ([]order.Order, error) {
-    var result []order.Order
-    if err := om.db.Preload("Payment").Where("user_id = ?", userID).Find(&result).Error; err != nil {
-        return nil, err
-    }
+	var result []order.Order
+	if err := om.db.Preload("Payment").Where("user_id = ?", userID).Find(&result).Error; err != nil {
+		return nil, err
+	}
 
-    return result, nil
+	return result, nil
+}
+
+func (om *OrderModel) GetOrdersByAdminID(userID uint) ([]order.Order, error) {
+	var result []order.Order
+	if err := om.db.Preload("Payment").Where("user_id = ?", userID).Find(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (om *OrderModel) GetOrdersByProductAdmin(productID uint) ([]order.Order, error) {
+	var result []order.Order
+	if err := om.db.Where("product_id = ?", productID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (om *OrderModel) GetProductByID(productID uint) (*order.Product, error) {
@@ -39,7 +57,7 @@ func (om *OrderModel) GetProductByID(productID uint) (*order.Product, error) {
 		return nil, err
 	}
 
-	return &result, nil 
+	return &result, nil
 }
 
 func (om *OrderModel) GetOrderByID(orderID uint) (*order.Order, error) {
@@ -48,5 +66,5 @@ func (om *OrderModel) GetOrderByID(orderID uint) (*order.Order, error) {
 		return nil, err
 	}
 
-	return &result, nil 
+	return &result, nil
 }
