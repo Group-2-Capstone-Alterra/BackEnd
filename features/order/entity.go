@@ -3,6 +3,7 @@ package order
 type Order struct {
 	ID             uint
 	UserID         uint
+	AdminID        uint
 	ProductID      uint
 	ProductName    string
 	ProductPicture string
@@ -35,6 +36,7 @@ type OrderModel interface {
 	GetOrdersByUserID(userID uint) ([]Order, error)
 	GetProductByID(productID uint) (*Product, error)
 	GetOrderByID(orderID uint) (*Order, error)
+	GetOrdersByProductAdmin(productID uint) ([]Order, error)
 	// GetPaymentByID(paymentID uint) (*Payment, error)
 }
 
@@ -43,5 +45,6 @@ type OrderService interface {
 	GetOrdersByUserID(userID uint) ([]Order, error)
 	GetProductByID(id uint) (data *Product, err error)
 	GetOrderByID(orderID uint) (*Order, error)
+	GetOrdersByProductAdmin(productID uint) ([]Order, error)
 	// GetPaymentByID(id uint) (data *Payment, err error)
 }
