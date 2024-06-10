@@ -58,7 +58,7 @@ func (dh *DoctorHandler) AddDoctor(c echo.Context) error {
 	inputCore.AdminID = uint(adminID)
 	_, errAdd := dh.doctorService.AddDoctor(inputCore, file, filename)
 	if errAdd != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Unable to add doctor. Please contact our support team.", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(errAdd.Error(), nil))
 	}
 
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Doctor added successfully. Thank you.", nil))

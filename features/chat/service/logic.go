@@ -7,7 +7,6 @@ import (
 	"PetPalApp/features/doctor"
 	"PetPalApp/features/user"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -29,32 +28,40 @@ func New(cm chat.DataInterface, consultationData consultation.ConsultationModel,
 	}
 }
 
+const (
+	notFoundRoomChat = "roomchat not found"
+)
+
 func (cs *ChatService) CreateChat(chat chat.ChatCore, role string) error {
-	if role == "user" { //Pengirim user
-		consulData, errconsulData := cs.consultationData.GetCuntationsById(chat.ConsultationID) //get data from consultation
-		if errconsulData != nil {
-			return fmt.Errorf("roomchat not found")
+	if chat.Message == "" {
+		return errors.New("message cannot be sent empty")
+	} else {
+		if role == "user" { //Pengirim user
+			consulData, errconsulData := cs.consultationData.GetCuntationsById(chat.ConsultationID) //get data from consultation
+			if errconsulData != nil {
+				return errors.New(notFoundRoomChat)
+			}
+			chat.ReceiverID = consulData.DoctorID                                                            // receiver is doctor
+			valConcul, _ := cs.consultationData.VerUser(chat.SenderID, chat.ReceiverID, chat.ConsultationID) //valid is current id and receiver is avail in roomchat id
+			if valConcul.ID == 0 {
+				return errors.New("[User] UserID and DoctorID not match at Roomchat")
+			}
+		} else { //Pengirim admin
+			consulData, errconsulData := cs.consultationData.GetCuntationsById(chat.ConsultationID) //get data from consultation
+			if errconsulData != nil {
+				return errors.New(notFoundRoomChat)
+			}
+			chat.ReceiverID = consulData.UserID //penerima adalah user
+			getDoctorByAdmin, _ := cs.doctorData.SelectByAdminId(chat.SenderID)
+			valConcul, _ := cs.consultationData.VerAdmin(getDoctorByAdmin.ID, chat.ReceiverID, chat.ConsultationID)
+			chat.SenderID = getDoctorByAdmin.ID
+			if valConcul.ID == 0 {
+				return errors.New("[Admin] UserID and DoctorID not match at Roomchat")
+			}
 		}
-		chat.ReceiverID = consulData.DoctorID                                                            // receiver is doctor
-		valConcul, _ := cs.consultationData.VerUser(chat.SenderID, chat.ReceiverID, chat.ConsultationID) //valid is current id and receiver is avail in roomchat id
-		if valConcul.ID == 0 {
-			return fmt.Errorf("[Sender User] UserID and DoctorID not match at Roomchat")
-		}
-	} else { //Pengirim admin
-		consulData, errconsulData := cs.consultationData.GetCuntationsById(chat.ConsultationID) //get data from consultation
-		if errconsulData != nil {
-			return fmt.Errorf("roomchat not found")
-		}
-		chat.ReceiverID = consulData.UserID //penerima adalah user
-		getDoctorByAdmin, _ := cs.doctorData.SelectByAdminId(chat.SenderID)
-		valConcul, _ := cs.consultationData.VerAdmin(getDoctorByAdmin.ID, chat.ReceiverID, chat.ConsultationID)
-		chat.SenderID = getDoctorByAdmin.ID
-		if valConcul.ID == 0 {
-			return fmt.Errorf("[Sender Admin] UserID and DoctorID not match at Roomchat")
-		}
+		chat.TimeStamp = time.Now()
+		return cs.chatModel.CreateChat(chat)
 	}
-	chat.TimeStamp = time.Now()
-	return cs.chatModel.CreateChat(chat)
 }
 
 func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([]chat.ChatCore, error) {
@@ -63,12 +70,12 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 		doctorData, _ := cs.doctorData.SelectByAdminId(currentID)
 		roomChatAvail, _ := cs.consultationData.GetCuntationsById(roomchatID)
 		if roomChatAvail.ID == 0 {
-			return nil, fmt.Errorf("[Role Admin] RoomChat Not Found")
+			return nil, errors.New("[Admin] RoomChat Not Found")
 		} else {
 			receiverID := roomChatAvail.UserID
 			valRoomchat, _ := cs.consultationData.VerAdmin(doctorData.ID, receiverID, roomchatID)
 			if valRoomchat.ID == 0 {
-				return nil, fmt.Errorf("[Sender Admin] UserID and DoctorID not match at current Roomchat")
+				return nil, errors.New("[Admin] UserID and DoctorID not match at current Roomchat")
 			} else {
 				return cs.chatModel.GetChatsDoctor(roomchatID)
 			}
@@ -76,12 +83,12 @@ func (cs *ChatService) GetChats(currentID uint, role string, roomchatID uint) ([
 	} else { //role is user
 		roomChatAvail, _ := cs.consultationData.GetCuntationsById(roomchatID)
 		if roomChatAvail.ID == 0 {
-			return nil, fmt.Errorf("[Role User] RoomChat Not Found")
+			return nil, errors.New("[User] RoomChat Not Found")
 		} else {
 			receiverID := roomChatAvail.DoctorID
 			valRoomchat, _ := cs.consultationData.VerUser(currentID, receiverID, roomchatID)
 			if valRoomchat.ID == 0 {
-				return nil, fmt.Errorf("[Sender User] UserID and DoctorID not match at current Roomchat")
+				return nil, errors.New("[User] UserID and DoctorID not match at current Roomchat")
 			} else {
 				return cs.chatModel.GetChatsUser(currentID, roomchatID)
 			}
@@ -99,7 +106,7 @@ func (cs *ChatService) Delete(roomChatID, bubbleChatID, senderID uint, role stri
 	}
 	valConcul, _ := cs.chatModel.VerAvailChat(roomChatID, bubbleChatID, senderID)
 	if valConcul == nil { // CurrentID and RoomChat not match (Roomchat not found)
-		return errors.New("Roomchat not found")
+		return errors.New(notFoundRoomChat)
 	} else { // CurrentID and RoomChat is match (Roomchat has found)
 		return cs.chatModel.Delete(roomChatID, bubbleChatID, senderID)
 	}

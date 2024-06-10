@@ -54,7 +54,7 @@ func (uh *UserHandler) Login(c echo.Context) error {
 	}
 	result, token, err := uh.userService.Login(reqLoginData.Email, reqLoginData.Password)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Invalid email or password. Please try again.", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(err.Error(), nil))
 	}
 	result.Token = token
 	var resultResponse = ResponseLogin(result)

@@ -24,33 +24,32 @@ func New(dm doctor.DoctorModel, helper helper.HelperInterface) doctor.DoctorServ
 
 func (ds *DoctorService) AddDoctor(doctor doctor.Core, file io.Reader, handlerFilename string) (string, error) {
 	//valisadminhavedoctor
-	isAdminHaveDoct, _ := ds.DoctorModel.SelectByAdminId(doctor.AdminID)
-	if isAdminHaveDoct.ID != 0 {
-		return "", errors.New("Anda sudah mempunyai dokter !")
+	if doctor.FullName == "" || doctor.Price == 0 {
+		return "", errors.New("full name or price must be provided")
 	} else {
-		if doctor.FullName == "" {
-			return "", errors.New("[validation] Fullname/specialization tidak boleh kosong")
-		}
-
-		if file != nil { //foto is not nil
-			timestamp := time.Now().Unix()
-			fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
-			photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
-			if errPhoto != nil {
-				return "", errPhoto
+		isAdminHaveDoct, _ := ds.DoctorModel.SelectByAdminId(doctor.AdminID)
+		if isAdminHaveDoct.ID != 0 {
+			return "", errors.New("you already have a doctor")
+		} else {
+			if file != nil { //foto is not nil
+				timestamp := time.Now().Unix()
+				fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)
+				photoFileName, errPhoto := ds.helper.UploadDoctorPicture(file, fileName)
+				if errPhoto != nil {
+					return "", errPhoto
+				}
+				doctor.ProfilePicture = photoFileName
+			} else { //foto is nil
+				doctor.ProfilePicture = "https://air-bnb.s3.ap-southeast-2.amazonaws.com/default.jpg"
 			}
-			doctor.ProfilePicture = photoFileName
-		} else { //foto is nil
-			doctor.ProfilePicture = "https://air-bnb.s3.ap-southeast-2.amazonaws.com/default.jpg"
-		}
 
-		err := ds.DoctorModel.AddDoctor(doctor)
-		if err != nil {
-			return "", err
+			err := ds.DoctorModel.AddDoctor(doctor)
+			if err != nil {
+				return "", err
+			}
+			return doctor.ProfilePicture, nil
 		}
-		return doctor.ProfilePicture, nil
 	}
-
 }
 
 func (ds *DoctorService) GetDoctorByIdAdmin(adminID uint) (*doctor.Core, error) {

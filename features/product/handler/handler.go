@@ -47,7 +47,7 @@ func (ph *ProductHandler) AddProduct(c echo.Context) error {
 	inputCore := RequestToCore(newProduct)
 	_, errInsert := ph.productService.Create(uint(idToken), inputCore, file, handler.Filename)
 	if errInsert != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to add product. Please ensure all fields are filled in correctly.", nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(errInsert.Error(), nil))
 	}
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Add product successful!", nil))
 }
