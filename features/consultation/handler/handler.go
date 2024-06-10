@@ -73,7 +73,6 @@ func (ch *ConsultationHandler) GetConsultations(c echo.Context) error {
 		doctorData, _ := ch.doctorData.SelectDoctorById(v.DoctorID)
 		allConsultation = append(allConsultation, GormToCore(v, *userData, *doctorData))
 	}
-
 	return c.JSON(http.StatusOK, responses.JSONWebResponse(retrieved, allConsultation))
 }
 

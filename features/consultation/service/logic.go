@@ -4,7 +4,7 @@ import (
 	"PetPalApp/features/admin"
 	"PetPalApp/features/consultation"
 	"PetPalApp/features/doctor"
-	"fmt"
+	"errors"
 	"log"
 )
 
@@ -25,7 +25,7 @@ func New(cm consultation.ConsultationModel, dataDoctor doctor.DoctorModel, dataA
 func (cs *ConsultationService) CreateConsultation(consultation consultation.ConsultationCore) error {
 	doctorAvailCheck, _ := cs.dataDoctor.SelectDoctorById(consultation.DoctorID)
 	if doctorAvailCheck.ID == 0 {
-		return fmt.Errorf("Doctor with that ID was not found in any clinic.")
+		return errors.New("Doctor with that ID was not found in any clinic.")
 	} else {
 		return cs.consultationModel.CreateConsultation(consultation)
 	}

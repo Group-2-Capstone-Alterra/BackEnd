@@ -36,7 +36,7 @@ func (p *productService) Create(id uint, input product.Core, file io.Reader, han
 		return "", echo.NewHTTPError(http.StatusBadRequest, errid)
 	}
 	if input.ProductName == "" || input.Price <= 0 || file == nil || input.Stock == 0 || input.Description == "" {
-		return "", echo.NewHTTPError(http.StatusBadRequest, "Failed to add product. Please ensure all fields are filled in correctly.")
+		return "", errors.New("Failed to add product. Please ensure all fields are filled in correctly.")
 	}
 	timestamp := time.Now().Unix()
 	fileName := fmt.Sprintf("%d_%s", timestamp, handlerFilename)

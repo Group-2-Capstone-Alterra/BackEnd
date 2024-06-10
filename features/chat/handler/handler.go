@@ -56,7 +56,7 @@ func (ch *ChatHandler) CreateChat(c echo.Context) error {
 	chatData := ReqToCore(uint(senderID), uint(roomchatIDConv), newChat)
 
 	if err := ch.chatService.CreateChat(chatData, role); err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error creating chat: "+err.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(err.Error(), nil))
 	}
 
 	return c.JSON(http.StatusCreated, responses.JSONWebResponse("Chat created successfully", nil))
@@ -76,7 +76,7 @@ func (ch *ChatHandler) GetChats(c echo.Context) error {
 
 	chats, err := ch.chatService.GetChats(uint(currentID), role, uint(roomchatIDConv))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Error retrieving chats: "+err.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse(err.Error(), nil))
 	}
 
 	var allChat []ChatResponse
