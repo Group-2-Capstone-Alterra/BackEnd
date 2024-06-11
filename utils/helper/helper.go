@@ -257,3 +257,12 @@ func Distance(userLat, userLon, adminLat, adminLon float64) float64 {
 
 	return R * c
 }
+
+func ContainsString(arr []string, value string) bool {
+    for _, v := range arr {
+        if v == value {
+            return true
+        }
+    }
+    return false
+}

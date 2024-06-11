@@ -1,7 +1,9 @@
 package data
 
 import (
-	order "PetPalApp/features/order"
+	"PetPalApp/features/order"
+	"fmt"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -17,38 +19,37 @@ func New(db *gorm.DB) order.OrderModel {
 }
 
 func (om *OrderModel) CreateOrder(order order.Order) (order.Order, error) {
-	tx := om.db.Create(&order)
-	if tx.Error != nil {
-		return order, tx.Error
-	}
-	return order, nil
+    tx := om.db.Create(&order)
+    if tx.Error != nil {
+        return order, tx.Error
+    }
+    return order, nil
+}
+
+func (om *OrderModel) UpdateOrder(orderID uint, updatedOrder order.Order) (order.Order, error) {
+	log.Printf("orderID: %+v\n", orderID)
+
+	var order order.Order
+    if err := om.db.Where("id = ?", orderID).First(&order).Error; err != nil {
+        return order, fmt.Errorf("failed to find payment with OrderID %d: %v", orderID, err)
+    }
+
+    order.Status = updatedOrder.Status
+
+    if err := om.db.Save(&order).Error; err != nil {
+        return order, fmt.Errorf("failed to update payment: %v", err)
+    }
+
+    return order, nil
 }
 
 func (om *OrderModel) GetOrdersByUserID(userID uint) ([]order.Order, error) {
-	var result []order.Order
-	if err := om.db.Preload("Payment").Where("user_id = ?", userID).Find(&result).Error; err != nil {
-		return nil, err
-	}
+    var result []order.Order
+    if err := om.db.Preload("Payment").Where("user_id = ?", userID).Find(&result).Error; err != nil {
+        return nil, err
+    }
 
-	return result, nil
-}
-
-func (om *OrderModel) GetOrdersByAdminID(userID uint) ([]order.Order, error) {
-	var result []order.Order
-	if err := om.db.Preload("Payment").Where("user_id = ?", userID).Find(&result).Error; err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (om *OrderModel) GetOrdersByProductAdmin(productID uint) ([]order.Order, error) {
-	var result []order.Order
-	if err := om.db.Where("product_id = ?", productID).First(&result).Error; err != nil {
-		return nil, err
-	}
-
-	return result, nil
+    return result, nil
 }
 
 func (om *OrderModel) GetProductByID(productID uint) (*order.Product, error) {
@@ -57,7 +58,7 @@ func (om *OrderModel) GetProductByID(productID uint) (*order.Product, error) {
 		return nil, err
 	}
 
-	return &result, nil
+	return &result, nil 
 }
 
 func (om *OrderModel) GetOrderByID(orderID uint) (*order.Order, error) {
@@ -66,5 +67,14 @@ func (om *OrderModel) GetOrderByID(orderID uint) (*order.Order, error) {
 		return nil, err
 	}
 
-	return &result, nil
+	return &result, nil 
+}
+
+func (om *OrderModel) GetOrderByInvoiceID(invoiceID string) (*order.Order, error) {
+	var result order.Order
+	if err := om.db.Where("invoice_id = ?", invoiceID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
 }
