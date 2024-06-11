@@ -1,7 +1,10 @@
 package handler
 
 import (
+	newOrder "PetPalApp/features/order"
+	newOrderResponse "PetPalApp/features/order/handler"
 	"PetPalApp/features/payment"
+	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
 	"fmt"
 	"log"
@@ -14,13 +17,15 @@ import (
 )
 
 type PaymentHandler struct {
-	paymentService payment.PaymentService
-	midtrans       midtrans.Client
+	paymentService  payment.PaymentService
+	orderService    newOrder.OrderService
+	midtrans        midtrans.Client
 }
 
-func New(ps payment.PaymentService, midtrans midtrans.Client) *PaymentHandler {
+func New(ps payment.PaymentService, os newOrder.OrderService, midtrans midtrans.Client) *PaymentHandler {
 	return &PaymentHandler{
 		paymentService: ps,
+		orderService: os,
 		midtrans: midtrans,
 	}
 }
@@ -46,6 +51,16 @@ func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to get product", nil))
     }
 
+    payments := payment.Payment{
+        PaymentMethod: newPayment.PaymentMethod,
+        OrderID:       newPayment.OrderID,
+    }
+
+    createdPayment, err := ph.paymentService.FindOrCreatePayment(newPayment.OrderID, payments)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create payment", nil))
+    }
+
     client := ph.midtrans
     req := &midtrans.ChargeReq{
         PaymentType: midtrans.SourceBankTransfer,
@@ -54,7 +69,7 @@ func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
         },
         TransactionDetails: midtrans.TransactionDetails{
             OrderID:  order.InvoiceID,
-            GrossAmt: int64(order.Price), // Jumlah transaksi
+            GrossAmt: int64(order.Price), 
         },
         CustomerDetail: &midtrans.CustDetail{
             Email: user.Email,
@@ -74,51 +89,82 @@ func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
     coreGateway := midtrans.CoreGateway{
         Client: client,
     }
-    // Lakukan transaksi
+   
     resp, err := coreGateway.Charge(req)
+    log.Printf("Charge Request: %+v\n", resp)
     if err != nil {
-        log.Fatalf("Transaction failed with error: %v", err)
+        log.Printf("Transaction failed with error: %v", err)
     }
-    log.Printf("Charge Request: %+v\n", req)
 
     var SignatureID string
     var VANumber string
-    // Cek hasil transaksi
+    var OrderStatus string
+    
     if resp.StatusCode == "201" {
         SignatureID = resp.TransactionID
         VANumber = resp.VANumbers[len(resp.VANumbers)-1].VANumber
+        OrderStatus = resp.TransactionStatus
         fmt.Printf("Transaction successful: %+v\n", resp)
     } else {
         fmt.Printf("Transaction failed with status: %s\n", resp.StatusMessage)
     }
 
-    payments := payment.Payment{
-        PaymentMethod: newPayment.PaymentMethod,
-        PaymentStatus: resp.TransactionStatus,
-        OrderID:       newPayment.OrderID,
-        InvoiceID:     order.InvoiceID,
+    if SignatureID == "" {
+        resp, err = coreGateway.Status(order.InvoiceID)
+        log.Printf("Check Status Request: %+v\n", resp)
+        if err != nil || !helper.ContainsString([]string{"201", "200"}, resp.StatusCode) {
+            log.Printf("Check Status Transaction failed with error: %v", err)
+            return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to charge payment", nil))
+        }
+
+        SignatureID = resp.TransactionID
+        VANumber = resp.VANumbers[len(resp.VANumbers)-1].VANumber
+        OrderStatus = resp.TransactionStatus
+    }
+
+    payments = payment.Payment{
         SignatureID:   SignatureID,
         VANumber:      VANumber,
     }
 
-    if SignatureID == "" {
-        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to charge payment", nil))
-    }
-
-    createdPayment, err := ph.paymentService.CreatePayment(payments)
+    createdPayment, err = ph.paymentService.Update(newPayment.OrderID, payments)
     if err != nil {
-        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create payment", nil))
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to update payment", nil))
     }
 
-    paymentresponse := PaymentResponse{
-        ID:            createdPayment.ID,
-        PaymentMethod: createdPayment.PaymentMethod,
-        PaymentStatus: createdPayment.PaymentStatus,
-        OrderID:       createdPayment.OrderID,
-        SignatureID:   createdPayment.SignatureID,
-        VANumber:      createdPayment.VANumber,
-		InvoiceID: 	   createdPayment.InvoiceID,
+    orderAttr := newOrder.Order{
+        ID: newPayment.OrderID,
+        Status: OrderStatus,
+    }
+
+	log.Printf("orderAttr: %+v\n", orderAttr)
+    updateOrder, err := ph.orderService.UpdateOrder(newPayment.OrderID, orderAttr)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to update order", nil))
+    }
+	log.Printf("updateOrder: %+v\n", updateOrder)
+
+
+    paymentresponse := newOrderResponse.OrderResponse{
+        ID: order.ID,
+        UserID: order.UserID,
+        ProductID: order.ProductID,
+        ProductName: order.ProductName,
+        ProductPicture: order.ProductPicture,
+        Quantity: order.Quantity,
+        Price: order.Price,
+        Status: updateOrder.Status,
+        InvoiceID:     order.InvoiceID,
+        Payment: newOrderResponse.PaymentResponse{
+            ID:            createdPayment.ID,
+            PaymentMethod: createdPayment.PaymentMethod,
+            OrderID:       createdPayment.OrderID,
+            SignatureID:   createdPayment.SignatureID,
+            VANumber:      createdPayment.VANumber,
+        },
+
     }
 
     return c.JSON(http.StatusCreated, responses.JSONWebResponse("payment created successfully", paymentresponse))
 }
+

@@ -38,6 +38,8 @@ import (
 	_paymentHandler "PetPalApp/features/payment/handler"
 	_paymentService "PetPalApp/features/payment/service"
 
+	_webhook "PetPalApp/features/webhook/handler"
+
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/labstack/echo/v4"
 	"github.com/veritrans/go-midtrans"
@@ -67,7 +69,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 
 	orderData := _orderData.New(db)
 	orderService := _orderService.New(orderData)
-	orderHandlerAPI := _orderHandler.New(orderService, productData)
+	orderHandlerAPI := _orderHandler.New(orderService, midtrans)
 
 	consultationData := _consultationData.New(db)
 	consultationService := _consultationService.New(consultationData, doctorData, adminData)
@@ -79,7 +81,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 
 	paymentData := _paymentData.New(db)
 	paymentService := _paymentService.New(paymentData)
-	paymentHandlerAPI := _paymentHandler.New(paymentService, midtrans)
+	paymentHandlerAPI := _paymentHandler.New(paymentService, orderService, midtrans)
 
 	//user
 	e.POST("/users/register", userHandlerAPI.Register)
@@ -94,7 +96,6 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 	e.GET("/products/:id", productHandlerAPI.GetProductById)
 	e.PATCH("/products/:id", productHandlerAPI.UpdateProductById, middlewares.JWTMiddleware())
 	e.DELETE("/products/:id", productHandlerAPI.Delete, middlewares.JWTMiddleware())
-	e.GET("/products/search", productHandlerAPI.GetProductByName)
 
 	//admins
 	e.POST("/admins/register", adminHandlerAPI.Register)
@@ -121,6 +122,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 	e.POST("/orders", orderHandlerAPI.CreateOrder, middlewares.JWTMiddleware())
 	e.GET("/orders", orderHandlerAPI.GetOrdersByUserID, middlewares.JWTMiddleware())
 	e.GET("/orders/:id", orderHandlerAPI.GetOrderByID, middlewares.JWTMiddleware())
+	e.PATCH("/orders/status_update", orderHandlerAPI.UpdateStatus, middlewares.JWTMiddleware())
 
 	//consultation
 	e.POST("/consultations/:id", consultationHandlerAPI.CreateConsultation, middlewares.JWTMiddleware())
@@ -131,4 +133,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 
 	//payments
 	e.POST("/payments", paymentHandlerAPI.CreatePayment, middlewares.JWTMiddleware())
+
+	//webhook
+	e.POST("/webhook/midtrans_notification", _webhook.New(orderService, midtrans).MidtransWebhook )
 }
