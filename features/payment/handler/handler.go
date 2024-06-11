@@ -61,11 +61,24 @@ func (ph *PaymentHandler) CreatePayment(c echo.Context) error {
         return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("Failed to create payment", nil))
     }
 
+    var bank midtrans.Bank
+
+    switch newPayment.PaymentMethod {
+    case "bca":
+    bank = midtrans.BankBca
+    case "bni":
+    bank = midtrans.BankBni
+    case "bri":
+    bank = midtrans.BankBri 
+    default :
+    bank = midtrans.BankBca   
+    }
+
     client := ph.midtrans
     req := &midtrans.ChargeReq{
         PaymentType: midtrans.SourceBankTransfer,
         BankTransfer: &midtrans.BankTransferDetail{
-            Bank: midtrans.BankBca,
+            Bank: bank,
         },
         TransactionDetails: midtrans.TransactionDetails{
             OrderID:  order.InvoiceID,
