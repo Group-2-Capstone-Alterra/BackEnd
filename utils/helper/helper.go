@@ -9,11 +9,13 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"mime"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -265,4 +267,12 @@ func ContainsString(arr []string, value string) bool {
         }
     }
     return false
+}
+
+func GenerateInvoiceID() string {
+	randomNumber := rand.Intn(9000) + 1000
+	currentDate := time.Now().Format("02012006")
+	invoiceID := fmt.Sprintf("ORDER-%s-%d", currentDate, randomNumber)
+
+	return invoiceID
 }

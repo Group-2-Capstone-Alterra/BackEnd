@@ -144,11 +144,6 @@ func (am *AdminModel) Update(adminid uint, updateData admin.Core) error {
 	return nil
 }
 
-// func (am *AdminModel) SelectAll(offset uint, sortStr string) ([]admin.AllClinicResponseCore, error) {
-// 	var allClinic []AllClinicResponse
-
-// }
-
 func (am *AdminModel) SelectAllAdmin() ([]admin.Core, error) {
 	var allAdmin []Admin
 

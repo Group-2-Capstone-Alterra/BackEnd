@@ -6,19 +6,16 @@ import (
 	"PetPalApp/features/order"
 	"PetPalApp/utils/helper"
 	"PetPalApp/utils/responses"
-	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/veritrans/go-midtrans"
 )
 
 type OrderHandler struct {
-	OrderService order.OrderService
+	OrderService    order.OrderService
 	midtrans        midtrans.Client
 }
 
@@ -53,7 +50,7 @@ func (oh *OrderHandler) CreateOrder(c echo.Context) error {
         Quantity:       uint(newOrderReq.Quantity),
         Price:          product.Price * float64(newOrderReq.Quantity), 
         Status:         "created",
-        InvoiceID:      generateInvoiceID(),
+        InvoiceID:      helper.GenerateInvoiceID(),
     }
 
     order, err := oh.OrderService.CreateOrder(newOrder)
@@ -117,14 +114,6 @@ func (oh *OrderHandler) GetOrderByID(c echo.Context) error {
     }
 
     return c.JSON(http.StatusOK, responses.JSONWebResponse("Order retrieved successfully", orderResponse))
-}
-
-func generateInvoiceID() string {
-	randomNumber := rand.Intn(9000) + 1000
-	currentDate := time.Now().Format("02012006")
-	invoiceID := fmt.Sprintf("ORDER-%s-%d", currentDate, randomNumber)
-
-	return invoiceID
 }
 
 func (oh *OrderHandler) GetOrdersByUserID(c echo.Context) error {

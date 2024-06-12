@@ -18,14 +18,18 @@ tags:
     description: Admin operations
   - name: product
     description: Product operations
-  - name: konsultasi
+  - name: consultation
     description: Consultation operations
   - name: chat
     description: Chat operations
-  - name: pemesanan
-    description: Order operations
   - name: clinic
     description: Clinic operations
+  - name: doctor
+    description: Doctor operations
+  - name: order
+    description: Order operations
+  - name: payment
+    description: Payment opertions
 paths:
   /users/register:
     post:
@@ -50,7 +54,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 201
-                message: Registration Successful
+                message: Registration successful! You can now log in to your account.
         "400":
           $ref: "#/components/responses/400"
         "500":
@@ -86,7 +90,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 200
-                message: Login successful
+                message: Login successful! You are now logged in.
                 data:
                   id: 1
                   full_name: "user"
@@ -112,7 +116,7 @@ paths:
                 $ref: "#/components/schemas/User"
               example:
                 code: 200
-                message: Successfully got profile details
+                message: Profile information loaded successfully.
                 data:
                   id: 1
                   profile_picture: "Link Profile Picture"
@@ -155,7 +159,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 200
-                message: Successfully changed profile details
+                message: Profile information updated successfully.
         "401":
           $ref: "#/components/responses/401"
         "400":
@@ -188,7 +192,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 200
-                message: Successfully Deleted User
+                message: Your account has been deleted. Thank you for using our service.
         404:
           description: User Not Found
           content:
@@ -399,7 +403,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 201
-                message: Successfully added product
+                message: Add product successful!
         "401":
           $ref: "#/components/responses/401"
         "400":
@@ -422,12 +426,16 @@ paths:
                 items:
                   $ref: "#/components/schemas/product"
               example:
-                - product_picture: "Link picture"
-                  product_name: "product A"
-                  price: 10000
-                - product_picture: "Link picture"
-                  product_name: "product B"
-                  price: 10000
+                message: Products retrieved successfully
+                data:
+                  - id: 1
+                    product_picture: "Link picture"
+                    product_name: "product A"
+                    price: 10000
+                  - id: 2
+                    product_picture: "Link picture"
+                    product_name: "product B"
+                    price: 10000
         "401":
           $ref: "#/components/responses/401"
         "500":
@@ -457,11 +465,15 @@ paths:
                       doctor_id: 5,
                       monday: "true",
                       tuesday: "true",
-                      wednesday: "false",
                       thursday: "true",
                       friday: "true",
                     }
-                  service: "vaksin"
+                  service:
+                    {
+                      vaccinations: "true",
+                      mcu: "true",
+                      online_consultations: "true",
+                    }
                   veterinary: "doctor name"
                   location: "alun-alun"
                   coordinate: "-7.981966354257,112.63094881813343"
@@ -479,7 +491,8 @@ paths:
                       thursday: "true",
                       friday: "true",
                     }
-                  service: "vaksin"
+                  service:
+                    { vaccinations: "true", online_consultations: "true" }
                   veterinary: "doctor name"
                   location: "alun-alun"
                   coordinate: "-7.981966354257,112.63094881813343"
@@ -509,10 +522,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/product"
               example:
-                product_picture: "Link picture"
-                product_name: "product A"
-                price: 10000
-                description: "Deskripsi product A"
+                message: Products retrieved successfully
+                data:
+                  product_picture: "Link picture"
+                  product_name: "product A"
+                  price: 10000
+                  description: "Deskripsi product A"
         "404":
           description: Product not found
           content:
@@ -556,7 +571,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 200
-                message: Successfully Changed Product Details
+                message: Product updated successfully
         "400":
           $ref: "#/components/responses/400"
         "404":
@@ -592,7 +607,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 200
-                message: Successfully Deleted Product
+                message: Product deleted successfully
         "404":
           description: Product Not Found
           content:
@@ -607,66 +622,47 @@ paths:
         "500":
           $ref: "#/components/responses/500"
 
-  /konsultasi:
-    post:
-      tags:
-        - konsultasi
-      description: Membuat jadwal konsultasi
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Konsultasi"
-            example:
-              dokter_id: 1
-              user_id: 1
-              jadwal: "2024-05-28T10:00:00Z"
-              tipe: "online"
-      responses:
-        "201":
-          description: Berhasil menambahkan jadwal konsultasi
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiDataResponse"
-              example:
-                code: 201
-                message: Berhasil menambahkan jadwal konsultasi
-                data:
-                  id: 1
-                  dokter_id: 1
-                  user_id: 1
-                  jadwal: "2024-05-28T10:00:00Z"
-                  tipe: "online"
-        "400":
-          $ref: "#/components/responses/400"
-        "500":
-          $ref: "#/components/responses/500"
-
-  /konsultasi/{id}:
+  /consultation:
     get:
       tags:
-        - konsultasi
+        - consultation
       description: Mendapatkan detail konsultasi
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       responses:
         "200":
           description: Berhasil mendapatkan detail konsultasi
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Konsultasi"
+                $ref: "#/components/schemas/consultation"
               example:
-                id: 1
-                dokter_id: 1
-                user_id: 1
-                jadwal: "2024-05-28T10:00:00Z"
-                tipe: "online"
+                message: "Consultations retrieved successfully"
+                data:
+                  - id: 1
+                    user_details:
+                      id: 3
+                      full_name: "user"
+                      profile_picture: "link picture"
+                    doctor_details:
+                      id: 11
+                      full_name: "doctor name"
+                      profile_picture: "link picture"
+                    service: "medical checkup"
+                    transaction_status: "Paid"
+                    consultation_status: "In Progress"
+                    scheduled_date: "2003-10-10"
+                  - id: 2
+                    user_details:
+                      id: 3
+                      full_name: "user"
+                      profile_picture: "link picture"
+                    doctor_details:
+                      id: 11
+                      full_name: "doctor name"
+                      profile_picture: "link picture"
+                    service: "medical checkup"
+                    transaction_status: "Paid"
+                    consultation_status: "In Progress"
+                    scheduled_date: "2003-10-10"
         "404":
           description: Konsultasi tidak ditemukan
           content:
@@ -679,9 +675,46 @@ paths:
         "500":
           $ref: "#/components/responses/500"
 
+  /consultation/{id}:
+    post:
+      tags:
+        - consultation
+      description: Membuat jadwal konsultasi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/consultation"
+            example:
+              scheduled_date: "2003-10-10"
+              tipe: "online"
+      responses:
+        "201":
+          description: Berhasil menambahkan jadwal konsultasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Berhasil menambahkan jadwal konsultasi
+                data:
+                  scheduled_date: "2024-05-28T10:00:00Z"
+                  tipe: "online"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
     put:
       tags:
-        - konsultasi
+        - consultation
       description: Mengubah detail konsultasi
       parameters:
         - in: path
@@ -694,10 +727,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Konsultasi"
+              $ref: "#/components/schemas/consultation"
             example:
-              jadwal: "2024-05-28T11:00:00Z"
-              tipe: "offline"
+              consultation_status: "In Progress"
       responses:
         "200":
           description: Berhasil mengubah jadwal konsultasi
@@ -709,11 +741,7 @@ paths:
                 code: 200
                 message: Berhasil mengubah jadwal konsultasi
                 data:
-                  id: 1
-                  dokter_id: 1
-                  user_id: 1
-                  jadwal: "2024-05-28T11:00:00Z"
-                  tipe: "offline"
+                  consultation_status: "In Progress"
         "400":
           $ref: "#/components/responses/400"
         "404":
@@ -757,7 +785,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 201
-                message: Message Sent Successfully
+                message: Chat created successfully
         "401":
           $ref: "#/components/responses/401"
         "400":
@@ -784,12 +812,36 @@ paths:
               schema:
                 $ref: "#/components/schemas/Chat"
               example:
-                id: 6
-                roomchat_id: 1
-                sender_id: 6
-                receiver_id: 1
-                message: "Chat"
-                time_stamp: "2024-06-02T05:15:55.312Z"
+                message: "Chats retrieved successfully"
+                data:
+                  - id: 6
+                    roomchat_id: 1
+                    sender:
+                      id: 1
+                      role: "user"
+                      full_name: "user test"
+                      profile_picture: "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/1717794313_almohada.jpeg"
+                    receiver:
+                      id: 2
+                      role: "admin"
+                      full_name: "admin test"
+                      profile_picture: "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/1717794313_admin.jpeg"
+                    message: "Chat"
+                    time_stamp: "2024-06-02T05:15:55.312Z"
+                  - id: 4
+                    roomchat_id: 1
+                    sender:
+                      id: 1
+                      role: "user"
+                      full_name: "user test"
+                      profile_picture: "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/1717794313_almohada.jpeg"
+                    receiver:
+                      id: 2
+                      role: "admin"
+                      full_name: "admin test"
+                      profile_picture: "https://air-bnb.s3.ap-southeast-2.amazonaws.com/profilepicture/1717794313_admin.jpeg"
+                    message: "Chat"
+                    time_stamp: "2024-06-02T05:15:55.312Z"
 
         "404":
           description: Chat History not found
@@ -824,7 +876,7 @@ paths:
                 $ref: "#/components/schemas/ApiDataResponse"
               example:
                 code: 200
-                message: Successfully Delete Message
+                message: Chat deleted successfully
         "404":
           description: Message Not Found
           content:
@@ -836,6 +888,296 @@ paths:
                 message: Message Not Found
         "401":
           $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /doctors:
+    post:
+      tags:
+        - doctor
+      description: Adding Doctor
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Doctor"
+            example:
+              fukka_name: "Doctor A"
+              about: "bla bla"
+              price: 30000
+              profile_picture: "Deskripsi product A"
+              monday: "true"
+              tuesday: "true"
+              wednesday: "true"
+              thursday: "false"
+              friday: "true"
+              vaccinations: "true"
+              operations: "false"
+              mcu: "false"
+              online_consultations: "true"
+      responses:
+        "201":
+          description: Successfully added doctor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: Doctor added successfully. Thank you.
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+    get:
+      tags:
+        - doctor
+      summary: Get all products for user
+      description: Gets the list of products displayed to the user
+      responses:
+        "200":
+          description: Successfully got the product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/product"
+              example:
+                message: Success get detail doctor profile
+                data:
+                  id: 1
+                  full_name: "Drh. Indra"
+                  price: 100000
+                  about: "Experience 15 years"
+                  profile_picture: "https://air-bnb.s3.ap-southeast-2.amazonaws.com/doctorpicture/1717800282_almohada.jpeg"
+                  available_days:
+                    monday: "true"
+                    wednesday: "true"
+                    thursday: "true"
+                  service:
+                    vaccinations: "true"
+                    mcu: "true"
+                    online_consultations: "true"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+    delete:
+      tags:
+        - doctor
+      description: Delete doctor
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Successfully Deleted Doctor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 200
+                message: Dcotor has been deleted. Thank you for using our service.
+        404:
+          description: User Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+              example:
+                code: 404
+                message: User Not Found
+        "401":
+          $ref: "#/components/responses/401"
+        500:
+          $ref: "#/components/responses/500"
+
+  /orders:
+    post:
+      tags:
+        - order
+      description: Create order
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/order"
+            example:
+              product_id: 1
+              quantity: 1
+      responses:
+        "201":
+          description: Successfully added doctor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: order created sucessfully
+                data:
+                  id: 1
+                  user_id: 1
+                  product_id: 1
+                  product_name: "makanan kucing"
+                  profile_picture: "www.gambar.com"
+                  quantity: 1
+                  price: 100000
+                  status: "created"
+                  invoice_id: "ORDER-09062024-4xxx"
+                  payment:
+                    id: 1
+                    order_id: 1
+                    payment_method: "bca"
+                    signature_id: "5684bae9-3983-49ea-aecf-5f6aba74xxx"
+                    va_number: "1671169xxxx"
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+
+    get:
+      tags:
+        - order
+      description: get order
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: orders retrieved sucessfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/product"
+              example:
+                code: 200
+                message: orders retrieved sucessfully
+                data:
+                  id: 1
+                  user_id: 1
+                  product_id: 1
+                  product_name: "makanan kucing"
+                  profile_picture: "www.gambar.com"
+                  quantity: 1
+                  price: 100000
+                  status: "created"
+                  invoice_id: "ORDER-09062024-4xxx"
+                  payment:
+                    id: 1
+                    order_id: 1
+                    payment_method: "bca"
+                    signature_id: "5684bae9-3983-49ea-aecf-5f6aba74xxx"
+                    va_number: "1671169xxxx"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /orders/{id}:
+    get:
+      tags:
+        - order
+      description: get order
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: orders retrieved sucessfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/product"
+              example:
+                code: 200
+                message: orders retrieved sucessfully
+                data:
+                  id: 1
+                  user_id: 1
+                  product_id: 1
+                  product_name: "makanan kucing"
+                  profile_picture: "www.gambar.com"
+                  quantity: 1
+                  price: 100000
+                  status: "created"
+                  invoice_id: "ORDER-09062024-4xxx"
+                  payment:
+                    id: 1
+                    order_id: 1
+                    payment_method: "bca"
+                    signature_id: "5684bae9-3983-49ea-aecf-5f6aba74xxx"
+                    va_number: "1671169xxxx"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
+
+  /payments:
+    post:
+      tags:
+        - payment
+      description: create payment
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/payment"
+            example:
+              payment_method: "bca"
+              order_id: 1
+      responses:
+        "201":
+          description: payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDataResponse"
+              example:
+                code: 201
+                message: payment created sucessfully
+                data:
+                  id: 1
+                  user_id: 1
+                  product_id: 1
+                  product_name: "makanan kucing"
+                  profile_picture: "www.gambar.com"
+                  quantity: 1
+                  price: 100000
+                  status: "pending"
+                  invoice_id: "ORDER-09062024-4xxx"
+                  payment:
+                    id: 1
+                    order_id: 1
+                    payment_method: "bca"
+                    signature_id: "5684bae9-3983-49ea-aecf-5f6aba74xxx"
+                    va_number: "1671169xxxx"
+
+        "401":
+          $ref: "#/components/responses/401"
+        "400":
+          $ref: "#/components/responses/400"
         "500":
           $ref: "#/components/responses/500"
 
@@ -931,19 +1273,22 @@ components:
         distance:
           type: integer
 
-    Konsultasi:
+    consultation:
       type: object
       properties:
         id:
           type: integer
-        dokter_id:
+        user_details:
+          type: object
+        doctor_details:
           type: integer
-        user_id:
-          type: integer
-        jadwal:
+        service:
           type: string
-          format: date-time
-        tipe:
+        transaction_status:
+          type: string
+        consultation_status:
+          type: string
+        scheduled_date:
           type: string
 
     ApiDataResponse:
@@ -963,11 +1308,105 @@ components:
           type: integer
         roomchat_id:
           type: integer
-        sender_id:
-          type: integer
+        sender:
+          type: object
+          properties:
+            id:
+              type: integer
+            role:
+              type: string
+            full_name:
+              type: string
+            profile_picture:
+              type: string
+        receiver:
+          type: object
+          properties:
+            id:
+              type: integer
+            role:
+              type: string
+            full_name:
+              type: string
+            profile_picture:
+              type: string
         message:
           type: string
         time_stamp:
+          type: string
+
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        price:
+          type: integer
+        about:
+          type: string
+        profile_picture:
+          type: string
+        available_days:
+          type: object
+          properties:
+            monday:
+              type: string
+            tuesday:
+              type: string
+            wednesday:
+              type: string
+            thursday:
+              type: string
+            friday:
+              type: string
+        services:
+          type: object
+          properties:
+            vaccinations:
+              type: string
+            operations:
+              type: string
+            mcu:
+              type: string
+            online_consultations:
+              type: string
+
+    order:
+      type: object
+      properties:
+        product_id:
+          type: integer
+        quantity:
+          type: integer
+        id:
+          type: integer
+        user_id:
+          type: integer
+        product_name:
+          type: string
+        product_picture:
+          type: string
+        price:
+          type: integer
+        status:
+          type: string
+
+    payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        order_id:
+          type: integer
+        payment_method:
+          type: string
+        signature_id:
+          type: string
+        billing_number:
+          type: string
+        invoice_id:
           type: string
 
     ApiResponse:

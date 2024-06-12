@@ -19,9 +19,6 @@ func (ps *PaymentService) FindOrCreatePayment(orderID uint, payment payment.Paym
 	return ps.paymentModel.FindOrCreatePayment(orderID, payment)
 }
 
-func (ps *PaymentService) GetPaymentByID(id uint) (data *payment.Payment, err error) {	
-	return ps.paymentModel.GetPaymentByID(id)	
-}
 
 func (ps *PaymentService) GetOrderByID(id uint) (data *order.Order, err error) {	
 	return ps.paymentModel.GetOrderByID(id)	
