@@ -71,6 +71,36 @@ func (_m *OrderModel) GetOrderByID(orderID uint) (*order.Order, error) {
 	return r0, r1
 }
 
+// GetOrderByInvoiceID provides a mock function with given fields: invoiceID
+func (_m *OrderModel) GetOrderByInvoiceID(invoiceID string) (*order.Order, error) {
+	ret := _m.Called(invoiceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOrderByInvoiceID")
+	}
+
+	var r0 *order.Order
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*order.Order, error)); ok {
+		return rf(invoiceID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *order.Order); ok {
+		r0 = rf(invoiceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*order.Order)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(invoiceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetOrdersByUserID provides a mock function with given fields: userID
 func (_m *OrderModel) GetOrdersByUserID(userID uint) ([]order.Order, error) {
 	ret := _m.Called(userID)
@@ -124,6 +154,34 @@ func (_m *OrderModel) GetProductByID(productID uint) (*order.Product, error) {
 
 	if rf, ok := ret.Get(1).(func(uint) error); ok {
 		r1 = rf(productID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateOrder provides a mock function with given fields: orderID, _a1
+func (_m *OrderModel) UpdateOrder(orderID uint, _a1 order.Order) (order.Order, error) {
+	ret := _m.Called(orderID, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateOrder")
+	}
+
+	var r0 order.Order
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint, order.Order) (order.Order, error)); ok {
+		return rf(orderID, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(uint, order.Order) order.Order); ok {
+		r0 = rf(orderID, _a1)
+	} else {
+		r0 = ret.Get(0).(order.Order)
+	}
+
+	if rf, ok := ret.Get(1).(func(uint, order.Order) error); ok {
+		r1 = rf(orderID, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}

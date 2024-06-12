@@ -43,6 +43,10 @@ func (cs *ConsultationService) GetConsultations(currentID uint, role string) ([]
 	}
 }
 
+func (cs *ConsultationService) GetCuntationsById(id uint) (*consultation.ConsultationCore, error) {
+	return cs.consultationModel.GetCuntationsById(id)
+}
+
 func (cs *ConsultationService) GetConsultationsByUserID(userID uint) ([]consultation.ConsultationCore, error) {
 	return cs.consultationModel.GetConsultationsByUserID(userID)
 }
