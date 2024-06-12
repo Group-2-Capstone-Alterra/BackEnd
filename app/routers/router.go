@@ -76,7 +76,7 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 	consultationHandlerAPI := _consultationHandler.New(consultationService, userData, doctorData)
 
 	chatData := _chatData.New(db)
-	chatService := _chatService.New(chatData, consultationData, doctorData, userData, adminData)
+	chatService := _chatService.New(chatData, consultationData, doctorData, userData, adminData, consultationService)
 	chatHandlerAPI := _chatHandler.New(chatService, consultationData, userData, doctorData, adminData)
 
 	paymentData := _paymentData.New(db)
@@ -135,5 +135,5 @@ func InitRouter(e *echo.Echo, db *gorm.DB, s3 *s3.S3, s3Bucket string, midtrans 
 	e.POST("/payments", paymentHandlerAPI.CreatePayment, middlewares.JWTMiddleware())
 
 	//webhook
-	e.POST("/webhook/midtrans_notification", _webhook.New(orderService, midtrans).MidtransWebhook )
+	e.POST("/webhook/midtrans_notification", _webhook.New(orderService, midtrans).MidtransWebhook)
 }
