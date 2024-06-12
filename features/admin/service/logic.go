@@ -120,7 +120,6 @@ func (as *AdminService) Update(adminid uint, updateData admin.Core, file io.Read
 
 func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) ([]clinic.Core, error) {
 	log.Println("[Service]")
-	// log.Println("[Service] sortStr", sortStr)
 	var allAdmin []admin.Core
 	var errAllAdmin error
 	if userid == 0 {
@@ -164,14 +163,12 @@ func (as *AdminService) GetAllClinic(userid uint, offset uint, sortStr string) (
 		return allClinic, nil
 	} else {
 		clinicSort := as.helper.SortClinicsByDistance(userid, allClinic)
-		// log.Println("[Service - Admin] allClinic", allClinic)
 		return clinicSort, nil
 	}
 }
 
 func (as *AdminService) GetClinic(id uint) (clinic.Core, error) {
 	log.Println("[Service]")
-	// log.Println("[Service] sortStr", sortStr)
 
 	dataAdmin, _ := as.AdminModel.AdminById(id)
 

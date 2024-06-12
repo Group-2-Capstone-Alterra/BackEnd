@@ -1,13 +1,5 @@
 package handler
 
-type PaymentResponse struct {
-	ID            uint   `json:"id"`
-	OrderID       uint   `json:"order_id"`
-	PaymentMethod string `json:"payment_method"`
-	SignatureID   string `json:"signature_id"`
-	VANumber      string `json:"va_number"`
-}
-
 type OrderResponse struct {
 	ID             uint            `json:"id"`
 	UserID         uint            `json:"user_id"`
@@ -19,4 +11,12 @@ type OrderResponse struct {
 	Status         string          `json:"status"`
 	InvoiceID      string          `json:"invoice_id"`
 	Payment        PaymentResponse `json:"payment"`
+}
+
+type PaymentResponse struct {
+	ID            uint   `json:"id"`
+	OrderID       uint   `json:"order_id"`
+	PaymentMethod string `json:"payment_method"`
+	SignatureID   string `json:"signature_id"`
+	VANumber      string `json:"va_number"`
 }

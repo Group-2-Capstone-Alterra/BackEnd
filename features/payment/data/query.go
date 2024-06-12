@@ -43,15 +43,6 @@ func (pm *PaymentModel) Update(orderID uint, updatedPayment payment.Payment) (pa
     return payment, nil
 }
 
-func (pm *PaymentModel) GetPaymentByID(paymentID uint) (*payment.Payment, error) {
-	var result payment.Payment
-	if err := pm.db.Where("id = ?", paymentID).First(&result).Error; err != nil {
-		return nil, err
-	}
-
-	return &result, nil 
-}
-
 func (pm *PaymentModel) GetOrderByID(orderID uint) (*order.Order, error) {
 	var result order.Order
 	if err := pm.db.Where("id = ?", orderID).First(&result).Error; err != nil {

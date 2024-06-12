@@ -62,7 +62,13 @@ func (ah *AdminHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, responses.JSONWebResponse("login failed: "+err.Error(), nil))
 	}
 	result.Token = token
-	var LoginResponse = ResponseLogin(result)
+	LoginResponse := LoginResponse {
+		ID:       result.ID,
+		Role:     result.Role,
+		FullName: result.FullName,
+		Email:    result.Email,
+		Token:    result.Token,
+	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("login successfull", LoginResponse))
 }
 
@@ -77,7 +83,16 @@ func (ah *AdminHandler) GetProfile(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.JSONWebResponse("get profile failed: "+err.Error(), nil))
 	}
 
-	adminResponse := ResponseProfile(*profile)
+	adminResponse := AdminResponse{
+		ID:       		profile.ID,
+		FullName: 		profile.FullName,
+		Email:    		profile.Email,
+		NumberPhone: 	profile.NumberPhone,
+		Role:     		profile.Role,
+		Address:  		profile.Address,
+		ProfilePicture: profile.ProfilePicture,
+		Coordinate:     profile.Coordinate,
+	}
 	return c.JSON(http.StatusOK, responses.JSONWebResponse("get profile successfull", adminResponse))
 }
 
